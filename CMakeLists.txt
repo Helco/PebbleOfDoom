@@ -56,6 +56,7 @@ set(sources_pcmockup
 
     pcmockup/pcmockup.h
     pcmockup/pcmockup.c
+    pcmockup/pebblewindow.c
 )
 assign_source_group(${sources_pcmockup})
 
