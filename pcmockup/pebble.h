@@ -53,4 +53,11 @@ enum
 #define APP_LOG(level,fmt,...) app_log(level, __FILE__, __LINE__, fmt __VA_ARGS__)
 void app_log(uint8_t log_level, const char *src_filename, int src_line_number, const char *fmt, ...);
 
+#define TRIG_MAX_RATIO 0xffff
+#define TRIG_MAX_ANGLE 0x10000
+
+int32_t sin_lookup(int32_t angle);
+int32_t cos_lookup(int32_t angle);
+int32_t atan2_lookup(int16_t y, int16_t x);
+
 #endif

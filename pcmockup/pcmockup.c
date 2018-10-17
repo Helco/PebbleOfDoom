@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
     int isRunning = 1;
     while (isRunning)
     {
-        uint32_t frameStart = SDL_GetTicks();
+        const uint32_t frameStart = SDL_GetTicks();
 
         pebbleWindow_update(pebbleWindow);
 
@@ -53,8 +53,8 @@ int main(int argc, char* argv[])
             }
         }
 
-        uint32_t frameEnd = SDL_GetTicks();
-        int delay = (1000 / MAX_FRAMERATE) - (int)(frameEnd - frameStart);
+        const uint32_t frameEnd = SDL_GetTicks();
+        const int delay = (1000 / MAX_FRAMERATE) - (int)(frameEnd - frameStart);
         if (delay > 0)
             SDL_Delay(delay);
     }
