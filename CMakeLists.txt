@@ -6,6 +6,11 @@ project(pebbleofdoom)
 ###################################################################
 
 find_package(SDL2 REQUIRED)
+set(CMAKE_C_STANDARD 11)
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    link_libraries(m)
+endif()
 
 ###################################################################
 # Utilities
@@ -24,8 +29,6 @@ function(assign_source_group)
         source_group("${_source_path_msvc}" FILES "${_source}")
     endforeach()
 endfunction(assign_source_group)
-
-# find_package(SDL REQUIRED)
 
 ###################################################################
 # PoD renderer
@@ -61,11 +64,11 @@ add_dependencies(pcmockup
     podrenderer
 )
 target_link_libraries(pcmockup
-    ${SDL_LIBRARY}
+    ${SDL2_LIBRARIES}
     podrenderer
 )
 target_include_directories(pcmockup PUBLIC
-    ${SDL_INCLUDE_DIR}
+    ${SDL2_INCLUDE_DIRS}
     "external/stb/"
     "renderer/"
 )
