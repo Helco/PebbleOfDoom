@@ -45,6 +45,10 @@ int main(int argc, char* argv[])
                 switch(event.key.keysym.sym)
                 {
                     case (SDLK_ESCAPE): { isRunning = 0; }break;
+                    case (SDLK_SPACE):
+                    {
+                        renderer_render(renderer, framebuffer);
+                    }break;
                 }
             }
         }
