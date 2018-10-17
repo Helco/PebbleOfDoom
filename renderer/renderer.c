@@ -29,5 +29,10 @@ void renderer_free(Renderer* this)
  */
 void renderer_render(Renderer* renderer, GColor* framebuffer)
 {
-    
+    for (int i = 0; i < RENDERER_WIDTH * RENDERER_HEIGHT; i++)
+    {
+        GColor color;
+        color.argb = rand() % 255;
+        framebuffer[i] = color;
+    }
 }
