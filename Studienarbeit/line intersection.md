@@ -18,3 +18,18 @@
 Source:
 - https://www.frustfrei-lernen.de/mathematik/schnittpunkt-zweier-geraden.html
 - http://rechen-fuchs.de/lagebeziehung-punkt-strecke/ 
+
+## Algorithmus 2: Alg. mit baryzentrischen Koordinaten
+1. Erste Strecke nehmen und die baryzentrischen Koordinaten der beiden Punkte der anderen Strecke berechnen
+2. Wenn beide Koordinaten auf einer Seite liegen gibt es keinen Schnittpunkt <br>
+3. Wenn nicht dann 1. und 2. Mit anderer Strecke durchführen
+4. Wenn diese auf einer Seite liege, so gibt es keinen Schnittpunkt
+5. Wenn diese auch auf entgegengesetzten Seiten liegen, ist ein schnittpunkt vorhanden <br>
+Ergebnis: Wissen ob ein Schnittpunkt vorhanden ist
+6. Schnittpunkt gegebenenfalls berechnen mit Schritt 1. und 2. des Algorithmus 1
+
+Source: Keine Quelle vorhanden da der Algorithmus selbst ausgedacht ist (vermutlich existiert dieser allerdings)
+
+### interesante Sache
+https://physik.cosmos-indirekt.de/Physik-Schule/Baryzentrische_Koordinaten <br>
+Beschreibt wie Parallelität zweier Geraden berechnet werden kann
