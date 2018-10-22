@@ -5,6 +5,8 @@ project(pebbleofdoom)
 # Dependencies
 ###################################################################
 
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/" ${CMAKE_MODULE_PATH})
+
 find_package(SDL2 REQUIRED)
 set(CMAKE_C_STANDARD 11)
 
@@ -65,11 +67,11 @@ add_dependencies(pcmockup
     podrenderer
 )
 target_link_libraries(pcmockup
-    ${SDL2_LIBRARIES}
+    ${SDL2_LIBRARY}
     podrenderer
 )
 target_include_directories(pcmockup PUBLIC
-    ${SDL2_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIR}
     "external/stb/"
     "renderer/"
 )

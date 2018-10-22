@@ -1,4 +1,6 @@
 #include "pcmockup.h"
+#include <stdio.h>
+#include <string.h>
 
 struct PebbleWindow
 {
