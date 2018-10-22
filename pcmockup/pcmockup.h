@@ -1,6 +1,6 @@
 #ifndef PCMOCKUP_H
 #define PCMOCKUP_H
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include "pebble.h"
 
 typedef struct PebbleWindow PebbleWindow;

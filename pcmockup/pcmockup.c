@@ -1,4 +1,3 @@
-#include <SDL2/SDL.h>
 #include <stdio.h>
 #include "pcmockup.h"
 #include "../renderer/renderer.h"
