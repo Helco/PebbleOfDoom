@@ -1,7 +1,6 @@
 var canvas = document.getElementById('myCanvas');
 var context = canvas.getContext('2d');
-
-var offx = 100, offy = 100;
+ var offx = 100, offy = 100;
 function line(x1, y1, x2, y2, color)
 {
   context.strokeStyle=color;
@@ -13,13 +12,12 @@ function line(x1, y1, x2, y2, color)
 }
 var cos = Math.cos;
 var sin = Math.sin;
-var DEGtoRAD = Math.PI / 180.0;
-
-function cross(x1,y1, x2,y2) {
+var tan = Math.tan;
+var DEGtoRAD = 3.141592653 / 180.0;
+ function cross(x1,y1, x2,y2) {
   return x1*y2 - y1*x2;
 }
-
-function intersect(x1,y1, x2,y2, x3,y3, x4,y4)
+ function intersect(x1,y1, x2,y2, x3,y3, x4,y4)
 {
   var x = cross(x1, y1, x2, y2);
   var y = cross(x3, y3, x4, y4);
@@ -28,26 +26,22 @@ function intersect(x1,y1, x2,y2, x3,y3, x4,y4)
   var iy = cross(x, y1-y2, y, y3-y4) / det;
   return [ix, iy];
 }
-
-var vx1 = 0, vy1 = 25*4;
+ var vx1 = 0, vy1 = 25*4;
 var vx2 = 70, vy2 = 25*4;
 var px = 30, py = -20;
 var angle = 130 * DEGtoRAD;
-setInterval(() => { angle += 1 * DEGtoRAD; drawstuff(); }, 16);
-
-function drawstuff() {
+setInterval(() => { angle += 2 * DEGtoRAD; drawstuff(); }, 16);
+ function drawstuff() {
   context.clearRect(0, 0, canvas.width, canvas.height);
   
 var tx1 = vx1 - px, ty1 = vy1 - py;
 var tx2 = vx2 - px, ty2 = vy2 - py;
-
-var tz1 = tx1 * cos(angle) + ty1 * sin(angle);
+ var tz1 = tx1 * cos(angle) + ty1 * sin(angle);
 var tz2 = tx2 * cos(angle) + ty2 * sin(angle);
 var tx1 = tx1 * sin(angle) - ty1 * cos(angle);
 var tx2 = tx2 * sin(angle) - ty2 * cos(angle);
 var u1 = 0.0, u2 = 1.0;
-
-function xchange(a, b) {
+ function xchange(a, b) {
   var tmp = a;
   a = b;
   b = tmp;
@@ -57,16 +51,13 @@ if (tx2 > tx1) {
   [tx1, tx2] = xchange(tx1, tx2);
   [tz1, tz2] = xchange(tz1, tz2);
 }
-
-
-var hfov = 90.0 / 2;
+ var hfov = 30.0 / 2;
 var nz = 0.0001, fz = 100.0;
-var nx = nz / cos(hfov * DEGtoRAD);
-var fx = fz / cos(hfov * DEGtoRAD);
+var nx = tan(hfov * DEGtoRAD) * nz;
+var fx = tan(hfov * DEGtoRAD) * fz;
 var [ ix1, iz1 ] = intersect(tx1, tz1, tx2, tz2, -nx, nz, -fx, fz);
 var [ ix2, iz2 ] = intersect(tx1, tz1, tx2, tz2, nx, nz, fx, fz);
-
-var otx1 = tx1, otx2 = tx2;
+ var otx1 = tx1, otx2 = tx2;
 var rw1 = (ix2 - tx1) / (tx2 - tx1);
 if (rw1 >= 0.0 && rw1 <= 1.0) {
   tx1 = ix2;
@@ -84,10 +75,9 @@ if ((iz1 < 0 && iz2 > 0 && tz1 < iz2 && tz2 < iz2) ||
   {
     tz1 = tz2 = -1 / 0;
   }
-
-var plane_width = 200;
+ var plane_width = 200;
 var plane_height = 100;
-var fov_stuff = (plane_width * Math.cos(hfov * DEGtoRAD)) / Math.tan(hfov * DEGtoRAD);
+var fov_stuff = (plane_width ) / Math.tan(hfov * DEGtoRAD);
 var height = 25;
 var height_off = -0;
 var x1 = -tx1 * fov_stuff / tz1,
@@ -110,8 +100,7 @@ line(nx, nz, fx, fz, "blue");
 line(-nx, nz, -fx, fz, "blue");
 line (ix1, iz1 - 3, ix1, iz1 + 3, "green");
 line (ix2, iz2 - 3, ix2, iz2 + 3, "green");
-
-offx = 800;
+ offx = 800;
 line (-plane_width, 0, +plane_width, 0, "black");
 if (tz1 > 0 && tz2 > 0) {
 line (x1, y1a, x2, y2a, "black");
