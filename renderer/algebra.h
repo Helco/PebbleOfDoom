@@ -18,7 +18,11 @@ typedef float real_t;
 #error You did not specify a real_t implementation
 #endif
 
-extern real_t real_one, real_zero;
+extern const real_t
+    real_one,
+    real_zero,
+    real_pi,
+    real_2pi;
 
 real_t real_from_int(int i);
 real_t real_add(real_t a, real_t b);

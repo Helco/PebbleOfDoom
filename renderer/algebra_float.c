@@ -3,8 +3,10 @@
 #ifdef REAL_USE_FLOAT
 #include <math.h>
 
-real_t real_one = 1.0f;
-real_t real_zero = 0.0f;
+const real_t real_one = 1.0f;
+const real_t real_zero = 0.0f;
+const real_t real_pi = 3.141592653f;
+const real_t real_2pi = 2 * 3.141592653f;
 
 real_t real_from_int(int i)
 {
