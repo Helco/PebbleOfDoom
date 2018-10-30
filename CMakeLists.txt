@@ -39,12 +39,18 @@ endfunction(assign_source_group)
 set(sources_podrenderer
     renderer/renderer.h
     renderer/renderer.c
+    renderer/algebra_float.c
+    renderer/algebra.h
+    renderer/algebra.c
 )
 assign_source_group(${sources_podrenderer})
 
 add_library(podrenderer ${sources_podrenderer})
 target_include_directories(podrenderer PUBLIC
     "pcmockup/" # to access pebble.h
+)
+target_compile_definitions(podrenderer
+    PUBLIC REAL_USE_FLOAT
 )
 
 ###################################################################
