@@ -29,8 +29,8 @@ var DEGtoRAD = 3.141592653 / 180.0;
  var vx1 = 0, vy1 = 25*4;
 var vx2 = 70, vy2 = 25*4;
 var px = 30, py = -20;
-var angle = 130 * DEGtoRAD;
-setInterval(() => { angle += 2 * DEGtoRAD; drawstuff(); }, 16);
+var angle = 90 * DEGtoRAD;
+setInterval(() => { angle += 1 * DEGtoRAD; drawstuff(); }, 16);
  function drawstuff() {
   context.clearRect(0, 0, canvas.width, canvas.height);
   
@@ -51,7 +51,7 @@ if (tx2 > tx1) {
   [tx1, tx2] = xchange(tx1, tx2);
   [tz1, tz2] = xchange(tz1, tz2);
 }
- var hfov = 30.0 / 2;
+ var hfov = 90.0 / 2;
 var nz = 0.0001, fz = 100.0;
 var nx = tan(hfov * DEGtoRAD) * nz;
 var fx = tan(hfov * DEGtoRAD) * fz;
@@ -70,11 +70,7 @@ if (rw2 >= 0.0 && rw2 <= 1.0) {
   tz2 = iz1;
   u2 = rw2;
 }
-if ((iz1 < 0 && iz2 > 0 && tz1 < iz2 && tz2 < iz2) ||
-    (iz2 < 0 && iz1 > 0 && tz1 < iz1 && tz2 < iz1))
-  {
-    tz1 = tz2 = -1 / 0;
-  }
+   
  var plane_width = 200;
 var plane_height = 100;
 var fov_stuff = (plane_width ) / Math.tan(hfov * DEGtoRAD);
@@ -86,6 +82,15 @@ var x1 = -tx1 * fov_stuff / tz1,
 var x2 = -tx2 * fov_stuff / tz2,
     y2a = plane_height * (-height/2 - height_off) / tz2,
     y2b = plane_height * (height/2 - height_off) / tz2;
+   
+function is_bullshit(x) { return x <= -plane_width || x >= plane_width; }
+if ((is_bullshit(x1) && is_bullshit(x2)) || (tz1 < 0 && tz2 < 0)) {
+  tz1 = tz2 = 1 / 0;
+  y1a = y2a = y1b = y2b = 50000;
+  console.log("hi");
+}
+   else
+     console.log("not");
   
 offx = 0;
 line(px, py, px + cos(angle) * 25, py + sin(angle) * 25, "red");
@@ -102,7 +107,7 @@ line (ix1, iz1 - 3, ix1, iz1 + 3, "green");
 line (ix2, iz2 - 3, ix2, iz2 + 3, "green");
  offx = 800;
 line (-plane_width, 0, +plane_width, 0, "black");
-if (tz1 > 0 && tz2 > 0) {
+
 line (x1, y1a, x2, y2a, "black");
 line (x1, y1b, x2, y2b, "black");
 line (x1, y1a, x1, y1b, "red");
@@ -116,5 +121,4 @@ for (var i = 0.1; i <= 0.9; i+=0.1)
     var ly2 = y1b + (y2b - y1b) * i;
     line(lx, ly1, lx, ly2, `hsl(${ Math.floor(u * 300 + 50) }, 100%, 50%)`);
   }
-}
 }
