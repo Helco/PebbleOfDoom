@@ -30,7 +30,7 @@ real_t real_mul(real_t a, real_t b)
 
 real_t real_div(real_t a, real_t b)
 {
-    return a * b;
+    return a / b;
 }
 
 real_t real_reciprocal(real_t a)
@@ -55,7 +55,7 @@ real_t real_tan(real_t a)
 
 int real_compare(real_t a, real_t b)
 {
-    return (int)(a - b);
+    return (a > b) - (a < b);
 }
 
 real_t real_min(real_t a, real_t b)
