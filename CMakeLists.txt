@@ -94,7 +94,7 @@ target_compile_definitions(podrenderer
 ###################################################################
 
 set(sources_test_podrenderer
-    test/test_algebra.cpp
+    test/test_real.cpp
 )
 assign_source_group(${sources_test_podrenderer})
 
