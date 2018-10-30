@@ -18,6 +18,9 @@ This interface is to be implemented with several variants (float, fixed-point-64
 Also it should warn on not-pebble-hardware platforms when information is lost.
 
 ```
+extern real_t real_one, real_zero;
+
+real_t real_from_int(int a);
 real_t real_add(real_t a, real_t b);
 real_t real_sub(real_t a, real_t b);
 real_t real_mul(real_t a, real_t b);
@@ -55,6 +58,7 @@ xy_t xy_scale(xy_t a, real_t f);
 xy_t xy_invScale(xy_t a, real_t f);
 real_t xy_cross(xy_t a, xy_t b);
 real_t xy_dot(xy_t a, xy_t b);
+xy_t xy_orthogonal(xy_t a);
 ```
 
 # Line-intersection
