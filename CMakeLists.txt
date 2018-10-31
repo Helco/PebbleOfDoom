@@ -97,6 +97,7 @@ set(sources_test_podrenderer
     test/fixtures.h
     test/test_real.cpp
     test/test_vector.cpp
+    test/test_intersection.cpp
 )
 assign_source_group(${sources_test_podrenderer})
 
