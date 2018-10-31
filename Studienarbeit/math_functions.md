@@ -19,6 +19,7 @@ Also it should warn on not-pebble-hardware platforms when information is lost.
 
 ```
 extern real_t real_one, real_zero;
+extern real_t real_pi, real_2pi;
 
 real_t real_from_int(int a);
 real_t real_add(real_t a, real_t b);
@@ -35,6 +36,16 @@ int real_compare(real_t a, real_t b);
 real_t real_min(real_t a, real_t b);
 real_t real_max(real_t a, real_t b);
 real_t real_abs(real_t a);
+
+int real_to_int(real_t a);
+int real_to_string(real_t a, char* str, int maxlen); // returns number of characters written
+real_t real_floor(real_t a);
+real_t real_ceil(real_t a);
+real_t real_round(real_t a);
+real_t real_fractional(real_t a);
+real_t real_sqrt(real_t a);
+real_t real_invSqrt(real_t a); // reciprocal of sqrt, may be faster to calculate than 1 / sqrt
+// no real_integer as this is equivalent to real_floor
 ```
 
 # Vector 2-dimensional
@@ -59,6 +70,9 @@ xy_t xy_invScale(xy_t a, real_t f);
 real_t xy_cross(xy_t a, xy_t b);
 real_t xy_dot(xy_t a, xy_t b);
 xy_t xy_orthogonal(xy_t a);
+real_t xy_lengthSqr(xy_t x); // sometimes only |v|^2 is needed
+real_t xy_length(xy_t x);
+xy_t xy_normalize(xy_t x);
 ```
 
 # Line-intersection
