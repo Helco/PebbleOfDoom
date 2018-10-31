@@ -60,6 +60,8 @@ struct xy_t {
     real_t x, y;
 };
 
+extern xy_t xy_one, xy_zero, xy_right, xy_up, xy_left, xy_down;
+extern xz_t xz_one, xz_zero, xz_right, xz_forward, xz_left, xz_backward;
 xy_t xy(real_t x, real_t y);
 xz_t xz(real_t x, real_t z);
 xy_t xy_add(xy_t a, xy_t b);
