@@ -96,6 +96,7 @@ target_compile_definitions(podrenderer
 set(sources_test_podrenderer
     test/fixtures.h
     test/test_real.cpp
+    test/test_vector.cpp
 )
 assign_source_group(${sources_test_podrenderer})
 
