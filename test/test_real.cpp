@@ -1,28 +1,8 @@
-#include <gtest/gtest.h>
-#include <gtest/gtest-spi.h>
-#include "podrenderer.h"
+#include "fixtures.h"
 
-class AlgebraReal : public testing::Test {
-protected:
-    const real_t minus_one = real_from_int(-1);
-    const real_t positive = real_div(real_one, real_from_int(42));
-    const real_t negative = real_div(real_from_int(-1), real_from_int(56));
-    const real_t one_third = real_div(real_one, real_from_int(3));
-    const real_t two_thirds = real_div(real_from_int(2), real_from_int(3));
-    const real_t two = real_from_int(2);
-    const real_t three = real_from_int(3);
-    const real_t four = real_from_int(4);
-    const real_t halfpi = real_div(real_pi, real_from_int(2));
+class TestAlgebraReal : public MathFixture { };
 
-    void expectApproxEq(real_t expected, real_t actual, real_t precFrac = real_from_int(20))
-    {
-        real_t precision = real_div(real_one, precFrac);
-        EXPECT_LE(0, real_compare(actual, real_sub(expected, precision)));
-        EXPECT_GE(0, real_compare(actual, real_add(expected, precision)));
-    }
-};
-
-TEST_F(AlgebraReal, real_constants) {
+TEST_F(TestAlgebraReal, real_constants) {
     EXPECT_EQ(real_one, real_from_int(1));
     EXPECT_EQ(real_zero, real_from_int(0));
     EXPECT_EQ(real_from_int(0), real_from_int(0));
@@ -37,7 +17,7 @@ TEST_F(AlgebraReal, real_constants) {
     EXPECT_NE(real_pi, real_2pi);
 }
 
-TEST_F(AlgebraReal, real_compare) {
+TEST_F(TestAlgebraReal, real_compare) {
     EXPECT_EQ(0, real_compare(real_zero, real_zero));
     EXPECT_EQ(0, real_compare(real_one, real_one));
 
@@ -53,7 +33,7 @@ TEST_F(AlgebraReal, real_compare) {
     EXPECT_GT(0, real_compare(negative, positive));
 }
 
-TEST_F(AlgebraReal, real_minmax) {
+TEST_F(TestAlgebraReal, real_minmax) {
     EXPECT_EQ(negative, real_min(negative, positive));
     EXPECT_EQ(negative, real_min(positive, negative));
     EXPECT_EQ(positive, real_max(negative, positive));
@@ -68,7 +48,7 @@ TEST_F(AlgebraReal, real_minmax) {
     EXPECT_EQ(real_zero, real_min(positive, real_zero));
 }
 
-TEST_F(AlgebraReal, real_abs) {
+TEST_F(TestAlgebraReal, real_abs) {
     EXPECT_EQ(real_one, real_abs(minus_one));
     EXPECT_EQ(real_one, real_abs(real_one));
     EXPECT_EQ(real_zero, real_abs(real_zero));
@@ -77,7 +57,7 @@ TEST_F(AlgebraReal, real_abs) {
     EXPECT_EQ(real_mul(minus_one, negative), real_abs(negative));
 }
 
-TEST_F(AlgebraReal, real_add) {
+TEST_F(TestAlgebraReal, real_add) {
     EXPECT_EQ(real_one, real_add(real_zero, real_one));
     EXPECT_EQ(real_zero, real_add(minus_one, real_one));
     EXPECT_EQ(real_zero, real_add(real_one, minus_one));
@@ -87,7 +67,7 @@ TEST_F(AlgebraReal, real_add) {
     EXPECT_EQ(real_one, real_add(two_thirds, one_third));
 }
 
-TEST_F(AlgebraReal, real_sub) {
+TEST_F(TestAlgebraReal, real_sub) {
     EXPECT_EQ(minus_one, real_sub(real_zero, real_one));
     EXPECT_EQ(real_from_int(-2), real_sub(minus_one, real_one));
     EXPECT_EQ(real_from_int(2), real_sub(real_one, minus_one));
@@ -96,7 +76,7 @@ TEST_F(AlgebraReal, real_sub) {
     EXPECT_EQ(one_third, real_sub(two_thirds, one_third));
 }
 
-TEST_F(AlgebraReal, real_mul) {
+TEST_F(TestAlgebraReal, real_mul) {
     EXPECT_EQ(real_from_int(12), real_mul(three, real_from_int(4)));
     EXPECT_EQ(real_from_int(12), real_mul(real_from_int(12), real_one));
     EXPECT_EQ(real_zero, real_mul(real_zero, real_one));
@@ -109,7 +89,7 @@ TEST_F(AlgebraReal, real_mul) {
     EXPECT_EQ(real_one, real_mul(three, one_third));
 }
 
-TEST_F(AlgebraReal, real_div) {
+TEST_F(TestAlgebraReal, real_div) {
     EXPECT_EQ(real_from_int(4), real_div(real_from_int(12), three));
     EXPECT_EQ(real_zero, real_div(real_zero, real_one));
     EXPECT_EQ(real_zero, real_div(real_zero, minus_one));
@@ -119,14 +99,14 @@ TEST_F(AlgebraReal, real_div) {
     EXPECT_EQ(one_third, real_div(real_one, three));
 }
 
-TEST_F(AlgebraReal, real_reciprocal) {
+TEST_F(TestAlgebraReal, real_reciprocal) {
     EXPECT_EQ(one_third, real_reciprocal(three));
     EXPECT_EQ(three, real_reciprocal(one_third));
     EXPECT_EQ(real_one, real_reciprocal(real_one));
     EXPECT_EQ(minus_one, real_reciprocal(minus_one));
 }
 
-TEST_F(AlgebraReal, real_sincostan) {
+TEST_F(TestAlgebraReal, real_sincostan) {
     expectApproxEq(real_zero, real_sin(real_zero));
     expectApproxEq(real_one, real_sin(halfpi));
     expectApproxEq(real_zero, real_sin(real_pi));
