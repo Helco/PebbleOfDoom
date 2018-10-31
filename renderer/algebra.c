@@ -120,7 +120,11 @@ bool_t xz_intersect(lineSeg_t seg1, lineSeg_t seg2, lineIntersection_t* result)
         real_div(ix, det),
         real_div(iz, det)
     );
-    result->phase1 = real_div(result->xz.x, seg1Vector.x);
-    result->phase2 = real_div(result->xz.x, seg2Vector.x);
+    result->phase1 = real_compare(seg1Vector.x, real_zero) != 0
+        ? real_div(real_sub(seg1.start.xz.x, result->xz.x), seg1Vector.x)
+        : real_div(real_sub(seg1.start.xz.z, result->xz.z), seg1Vector.z);
+    result->phase2 = real_compare(seg2Vector.x, real_zero) != 0
+        ? real_div(real_sub(seg2.start.xz.x, result->xz.x), seg2Vector.x)
+        : real_div(real_sub(seg2.start.xz.z, result->xz.z), seg2Vector.z);
     return true;
 }
