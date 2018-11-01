@@ -151,3 +151,20 @@ TEST_F(TestAlgebraReal, real_sincostan) {
     expectApproxEq(real_tan(one_third), real_div(real_sin(one_third), real_cos(one_third)));
     expectApproxEq(real_tan(two_thirds), real_div(real_sin(two_thirds), real_cos(two_thirds)));
 }
+
+TEST_F(TestAlgebraReal, real_degToRad) {
+    expectApproxEq(real_zero, real_degToRad(real_from_int(0)));
+    expectApproxEq(halfpi, real_degToRad(real_from_int(90)));
+    expectApproxEq(real_pi, real_degToRad(real_from_int(180)));
+    expectApproxEq(real_add(real_pi, halfpi), real_degToRad(real_from_int(270)));
+    expectApproxEq(real_2pi, real_degToRad(real_from_int(360)));
+}
+
+TEST_F(TestAlgebraReal, real_radToDeg) {
+    expectApproxEq(real_from_int(0), real_radToDeg(real_zero));
+    expectApproxEq(real_from_int(90), real_radToDeg(halfpi));
+    expectApproxEq(real_from_int(180), real_radToDeg(real_pi));
+    expectApproxEq(real_from_int(270), real_radToDeg(real_add(real_pi, halfpi)));
+    expectApproxEq(real_from_int(360), real_radToDeg(real_2pi));
+}
+

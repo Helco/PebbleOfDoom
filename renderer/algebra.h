@@ -37,6 +37,8 @@ real_t real_reciprocal(real_t a);
 real_t real_sin(real_t a); // in radians
 real_t real_cos(real_t a);
 real_t real_tan(real_t a);
+real_t real_degToRad(real_t deg);
+real_t real_radToDeg(real_t rad);
 
 int real_compare(real_t a, real_t b);
 bool_t real_inBetween(real_t value, real_t min, real_t max);

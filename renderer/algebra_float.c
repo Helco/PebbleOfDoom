@@ -64,6 +64,16 @@ real_t real_tan(real_t a)
     return tanf(a);
 }
 
+real_t real_degToRad(real_t deg)
+{
+    return deg * 3.141592653f / 180.0f;
+}
+
+real_t real_radToDeg(real_t rad)
+{
+    return rad * 180.0f / 3.141592653f;
+}
+
 int real_compare(real_t a, real_t b)
 {
     return (a > b) - (a < b);
