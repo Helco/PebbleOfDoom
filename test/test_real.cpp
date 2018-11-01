@@ -33,6 +33,19 @@ TEST_F(TestAlgebraReal, real_compare) {
     EXPECT_GT(0, real_compare(negative, positive));
 }
 
+TEST_F(TestAlgebraReal, real_inBetween) {
+    EXPECT_TRUE(real_inBetween(one_half, real_zero, real_one));
+    EXPECT_TRUE(real_inBetween(real_zero, real_zero, real_one));
+    EXPECT_TRUE(real_inBetween(real_one, real_zero, real_one));
+    EXPECT_FALSE(real_inBetween(minus_one, real_zero, real_one));
+    EXPECT_FALSE(real_inBetween(negative, real_zero, real_one));
+    EXPECT_FALSE(real_inBetween(four, real_zero, real_one));
+    EXPECT_FALSE(real_inBetween(four, minus_one, three));
+    EXPECT_TRUE(real_inBetween(real_zero, negative, positive));
+
+    EXPECT_FALSE(real_inBetween(real_zero, positive, negative));
+}
+
 TEST_F(TestAlgebraReal, real_minmax) {
     EXPECT_EQ(negative, real_min(negative, positive));
     EXPECT_EQ(negative, real_min(positive, negative));
@@ -55,6 +68,14 @@ TEST_F(TestAlgebraReal, real_abs) {
     EXPECT_EQ(positive, real_abs(positive));
 
     EXPECT_EQ(real_mul(minus_one, negative), real_abs(negative));
+}
+
+TEST_F(TestAlgebraReal, real_signInt) {
+    EXPECT_EQ(1, real_signInt(real_one));
+    EXPECT_EQ(1, real_signInt(real_zero));
+    EXPECT_EQ(1, real_signInt(positive));
+    EXPECT_EQ(-1, real_signInt(negative));
+    EXPECT_EQ(-1, real_signInt(minus_one));
 }
 
 TEST_F(TestAlgebraReal, real_add) {

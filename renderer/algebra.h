@@ -39,9 +39,11 @@ real_t real_cos(real_t a);
 real_t real_tan(real_t a);
 
 int real_compare(real_t a, real_t b);
+bool_t real_inBetween(real_t value, real_t min, real_t max);
 real_t real_min(real_t a, real_t b);
 real_t real_max(real_t a, real_t b);
 real_t real_abs(real_t a);
+int real_signInt(real_t a);
 
 real_t real_floor(real_t a);
 real_t real_ceil(real_t a);

@@ -69,6 +69,11 @@ int real_compare(real_t a, real_t b)
     return (a > b) - (a < b);
 }
 
+bool_t real_inBetween(real_t value, real_t min, real_t max)
+{
+    return value >= min && value <= max;
+}
+
 real_t real_min(real_t a, real_t b)
 {
     return a < b ? a : b;
@@ -82,6 +87,11 @@ real_t real_max(real_t a, real_t b)
 real_t real_abs(real_t a)
 {
     return a < 0 ? -a : a;
+}
+
+int real_signInt(real_t a)
+{
+    return a < 0 ? -1 : 1;
 }
 
 real_t real_floor(real_t a)
