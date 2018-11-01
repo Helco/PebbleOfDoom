@@ -45,3 +45,44 @@ TEST_F(TestIntersection, out_of_segment) {
     expectApproxEq(real_mul(one_third, minus_one), xz_linePhase(seg1, intersection));
     expectApproxEq(one_half, xz_linePhase(seg2, intersection));
 }
+
+TEST_F(TestIntersection, same_line_segment) {
+    lineSeg_t seg;
+    seg.start.xy = xy(real_zero, real_zero);
+    seg.end.xy = xy(three, real_zero);
+
+    xy_t intersection;
+    EXPECT_FALSE(xy_lineIntersect(seg, seg, &intersection));
+}
+
+TEST_F(TestIntersection, small_angle) {
+    lineSeg_t seg1;
+    seg1.start.xz = xz(real_zero, real_one);
+    seg1.end.xz = xz(three, real_one);
+    lineSeg_t seg2;
+    seg2.start.xz = xz(real_zero, real_sub(real_one, positive));
+    seg2.end.xz = xz(three, real_add(real_one, positive));
+
+    xz_t intersection;
+    EXPECT_TRUE(xz_lineIntersect(seg1, seg2, &intersection));
+    expectApproxEq(real_add(real_one, one_half), intersection.x);
+    expectApproxEq(real_one, intersection.z);
+    expectApproxEq(one_half, xz_linePhase(seg1, intersection));
+    expectApproxEq(one_half, xz_linePhase(seg2, intersection));
+}
+
+TEST_F(TestIntersection, ends_in_intersection) {
+    lineSeg_t seg1;
+    seg1.start.xz = xz(real_zero, real_one);
+    seg1.end.xz = xz(three, real_one);
+    lineSeg_t seg2;
+    seg2.start.xz = xz(real_zero, real_zero);
+    seg2.end.xz = xz(real_one, real_one);
+
+    xz_t intersection;
+    EXPECT_TRUE(xz_lineIntersect(seg1, seg2, &intersection));
+    expectApproxEq(real_one, intersection.x);
+    expectApproxEq(real_one, intersection.z);
+    expectApproxEq(one_third, xz_linePhase(seg1, intersection));
+    expectApproxEq(real_one, xz_linePhase(seg2, intersection));
+}
