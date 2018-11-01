@@ -2,6 +2,18 @@
 
 class TestAlgebraVector : public MathFixture { };
 
+TEST_F(TestAlgebraVector, constants) {
+    // To test macro evaluation
+    xy_t xyone = xy_one;
+    xy_t xyzero = xy_zero;
+    xy_t xyright = xy_right;
+    xy_t xyup = xy_up;
+    xz_t xzone = xz_one;
+    xz_t xzzero = xz_zero;
+    xz_t xzright = xz_right;
+    xz_t xzforward = xz_forward;
+}
+
 TEST_F(TestAlgebraVector, constructor) {
     xy_t v1 = xy(real_one, real_zero);
     EXPECT_EQ(real_one, v1.x);
@@ -66,7 +78,7 @@ TEST_F(TestAlgebraVector, orthogonal) {
     /* TODO: Enable after implementing xy_lengthSqr
     real_t l1 = xy_lengthSqr(v1);
     real_t l2 = xy_lengthSqr(v2);
-    real_t l3 = xy_lengthSqr(v3);    
+    real_t l3 = xy_lengthSqr(v3);
     expectApproxEq(l1, l2);
     expectApproxEq(l2, l3);
 

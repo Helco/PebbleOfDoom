@@ -61,7 +61,10 @@ typedef struct xy_t {
     real_t x, y;
 } xy_t;
 
-extern xy_t xy_one, xy_zero, xy_right, xy_up, xy_left, xy_down;
+#define xy_one (xy(real_one, real_one))
+#define xy_zero (xy(real_zero, real_zero))
+#define xy_right (xy(real_one, real_zero))
+#define xy_up (xy(real_zero, real_one))
 xy_t xy(real_t x, real_t y);
 xy_t xy_add(xy_t a, xy_t b);
 xy_t xy_sub(xy_t a, xy_t b);
@@ -74,7 +77,10 @@ real_t xy_lengthSqr(xy_t x);
 real_t xy_length(xy_t x);
 xy_t xy_normalize(xy_t x);
 
-extern xz_t xz_one, xz_zero, xz_right, xz_forward, xz_left, xz_backward;
+#define xz_one (xz(real_one, real_one))
+#define xz_zero (xz(real_zero, real_zero))
+#define xz_right (xz(real_one, real_zero))
+#define xz_forward (xz(real_zero, real_one))
 xz_t xz(real_t x, real_t z);
 xz_t xz_add(xz_t a, xz_t b);
 xz_t xz_sub(xz_t a, xz_t b);
