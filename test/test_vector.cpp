@@ -75,14 +75,41 @@ TEST_F(TestAlgebraVector, orthogonal) {
 
     expectApproxEq(real_zero, xy_dot(v1, v2));
 
-    /* TODO: Enable after implementing xy_lengthSqr
     real_t l1 = xy_lengthSqr(v1);
     real_t l2 = xy_lengthSqr(v2);
     real_t l3 = xy_lengthSqr(v3);
     expectApproxEq(l1, l2);
     expectApproxEq(l2, l3);
 
-    xy_t v1_dot_v3 = xy_dot(v1, v3);
-    expectApproxEq(l1, xy_length(v1_dot_v3));
-    */
+    real_t v1_dot_v3 = real_abs(xy_dot(v1, v3));
+    expectApproxEq(l1, v1_dot_v3);
+}
+
+TEST_F(TestAlgebraVector, lengthSqr) {
+    xy_t v1 = xy(real_one, two);
+    expectApproxEq(real_from_int(5), xy_lengthSqr(v1));
+
+    xy_t v2 = xy(minus_one, real_one);
+    expectApproxEq(two, xy_lengthSqr(v2));
+
+    expectApproxEq(real_zero, xy_lengthSqr(xy_zero));
+}
+
+TEST_F(TestAlgebraVector, length) {
+    xy_t v1 = xy(real_sqrt(real_from_int(7)), three);
+    expectApproxEq(four, xy_length(v1));
+
+    xy_t v2 = xy(real_zero, real_one);
+    expectApproxEq(real_one, xy_length(v2));
+
+    expectApproxEq(real_zero, xy_length(xy_zero));
+}
+
+TEST_F(TestAlgebraVector, normalize) {
+    xy_t v1 = xy_normalize(xy(three, real_zero));
+    expectApproxEq(real_one, v1.x);
+    expectApproxEq(real_zero, v1.y);
+
+    xy_t v2 = xy_normalize(xy(one_third, two_thirds));
+    expectApproxEq(real_one, xy_length(v2));
 }
