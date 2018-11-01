@@ -168,3 +168,22 @@ TEST_F(TestAlgebraReal, real_radToDeg) {
     expectApproxEq(real_from_int(360), real_radToDeg(real_2pi));
 }
 
+TEST_F(TestAlgebraReal, real_floor) {
+    expectApproxEq(real_zero, real_floor(one_half));
+    expectApproxEq(real_zero, real_floor(one_third));
+    expectApproxEq(real_zero, real_floor(two_thirds));
+    expectApproxEq(real_one, real_floor(real_one));
+    expectApproxEq(real_zero, real_floor(real_zero));
+    expectApproxEq(minus_one, real_floor(minus_one));
+    expectApproxEq(minus_one, real_floor(negative));
+}
+
+TEST_F(TestAlgebraReal, real_ceil) {
+    expectApproxEq(real_one, real_ceil(one_half));
+    expectApproxEq(real_one, real_ceil(one_third));
+    expectApproxEq(real_one, real_ceil(two_thirds));
+    expectApproxEq(real_one, real_ceil(real_one));
+    expectApproxEq(real_zero, real_ceil(real_zero));
+    expectApproxEq(minus_one, real_ceil(minus_one));
+    expectApproxEq(real_zero, real_ceil(negative));
+}
