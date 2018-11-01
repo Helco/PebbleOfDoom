@@ -2,6 +2,7 @@
 
 #ifdef REAL_USE_FLOAT
 #include <math.h>
+#include <pebble.h>
 
 const real_t real_one = 1.0f;
 const real_t real_zero = 0.0f;
@@ -11,6 +12,16 @@ const real_t real_2pi = 2 * 3.141592653f;
 real_t real_from_int(int i)
 {
     return (real_t)i;
+}
+
+int real_to_int(real_t a)
+{
+    return (real_t)a;
+}
+
+int real_to_string(real_t a, char* str, int maxlen)
+{
+    return snprintf(str, maxlen, "%f", a);
 }
 
 real_t real_add(real_t a, real_t b)
@@ -72,4 +83,36 @@ real_t real_abs(real_t a)
 {
     return a < 0 ? -a : a;
 }
+
+real_t real_floor(real_t a)
+{
+    return floorf(a);
+}
+
+real_t real_ceil(real_t a)
+{
+    return ceilf(a);
+}
+
+real_t real_round(real_t a)
+{
+    return roundf(a);
+}
+
+real_t real_fractional(real_t a)
+{
+    float dummy;
+    return modff(a, &dummy);
+}
+
+real_t real_sqrt(real_t a)
+{
+    return sqrtf(a);
+}
+
+real_t real_invSqrt(real_t a)
+{
+    return 1.0f / sqrtf(a);
+}
+
 #endif

@@ -58,6 +58,22 @@ xy_t xy_orthogonal(xy_t a)
     return res;
 }
 
+real_t xy_lengthSqr(xy_t a)
+{
+    return real_add(real_mul(a.x, a.x), real_mul(a.y, a.y));
+}
+
+real_t xy_length(xy_t a)
+{
+    return real_sqrt(xy_length(a));
+}
+
+xy_t xy_normalize(xy_t a)
+{
+    real_t factor = real_invSqrt(xy_length(a));
+    return xy_scale(a, factor);
+}
+
 xz_t xz(real_t x, real_t z)
 {
     xz_t xz = { x, z };
@@ -100,6 +116,21 @@ real_t xz_dot(xz_t a, xz_t b)
 xz_t xz_orthogonal(xz_t a)
 {
     return xy_to_xz(xy_orthogonal(xz_to_xy(a)));
+}
+
+real_t xz_lengthSqr(xz_t x)
+{
+    return xy_lengthSqr(xz_to_xy(x));
+}
+
+real_t xz_length(xz_t x)
+{
+    return xy_length(xz_to_xy(x));
+}
+
+xz_t xz_normalize(xz_t x)
+{
+    return xy_to_xz(xy_normalize(xz_to_xy(x)));
 }
 
 //

@@ -25,6 +25,9 @@ extern const real_t
     real_2pi;
 
 real_t real_from_int(int i);
+int real_to_int(real_t a);
+int real_to_string(real_t a, char* str, int maxlen); // returns number of characters written
+
 real_t real_add(real_t a, real_t b);
 real_t real_sub(real_t a, real_t b);
 real_t real_mul(real_t a, real_t b);
@@ -40,6 +43,13 @@ real_t real_min(real_t a, real_t b);
 real_t real_max(real_t a, real_t b);
 real_t real_abs(real_t a);
 
+real_t real_floor(real_t a);
+real_t real_ceil(real_t a);
+real_t real_round(real_t a);
+real_t real_fractional(real_t a);
+real_t real_sqrt(real_t a);
+real_t real_invSqrt(real_t a);
+
 //
 // 2-dimensional Vector
 //
@@ -51,6 +61,7 @@ typedef struct xy_t {
     real_t x, y;
 } xy_t;
 
+extern xy_t xy_one, xy_zero, xy_right, xy_up, xy_left, xy_down;
 xy_t xy(real_t x, real_t y);
 xy_t xy_add(xy_t a, xy_t b);
 xy_t xy_sub(xy_t a, xy_t b);
@@ -59,7 +70,11 @@ xy_t xy_invScale(xy_t a, real_t f);
 real_t xy_cross(xy_t a, xy_t b);
 real_t xy_dot(xy_t a, xy_t b);
 xy_t xy_orthogonal(xy_t a);
+real_t xy_lengthSqr(xy_t x);
+real_t xy_length(xy_t x);
+xy_t xy_normalize(xy_t x);
 
+extern xz_t xz_one, xz_zero, xz_right, xz_forward, xz_left, xz_backward;
 xz_t xz(real_t x, real_t z);
 xz_t xz_add(xz_t a, xz_t b);
 xz_t xz_sub(xz_t a, xz_t b);
@@ -68,6 +83,9 @@ xz_t xz_invScale(xz_t a, real_t f);
 real_t xz_cross(xz_t a, xz_t b);
 real_t xz_dot(xz_t a, xz_t b);
 xz_t xz_orthogonal(xz_t a);
+real_t xz_lengthSqr(xz_t x);
+real_t xz_length(xz_t x);
+xz_t xz_normalize(xz_t x);
 
 //
 // line intersection
