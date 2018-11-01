@@ -187,3 +187,42 @@ TEST_F(TestAlgebraReal, real_ceil) {
     expectApproxEq(minus_one, real_ceil(minus_one));
     expectApproxEq(real_zero, real_ceil(negative));
 }
+
+TEST_F(TestAlgebraReal, real_round) {
+    expectApproxEq(real_one, real_round(one_half));
+    expectApproxEq(real_zero, real_round(one_third));
+    expectApproxEq(real_one, real_round(two_thirds));
+    expectApproxEq(real_zero, real_round(negative));
+    expectApproxEq(real_one, real_round(real_one));
+    expectApproxEq(minus_one, real_round(minus_one));
+    expectApproxEq(real_zero, real_round(real_zero));
+}
+
+TEST_F(TestAlgebraReal, real_fractional) {
+    expectApproxEq(one_half, real_fractional(one_half));
+    expectApproxEq(one_third, real_fractional(one_third));
+    expectApproxEq(two_thirds, real_fractional(two_thirds));
+    expectApproxEq(real_zero, real_fractional(real_zero));
+    expectApproxEq(real_zero, real_fractional(real_one));
+    expectApproxEq(real_zero, real_fractional(minus_one));
+
+    real_t fractPi = real_fractional(real_pi);
+    expectApproxEq(fractPi, real_sub(real_pi, real_floor(real_pi)));
+}
+
+TEST_F(TestAlgebraReal, real_sqrt) {
+    expectApproxEq(real_one, real_sqrt(real_one));
+    expectApproxEq(three, real_sqrt(real_from_int(9)));
+    expectApproxEq(two, real_sqrt(four));
+
+    real_t sqrtTwo = real_sqrt(two);
+    expectApproxEq(two, real_mul(sqrtTwo, sqrtTwo));
+}
+
+TEST_F(TestAlgebraReal, real_invSqrt) {
+    expectApproxEq(real_one, real_invSqrt(real_one));
+    expectApproxEq(one_third, real_invSqrt(real_from_int(9)));
+
+    real_t invSqrtTwo = real_invSqrt(two);
+    expectApproxEq(real_sqrt(two), real_reciprocal(invSqrtTwo));
+}
