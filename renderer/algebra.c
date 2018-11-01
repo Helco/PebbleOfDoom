@@ -65,12 +65,12 @@ real_t xy_lengthSqr(xy_t a)
 
 real_t xy_length(xy_t a)
 {
-    return real_sqrt(xy_length(a));
+    return real_sqrt(xy_lengthSqr(a));
 }
 
 xy_t xy_normalize(xy_t a)
 {
-    real_t factor = real_invSqrt(xy_length(a));
+    real_t factor = real_invSqrt(xy_lengthSqr(a));
     return xy_scale(a, factor);
 }
 
