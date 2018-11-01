@@ -72,15 +72,6 @@ xz_t xz_orthogonal(xz_t a);
 //
 // line intersection
 //
-typedef struct lineIntersection_t {
-    union {
-        xy_t xy;
-        xz_t xz;
-    };
-    real_t phase1;
-    real_t phase2;
-} lineIntersection_t;
-
 typedef struct lineSeg_t {
     union {
         xy_t xy;
@@ -92,7 +83,10 @@ typedef struct lineSeg_t {
     } end;
 } lineSeg_t;
 
-bool_t xz_intersect(lineSeg_t seg1, lineSeg_t seg2, lineIntersection_t* result);
-#define xy_intersect xz_intersect
+bool_t xz_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xz_t* result);
+real_t xz_linePhase(lineSeg_t seg, xz_t intersection);
+bool_t xy_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xy_t* result);
+real_t xy_linePhase(lineSeg_t seg, xy_t intersection);
+
 
 #endif

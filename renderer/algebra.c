@@ -105,7 +105,7 @@ xz_t xz_orthogonal(xz_t a)
 //
 // line-intersection
 //
-bool_t xz_intersect(lineSeg_t seg1, lineSeg_t seg2, lineIntersection_t* result)
+bool_t xz_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xz_t* result)
 {
     xz_t seg1Vector = xz_sub(seg1.start.xz, seg1.end.xz);
     xz_t seg2Vector = xz_sub(seg2.start.xz, seg2.end.xz);
@@ -116,15 +116,25 @@ bool_t xz_intersect(lineSeg_t seg1, lineSeg_t seg2, lineIntersection_t* result)
     real_t seg2Det = xz_cross(seg2.start.xz, seg2.end.xz);
     real_t ix = xz_cross(xz(seg1Det, seg1Vector.x), xz(seg2Det, seg2Vector.x));
     real_t iz = xz_cross(xz(seg1Det, seg1Vector.z), xz(seg2Det, seg2Vector.z));
-    result->xz = xz(
-        real_div(ix, det),
-        real_div(iz, det)
-    );
-    result->phase1 = real_compare(seg1Vector.x, real_zero) != 0
-        ? real_div(real_sub(seg1.start.xz.x, result->xz.x), seg1Vector.x)
-        : real_div(real_sub(seg1.start.xz.z, result->xz.z), seg1Vector.z);
-    result->phase2 = real_compare(seg2Vector.x, real_zero) != 0
-        ? real_div(real_sub(seg2.start.xz.x, result->xz.x), seg2Vector.x)
-        : real_div(real_sub(seg2.start.xz.z, result->xz.z), seg2Vector.z);
+    result->x = real_div(ix, det);
+    result->z = real_div(iz, det);
     return true;
+}
+
+real_t xz_linePhase(lineSeg_t seg, xz_t intersection)
+{
+    xz_t segVector = xz_sub(seg.start.xz, seg.end.xz);
+    return real_compare(segVector.x, real_zero) != 0
+        ? real_div(real_sub(seg.start.xz.x, intersection.x), segVector.x)
+        : real_div(real_sub(seg.start.xz.z, intersection.z), segVector.z);
+}
+
+bool_t xy_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xy_t* result)
+{
+    return xz_lineIntersect(seg1, seg2, (xz_t*)result);
+}
+
+real_t xy_linePhase(lineSeg_t seg, xy_t intersection)
+{
+    return xz_linePhase(seg, xy_to_xz(intersection));
 }
