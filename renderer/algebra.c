@@ -13,8 +13,8 @@ xy_t xy(real_t x, real_t y)
 xy_t xy_add(xy_t a, xy_t b)
 {
     xy_t res = {
-        a.x + b.x,
-        a.y + b.y
+        real_add(a.x, b.x),
+        real_add(a.y, b.y)
     };
     return res;
 }
@@ -22,8 +22,8 @@ xy_t xy_add(xy_t a, xy_t b)
 xy_t xy_sub(xy_t a, xy_t b)
 {
     xy_t res = {
-        a.x - b.x,
-        a.y - b.y
+        real_sub(a.x, b.x),
+        real_sub(a.y, b.y)
     };
     return res;
 }
@@ -31,8 +31,8 @@ xy_t xy_sub(xy_t a, xy_t b)
 xy_t xy_scale(xy_t a, real_t f)
 {
     xy_t res = {
-        a.x * f,
-        a.y * f
+        real_mul(a.x, f),
+        real_mul(a.y, f)
     };
     return res;
 }
@@ -44,17 +44,17 @@ xy_t xy_invScale(xy_t a, real_t f)
 
 real_t xy_cross(xy_t a, xy_t b)
 {
-    return a.x * b.y - a.y * b.x;
+    return real_sub(real_mul(a.x, b.y), real_mul(a.y, b.x));
 }
 
 real_t xy_dot(xy_t a, xy_t b)
 {
-    return a.x * b.x + a.y * b.y;
+    return real_add(real_mul(a.x, b.x), real_mul(a.y, b.y));
 }
 
 xy_t xy_orthogonal(xy_t a)
 {
-    xy_t res = { -a.y, a.x };
+    xy_t res = { real_sub(real_zero, a.y), a.x };
     return res;
 }
 
