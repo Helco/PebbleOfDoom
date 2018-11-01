@@ -74,6 +74,16 @@ xy_t xy_normalize(xy_t a)
     return xy_scale(a, factor);
 }
 
+xy_t xy_rotate(xy_t a, real_t angleInRad)
+{
+    real_t s = real_sin(angleInRad);
+    real_t c = real_cos(angleInRad);
+    return xy(
+        real_sub(real_mul(a.x, c), real_mul(a.y, s)),
+        real_add(real_mul(a.x, s), real_mul(a.y, c))
+    );
+}
+
 xz_t xz(real_t x, real_t z)
 {
     xz_t xz = { x, z };
@@ -131,6 +141,11 @@ real_t xz_length(xz_t x)
 xz_t xz_normalize(xz_t x)
 {
     return xy_to_xz(xy_normalize(xz_to_xy(x)));
+}
+
+xz_t xz_rotate(xz_t a, real_t angleInRad)
+{
+    return xy_to_xz(xy_rotate(xz_to_xy(a), angleInRad));
 }
 
 //

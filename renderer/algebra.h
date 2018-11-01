@@ -80,6 +80,7 @@ xy_t xy_orthogonal(xy_t a);
 real_t xy_lengthSqr(xy_t x);
 real_t xy_length(xy_t x);
 xy_t xy_normalize(xy_t x);
+xy_t xy_rotate(xy_t a, real_t angleInRad);
 
 #define xz_one (xz(real_one, real_one))
 #define xz_zero (xz(real_zero, real_zero))
@@ -96,6 +97,7 @@ xz_t xz_orthogonal(xz_t a);
 real_t xz_lengthSqr(xz_t x);
 real_t xz_length(xz_t x);
 xz_t xz_normalize(xz_t x);
+xz_t xz_rotate(xz_t a, real_t angleInRad);
 
 //
 // line intersection
