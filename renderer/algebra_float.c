@@ -7,7 +7,7 @@
 const real_t real_one = 1.0f;
 const real_t real_zero = 0.0f;
 const real_t real_pi = 3.141592653f;
-const real_t real_2pi = 2 * 3.141592653f;
+const real_t real_2pi = 2 * real_pi;
 
 real_t real_from_int(int i)
 {
@@ -66,12 +66,12 @@ real_t real_tan(real_t a)
 
 real_t real_degToRad(real_t deg)
 {
-    return deg * 3.141592653f / 180.0f;
+    return deg * real_pi / 180.0f;
 }
 
 real_t real_radToDeg(real_t rad)
 {
-    return rad * 180.0f / 3.141592653f;
+    return rad * 180.0f / real_pi;
 }
 
 int real_compare(real_t a, real_t b)
