@@ -6,8 +6,9 @@
 
 const real_t real_one = 1.0f;
 const real_t real_zero = 0.0f;
-const real_t real_pi = 3.141592653f;
-const real_t real_2pi = 2 * real_pi;
+#define REAL_PI 3.141592653f
+const real_t real_pi = REAL_PI;
+const real_t real_2pi = 2 * REAL_PI;
 
 real_t real_from_int(int i)
 {
