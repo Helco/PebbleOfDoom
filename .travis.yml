@@ -11,6 +11,6 @@ before_install:
 script:
   - mkdir -p build
   - cd build
-  - cmake
+  - cmake ..
   - make
   - ./test_podrenderer
