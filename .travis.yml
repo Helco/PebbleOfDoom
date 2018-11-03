@@ -5,6 +5,7 @@ branches:
   - travis_ci
 
 before_install:
+  - sudo apt-get install -y libegl1-mesa-dev libgles2-mesa-dev
   - sudo apt-get install -y libsdl2-dev
 
 script:
