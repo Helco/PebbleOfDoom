@@ -4,12 +4,8 @@ branches:
   only:
   - travis_ci
 
-addons:
-  apt:
-    packages:
-    - cmake
-    - gcc-6
-    - libsdl2-dev
+before_install:
+  - sudo apt-get install -y gcc-6 libsdl2-dev
 
 script:
   - mkdir -p build
