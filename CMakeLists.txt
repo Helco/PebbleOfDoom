@@ -15,6 +15,9 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     link_libraries(m)
 endif()
 
+include(CTest)
+include(GoogleTest)
+
 ###################################################################
 # Utilities
 ###################################################################
@@ -32,6 +35,15 @@ function(assign_source_group)
         source_group("${_source_path_msvc}" FILES "${_source}")
     endforeach()
 endfunction(assign_source_group)
+
+# To add googletests in the best way regarding cmake version
+function(add_googletest TARGET PREFIX)
+    if (CMAKE_VERSION VERSION_LESS "3.10.0")
+        gtest_add_tests(TARGET ${TARGET} TEST_PREFIX ${PREFIX})
+    else()
+        gtest_discover_tests(${TARGET} TEST_PREFIX ${PREFIX})
+    endif()
+endfunction(add_googletest)
 
 ###################################################################
 # googletest
@@ -106,7 +118,7 @@ target_link_libraries(test_podrenderer
     podrenderer
     gtest_main
 )
-add_test(NAME test_podrenderer COMMAND test_podrenderer)
+add_googletest(test_podrenderer "def.")
 
 ###################################################################
 # PC Mockup

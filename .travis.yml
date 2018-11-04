@@ -13,4 +13,4 @@ script:
   - cd build
   - cmake ..
   - make
-  - ./test_podrenderer
+  - ctest
