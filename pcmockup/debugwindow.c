@@ -62,7 +62,7 @@ void debugWindow_free(DebugWindow* me)
 void debugWindow_startUpdate(DebugWindow* me)
 {
     SDL_Rect src;
-    int textureW, textureH;
+    int textureW = -1, textureH = -1;
     SDL_GetWindowSize(me->window, &src.w, &src.h);
     if (me->texture != NULL)
         SDL_QueryTexture(me->texture, NULL, NULL, &textureW, &textureH);
