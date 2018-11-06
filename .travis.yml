@@ -2,7 +2,7 @@ language: cpp
 
 branches:
   only:
-  - travis_ci
+  - master
 
 before_install:
   - sudo apt-get install -y libegl1-mesa-dev libgles2-mesa-dev
