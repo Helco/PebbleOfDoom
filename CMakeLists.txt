@@ -87,6 +87,7 @@ endif()
 set(sources_podrenderer
     renderer/renderer.h
     renderer/renderer.c
+    renderer/renderer_debug.c
     renderer/algebra_float.c
     renderer/algebra.h
     renderer/algebra.c
@@ -96,9 +97,11 @@ assign_source_group(${sources_podrenderer})
 add_library(podrenderer ${sources_podrenderer})
 target_include_directories(podrenderer PUBLIC
     "pcmockup/" # to access pebble.h
+    ${SDL2_INCLUDE_DIR} # for debug output
 )
 target_compile_definitions(podrenderer
     PUBLIC REAL_USE_FLOAT
+    PUBLIC DEBUG_WINDOWS
 )
 
 ###################################################################
@@ -132,6 +135,8 @@ set(sources_pcmockup
     pcmockup/pcmockup.h
     pcmockup/pcmockup.c
     pcmockup/pebblewindow.c
+    pcmockup/debugwindow.c
+    pcmockup/debugwindowset.c
 )
 assign_source_group(${sources_pcmockup})
 

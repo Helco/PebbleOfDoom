@@ -18,7 +18,7 @@ PebbleWindow* pebbleWindow_init(GSize windowSize, GSize pebbleSize)
     if (this == NULL)
         return NULL;
     memset(this, 0, sizeof(PebbleWindow));
-    
+
     this->window = SDL_CreateWindow("PebbleOfDoom - PCMockup",
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
         windowSize.w, windowSize.h,
@@ -64,7 +64,7 @@ PebbleWindow* pebbleWindow_init(GSize windowSize, GSize pebbleSize)
         pebbleWindow_free(this);
         return NULL;
     }
-    
+
     this->pebbleSize = pebbleSize;
 
     return this;
@@ -89,25 +89,10 @@ void pebbleWindow_free(PebbleWindow* this)
 
 static SDL_Rect prv_pebbleWindow_fitPebbleScreen(const PebbleWindow* this)
 {
-    SDL_Rect src, dst;
+    SDL_Rect src;
     SDL_GetWindowSize(this->window, &src.w, &src.h);
-    const float windowAspect = (float)src.w / src.h;
     const float pebbleAspect = (float)this->pebbleSize.w / this->pebbleSize.h;
-    if (windowAspect > pebbleAspect)
-    {
-        dst.y = 0;
-        dst.h = src.h;
-        dst.w = (int)(pebbleAspect * src.h);
-        dst.x = (src.w / 2) - (dst.w / 2);
-    }
-    else
-    {
-        dst.x = 0;
-        dst.w = src.w;
-        dst.h = (int)(src.w / pebbleAspect);
-        dst.y = (src.h / 2) - (dst.h / 2);
-    }
-    return dst;
+    return findBestFit(src, pebbleAspect);
 }
 
 static inline SDL_Color prv_convertGColorTo32Bit(GColor pebbleColor)
@@ -132,20 +117,18 @@ static void prv_pebbleWindow_convertPebbleToTexture(PebbleWindow* this)
     for (int y = 0; y < this->pebbleSize.h; y++)
     {
         itTexPixel = (uint32_t*)texPixels;
-        itPebblePixel = (const GColor*)pebblePixels;
         for (int x = 0; x < this->pebbleSize.w; x++)
         {
+            itPebblePixel = pebblePixels + x * this->pebbleSize.h + y;
             SDL_Color color = prv_convertGColorTo32Bit(*itPebblePixel);
             *itTexPixel = SDL_MapRGBA(this->texturePixelFormat,
                 color.r, color.g, color.b, color.a);
 
             itTexPixel++;
-            itPebblePixel++;
         }
 
         // Advance to next line
         texPixels += texPitch;
-        pebblePixels += this->pebbleSize.w;
     }
 
     SDL_UnlockTexture(this->pebbleTexture);
@@ -160,6 +143,14 @@ void pebbleWindow_update(PebbleWindow* this)
     const SDL_Rect dst = prv_pebbleWindow_fitPebbleScreen(this);
     SDL_RenderCopy(this->renderer, this->pebbleTexture, NULL, &dst);
     SDL_RenderPresent(this->renderer);
+}
+
+SDL_Rect pebbleWindow_getBounds(PebbleWindow* me)
+{
+    SDL_Rect bounds;
+    SDL_GetWindowPosition(me->window, &bounds.x, &bounds.y);
+    SDL_GetWindowSize(me->window, &bounds.w, &bounds.h);
+    return bounds;
 }
 
 GColor* pebbleWindow_getPebbleFramebuffer(PebbleWindow* window)

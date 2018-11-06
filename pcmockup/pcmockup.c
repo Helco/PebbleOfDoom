@@ -14,16 +14,24 @@ int main(int argc, char* argv[])
         fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());
         return -1;
     }
+    Renderer* renderer = renderer_init();
+    if (renderer == NULL)
+        return -1;
+
     PebbleWindow* pebbleWindow = pebbleWindow_init(
         GSize(START_WINDOW_WIDTH, START_WINDOW_HEIGHT),
         GSize(RENDERER_WIDTH, RENDERER_HEIGHT)
     );
     if (pebbleWindow == NULL)
         return -1;
-    Renderer* renderer = renderer_init();
-    if (renderer == NULL)
+
+    DebugWindowSet* debugWindowSet = debugWindowSet_init(
+        pebbleWindow_getBounds(pebbleWindow),
+        renderer
+    );
+    if (debugWindowSet == NULL)
         return -1;
-        
+
     GColor* framebuffer = pebbleWindow_getPebbleFramebuffer(pebbleWindow);
     renderer_render(renderer, framebuffer);
 
@@ -32,7 +40,9 @@ int main(int argc, char* argv[])
     {
         const uint32_t frameStart = SDL_GetTicks();
 
+        renderer_render(renderer, framebuffer);
         pebbleWindow_update(pebbleWindow);
+        debugWindowSet_update(debugWindowSet);
 
         SDL_Event event;
         while (SDL_PollEvent(&event))
@@ -50,6 +60,7 @@ int main(int argc, char* argv[])
                     }break;
                 }
             }
+            debugWindowSet_handleUpdate(debugWindowSet, &event);
         }
 
         const uint32_t frameEnd = SDL_GetTicks();
@@ -60,6 +71,28 @@ int main(int argc, char* argv[])
 
     renderer_free(renderer);
     pebbleWindow_free(pebbleWindow);
+    debugWindowSet_free(debugWindowSet);
     SDL_Quit();
     return 0;
+}
+
+SDL_Rect findBestFit(SDL_Rect src, float dstAspect)
+{
+    SDL_Rect dst;
+    const float srcAspect = (float)src.w / src.h;
+    if (srcAspect > dstAspect)
+    {
+        dst.y = 0;
+        dst.h = src.h;
+        dst.w = (int)(dstAspect * src.h);
+        dst.x = (src.w / 2) - (dst.w / 2);
+    }
+    else
+    {
+        dst.x = 0;
+        dst.w = src.w;
+        dst.h = (int)(src.w / dstAspect);
+        dst.y = (src.h / 2) - (dst.h / 2);
+    }
+    return dst;
 }
