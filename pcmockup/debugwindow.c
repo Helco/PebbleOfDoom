@@ -87,7 +87,7 @@ void debugWindow_startUpdate(DebugWindow* me)
     SDL_SetRenderDrawColor(me->renderer, 0, 0, 0, 255);
     SDL_RenderClear(me->renderer);
 
-    float scale = real_to_int(real_mul(me->zoom, real_from_int(1000))) / 1000.0f;
+    float scale = real_to_float(me->zoom);
     SDL_RenderSetScale(me->renderer, scale, scale);
 }
 
