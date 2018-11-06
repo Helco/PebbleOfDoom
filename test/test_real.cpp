@@ -17,6 +17,24 @@ TEST_F(TestAlgebraReal, real_constants) {
     EXPECT_NE(real_pi, real_2pi);
 }
 
+TEST_F(TestAlgebraReal, real_from_float) {
+    expectApproxEq(real_one, real_from_float(1.0f));
+    expectApproxEq(real_zero, real_from_float(0.0f));
+    expectApproxEq(minus_one, real_from_float(-1.0f));
+    expectApproxEq(one_third, real_from_float(0.3333333f));
+    expectApproxEq(two_thirds, real_from_float(0.6666666f));
+    expectApproxEq(real_pi, real_from_float(3.141592653f));
+}
+
+TEST_F(TestAlgebraReal, real_to_float) {
+    EXPECT_FLOAT_EQ(1.0f, real_to_float(real_one));
+    EXPECT_FLOAT_EQ(0.0f, real_to_float(real_zero));
+    EXPECT_FLOAT_EQ(-1.0f, real_to_float(minus_one));
+    EXPECT_FLOAT_EQ(0.3333333f, real_to_float(one_third));
+    EXPECT_FLOAT_EQ(0.6666666f, real_to_float(two_thirds));
+    EXPECT_FLOAT_EQ(3.141592653f, real_to_float(real_pi));
+}
+
 TEST_F(TestAlgebraReal, real_compare) {
     EXPECT_EQ(0, real_compare(real_zero, real_zero));
     EXPECT_EQ(0, real_compare(real_one, real_one));

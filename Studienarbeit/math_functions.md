@@ -23,6 +23,8 @@ extern real_t real_pi, real_2pi;
 
 real_t real_from_int(int a);
 int real_to_int(real_t a);
+real_t real_from_float(float f);
+float real_to_float(real_t a);
 int real_to_string(real_t a, char* str, int maxlen); // returns number of characters written
 real_t real_add(real_t a, real_t b);
 real_t real_sub(real_t a, real_t b);

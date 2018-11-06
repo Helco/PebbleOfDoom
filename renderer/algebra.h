@@ -26,6 +26,8 @@ extern const real_t
 
 real_t real_from_int(int i);
 int real_to_int(real_t a);
+real_t real_from_float(float f);
+float real_to_float(real_t a);
 int real_to_string(real_t a, char* str, int maxlen); // returns number of characters written
 
 real_t real_add(real_t a, real_t b);

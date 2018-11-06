@@ -20,6 +20,16 @@ int real_to_int(real_t a)
     return (real_t)a;
 }
 
+real_t real_from_float(float f)
+{
+    return (real_t)f;
+}
+
+float real_to_float(real_t a)
+{
+    return (float)a;
+}
+
 int real_to_string(real_t a, char* str, int maxlen)
 {
     return snprintf(str, maxlen, "%f", a);
