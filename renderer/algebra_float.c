@@ -1,5 +1,9 @@
 #include "algebra.h"
 
+#undef abs // this conflicts with math.h
+#undef min
+#undef max
+
 #ifdef REAL_USE_FLOAT
 #include <math.h>
 #include <pebble.h>

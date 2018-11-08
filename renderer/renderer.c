@@ -46,7 +46,7 @@ Renderer* renderer_init()
     this->leftFovSeg.end.xz = xz(real_mul(minus_one, farPlane.x), farPlane.z);
     this->rightFovSeg.start.xz = nearPlane;
     this->rightFovSeg.end.xz = farPlane;
-    this->fovStuff = real_div(real_from_int(-RENDERER_WIDTH / 2), tanHalfFov);
+    this->fovStuff = real_div(real_from_int(-HALF_RENDERER_WIDTH), tanHalfFov);
 
     return this;
 }
@@ -68,10 +68,6 @@ static xz_t myxz_rotate(xz_t a, real_t angleInRad)
     );
 }
 
-#define min(a,b) ((a)<(b)?(a):(b))
-#define max(a,b) ((a)>(b)?(a):(b))
-#define abs(a) ((a)<0?-(a):(a))
-
 xz_t renderer_transformVector(const Renderer* me, xz_t vector)
 {
     return myxz_rotate(vector, me->angle);
@@ -86,12 +82,6 @@ void renderer_transformLine(const Renderer* me, const lineSeg_t* line, lineSeg_t
 {
     result->start.xz = renderer_transformPoint(me, line->start.xz);
     result->end.xz = renderer_transformPoint(me, line->end.xz);
-    /*if (real_compare(result->start.xz.x, result->end.xz.x) < 0)
-    {
-        xz_t tmp = result->start.xz;
-        result->start.xz = result->end.xz;
-        result->end.xz = tmp;
-    }*/
 }
 
 void renderer_transformWall(const Renderer* me, const Wall* wall, lineSeg_t* result)
@@ -102,81 +92,77 @@ void renderer_transformWall(const Renderer* me, const Wall* wall, lineSeg_t* res
     renderer_transformLine(me, &lineSeg, result);
 }
 
-void renderer_renderWall(Renderer* this, GColor* framebuffer, const Wall* wall)
+typedef struct
 {
-    // Transform corners
-    lineSeg_t wallSeg;
-    renderer_transformWall(this, wall, &wallSeg);
-    xz_t startT = wallSeg.start.xz;
-    xz_t endT = wallSeg.end.xz;
-    if (startT.z < 0 && endT.z < 0)
-        return;
+    struct {
+        int x;
+        int yStart, yEnd;
+    } left, right;
+} WallSection;
 
-    // Intersect with FOV rays
+void renderer_project(const Renderer* me, const Wall* wall, const lineSeg_t* transformedSeg, WallSection* projected)
+{
+    const real_t halfHeight = real_div(wall->height, real_from_int(2));
+    const real_t scaledWallHeight = real_mul(real_from_int(HALF_RENDERER_HEIGHT), halfHeight);
+    const real_t negScaledWallHeight = real_sub(real_zero, scaledWallHeight);
+    const xz_t startT = transformedSeg->start.xz;
+    const xz_t endT = transformedSeg->end.xz;
+
+#define div_and_int(value, z) (real_to_int(real_div((value), (z))))
+    projected->left.x =       div_and_int(real_mul(startT.x, me->fovStuff), startT.z) + HALF_RENDERER_WIDTH;
+    projected->left.yStart =  div_and_int(negScaledWallHeight, startT.z)              + HALF_RENDERER_HEIGHT;
+    projected->left.yEnd =    div_and_int(scaledWallHeight, startT.z)                 + HALF_RENDERER_HEIGHT;
+
+    projected->right.x =      div_and_int(real_mul(endT.x, me->fovStuff), endT.z)     + HALF_RENDERER_WIDTH;
+    projected->right.yStart = div_and_int(negScaledWallHeight, endT.z)                + HALF_RENDERER_HEIGHT;
+    projected->right.yEnd =   div_and_int(scaledWallHeight, endT.z)                   + HALF_RENDERER_HEIGHT;
+#undef div_and_int
+}
+
+void renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
+{
     xz_t leftIntersection, rightIntersection;
-    bool_t intersectsLeft = xz_lineIntersect(wallSeg, this->leftFovSeg, &leftIntersection);
-    bool_t intersectsRight = xz_lineIntersect(wallSeg, this->rightFovSeg, &rightIntersection);
-    real_t phaseLeft = intersectsLeft ? xz_linePhase(this->leftFovSeg, leftIntersection) : real_zero; // pi is > 1
-    real_t phaseRight = intersectsRight ? xz_linePhase(this->rightFovSeg, rightIntersection) : real_zero;
-    real_t wallPhaseLeft = intersectsLeft ? xz_linePhase(wallSeg, leftIntersection) : real_zero; // pi is > 1
-    real_t wallPhaseRight = intersectsRight ? xz_linePhase(wallSeg, rightIntersection) : real_zero;
-    bool_t inFovSegLeft = real_inBetween(phaseLeft, real_zero, real_one);
-    bool_t inFovSegRight = real_inBetween(phaseRight, real_zero, real_one);
+    bool_t intersectsLeft = xz_lineIntersect(*wallSeg, me->leftFovSeg, &leftIntersection);
+    bool_t intersectsRight = xz_lineIntersect(*wallSeg, me->rightFovSeg, &rightIntersection);
+    real_t wallPhaseLeft = intersectsLeft ? xz_linePhase(*wallSeg, leftIntersection) : real_zero;
+    real_t wallPhaseRight = intersectsRight ? xz_linePhase(*wallSeg, rightIntersection) : real_zero;
     bool_t inWallSegLeft = real_inBetween(wallPhaseLeft, real_zero, real_one);
     bool_t inWallSegRight = real_inBetween(wallPhaseRight, real_zero, real_one);
-    bool_t should = inFovSegLeft && inFovSegRight && abs(real_signInt(wallPhaseLeft) + real_signInt(wallPhaseRight)) == 0;
-    xz_t leftOffset = xz_sub(this->leftFovSeg.end.xz, this->leftFovSeg.start.xz);
-    xz_t rightOffset = xz_sub(this->rightFovSeg.end.xz, this->rightFovSeg.start.xz);
-    xz_t leftNormal = xz_orthogonal(leftOffset);
-    xz_t rightNormal = xz_orthogonal(rightOffset);
-    bool_t isStartIn =
-        real_signInt(real_sub(xz_dot(leftNormal, startT), xz_dot(leftNormal, leftOffset))) < 0 &&
-        real_signInt(real_sub(xz_dot(rightNormal, startT), xz_dot(rightNormal, rightOffset))) > 0;
-    bool_t isEndIn =
-        real_signInt(real_sub(xz_dot(leftNormal, endT), xz_dot(leftNormal, leftOffset))) < 0 &&
-        real_signInt(real_sub(xz_dot(rightNormal, endT), xz_dot(rightNormal, rightOffset))) > 0;
-    //should = should || (inFovSegLeft && inWallSegLeft) || (inFovSegRight && inWallSegRight);
-    should = (inFovSegLeft && inWallSegLeft) || (inFovSegRight && inWallSegRight) || (isStartIn && isEndIn);
-    //if (!should)
-        //return;
-    if (real_compare(startT.z, this->leftFovSeg.start.xz.z) <= 0)
+
+    if (real_compare(wallSeg->start.xz.z, me->leftFovSeg.start.xz.z) <= 0)
     {
-        startT = (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight)
+        wallSeg->start.xz = (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight)
             ? rightIntersection
             : leftIntersection;
     }
-    if (real_compare(endT.z, this->leftFovSeg.start.xz.z) <= 0)
+
+    if (real_compare(wallSeg->end.xz.z, me->leftFovSeg.start.xz.z) <= 0)
     {
-        endT = (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft)
+        wallSeg->end.xz = (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft)
             ? leftIntersection
             : rightIntersection;
     }
-    
-    //if ((!inFovSegLeft && !inFovSegRight))
-        //return;
-    //else if (inFovSegLeft)
-    //    startT = leftIntersection;
-    //else if (inFovSegRight)
-    //    endT = rightIntersection;
+}
 
-    // calculate screen position
-    real_t halfHeight = real_div(wall->height, real_from_int(2));
-    real_t renderHeight = real_from_int(RENDERER_HEIGHT / 2);
-    real_t scaledWallHeight = real_mul(renderHeight, halfHeight);
-    int xLeft = real_to_int(real_div(real_mul(startT.x, this->fovStuff), startT.z)) + RENDERER_WIDTH/2;
-    int xRight = real_to_int(real_div(real_mul(endT.x, this->fovStuff), endT.z)) + RENDERER_WIDTH/2;
-    if (xLeft >= xRight || xRight < 0 || xLeft >= RENDERER_WIDTH)
+void renderer_renderWall(Renderer* this, GColor* framebuffer, const Wall* wall)
+{
+    lineSeg_t wallSeg;
+    renderer_transformWall(this, wall, &wallSeg);
+    if (wallSeg.start.xz.z < 0 && wallSeg.end.xz.z < 0)
         return;
-    int yLeftStart = real_to_int(real_div(real_sub(real_zero, scaledWallHeight), startT.z)) + RENDERER_HEIGHT/2;
-    int yLeftEnd = real_to_int(real_div(scaledWallHeight, startT.z)) + RENDERER_HEIGHT/2;
-    int yRightStart = real_to_int(real_div(real_sub(real_zero, scaledWallHeight), endT.z)) + RENDERER_HEIGHT/2;
-    int yRightEnd = real_to_int(real_div(scaledWallHeight, endT.z)) + RENDERER_HEIGHT/2;
+
+    renderer_clipByFov(this, &wallSeg);
+
+    WallSection p;
+    renderer_project(this, wall, &wallSeg, &p);
+    if (p.left.x >= p.right.x || p.right.x < 0 || p.left.x >= RENDERER_WIDTH)
+        return;
 
     // render wall
-    for (int x = max(0, xLeft); x <= min(RENDERER_WIDTH - 1, xRight); x++) {
+    for (int x = max(0, p.left.x); x <= min(RENDERER_WIDTH - 1, p.right.x); x++) {
         GColor* curPixel = framebuffer + x * RENDERER_HEIGHT;
-        int yCurStart = (x - xLeft) * (yRightStart - yLeftStart) / (xRight - xLeft) + yLeftStart;
-        int yCurEnd = (x - xLeft) * (yRightEnd - yLeftEnd) / (xRight - xLeft) + yLeftEnd;
+        int yCurStart = (x - p.left.x) * (p.right.yStart - p.left.yStart) / (p.right.x - p.left.x) + p.left.yStart;
+        int yCurEnd = (x - p.left.x) * (p.right.yEnd - p.left.yEnd) / (p.right.x - p.left.x) + p.left.yEnd;
 
         int y;
         for (y = 0; y < max(0, yCurStart); y++)
