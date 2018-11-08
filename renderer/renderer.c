@@ -13,6 +13,7 @@ Renderer* renderer_init()
     this->wall.end = xz(real_from_int(0), real_from_int(50));
     this->wall.start = xz(real_from_int(70), real_from_int(50));
     this->wall.height = real_from_int(25);
+    this->wall.heightOffset = real_zero;
     this->wall.floorColor.argb = 0b00001111; // blue
     this->wall.wallColor.argb = 0b00110011; // green
     this->wall.ceilColor.argb = 0b11000011; // red
@@ -20,6 +21,7 @@ Renderer* renderer_init()
     this->wall2.start = xz(real_from_int(0), real_from_int(50));
     this->wall2.end = xz(real_from_int(0), real_from_int(-30));
     this->wall2.height = real_from_int(25);
+    this->wall2.heightOffset = real_zero;
     this->wall2.floorColor.argb = 0b00001111; // blue
     this->wall2.wallColor.argb = 0b11001111; // magic pink
     this->wall2.ceilColor.argb = 0b11000011; // red
@@ -27,11 +29,13 @@ Renderer* renderer_init()
     this->wall3.start = xz(real_from_int(0), real_from_int(-30));
     this->wall3.end = xz(real_from_int(70), real_from_int(50));
     this->wall3.height = real_from_int(25);
+    this->wall3.heightOffset = real_zero;
     this->wall3.floorColor.argb = 0b00001111; // blue
     this->wall3.wallColor.argb = 0b11110011; // magic something
     this->wall3.ceilColor.argb = 0b11000011; // red
 
     this->pos = xz(real_from_int(20), real_from_int(20));
+    this->height = real_zero;
     this->angle = real_degToRad(real_from_int(223));
     this->halfFov = real_degToRad(real_from_int(30));
     xz_t nearPlane, farPlane;
@@ -103,8 +107,11 @@ typedef struct
 void renderer_project(const Renderer* me, const Wall* wall, const lineSeg_t* transformedSeg, WallSection* projected)
 {
     const real_t halfHeight = real_div(wall->height, real_from_int(2));
-    const real_t scaledWallHeight = real_mul(real_from_int(HALF_RENDERER_HEIGHT), halfHeight);
-    const real_t negScaledWallHeight = real_sub(real_zero, scaledWallHeight);
+    const real_t relHeightOffset = me->height - wall->heightOffset;
+#define scale_height(value) (real_mul(real_from_int(HALF_RENDERER_HEIGHT), (value)))
+    const real_t scaledWallHeight =    scale_height(real_add(halfHeight, relHeightOffset));
+    const real_t negScaledWallHeight = scale_height(real_add(real_neg(halfHeight), relHeightOffset));
+#undef scale_height
     const xz_t startT = transformedSeg->start.xz;
     const xz_t endT = transformedSeg->end.xz;
 
