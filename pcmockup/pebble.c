@@ -4,6 +4,16 @@
 #include <stdarg.h>
 #include <math.h>
 
+GColor GColorFromRGBA(int r, int g, int b, int a)
+{
+    GColor color;
+    color.r = r >> 6;
+    color.g = g >> 6;
+    color.b = b >> 6;
+    color.a = a >> 6;
+    return color;
+}
+
 GPoint __makeGPoint(int16_t x, int16_t y)
 {
     GPoint point = { x, y };

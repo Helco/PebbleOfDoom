@@ -1,0 +1,24 @@
+{
+  "name": "PDoom",
+  "author": "HelcoAndGobuhl",
+  "version": "1.0.0",
+  "keywords": ["pebble-app"],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "PDoom",
+    "uuid": "c4fe29a2-2a1a-4e49-a5d9-b6ced4f5843b",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "basalt"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "messageKeys": [],
+    "resources": {
+      "media": []
+    }
+  }
+}

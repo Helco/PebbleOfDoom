@@ -14,25 +14,25 @@ Renderer* renderer_init()
     this->wall.start = xz(real_from_int(70), real_from_int(50));
     this->wall.height = real_from_int(25);
     this->wall.heightOffset = real_zero;
-    this->wall.floorColor.argb = 0b00001111; // blue
-    this->wall.wallColor.argb = 0b00110011; // green
-    this->wall.ceilColor.argb = 0b11000011; // red
+    this->wall.floorColor = GColorFromRGB(0, 0, 255);
+    this->wall.wallColor = GColorFromRGB(0, 255, 0);
+    this->wall.ceilColor = GColorFromRGB(255, 0, 0);
 
     this->wall2.start = xz(real_from_int(0), real_from_int(50));
     this->wall2.end = xz(real_from_int(0), real_from_int(-30));
     this->wall2.height = real_from_int(25);
     this->wall2.heightOffset = real_zero;
-    this->wall2.floorColor.argb = 0b00001111; // blue
-    this->wall2.wallColor.argb = 0b11001111; // magic pink
-    this->wall2.ceilColor.argb = 0b11000011; // red
+    this->wall2.floorColor = GColorFromRGB(0, 0, 255);
+    this->wall2.wallColor = GColorFromRGB(255, 0, 255);
+    this->wall2.ceilColor = GColorFromRGB(255, 0, 0);
 
     this->wall3.start = xz(real_from_int(0), real_from_int(-30));
     this->wall3.end = xz(real_from_int(70), real_from_int(50));
     this->wall3.height = real_from_int(25);
     this->wall3.heightOffset = real_zero;
-    this->wall3.floorColor.argb = 0b00001111; // blue
-    this->wall3.wallColor.argb = 0b11110011; // magic something
-    this->wall3.ceilColor.argb = 0b11000011; // red
+    this->wall3.floorColor = GColorFromRGB(0, 0, 255);
+    this->wall3.wallColor = GColorFromRGB(0, 255, 255);
+    this->wall3.ceilColor = GColorFromRGB(255, 0, 0);
 
     this->pos = xz(real_from_int(20), real_from_int(20));
     this->height = real_zero;

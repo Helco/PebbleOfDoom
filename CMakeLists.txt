@@ -91,6 +91,8 @@ set(sources_podrenderer
     renderer/algebra_float.c
     renderer/algebra.h
     renderer/algebra.c
+
+    pcmockup/pebble.c
 )
 assign_source_group(${sources_podrenderer})
 
@@ -129,7 +131,6 @@ add_googletest(test_podrenderer "def.")
 
 set(sources_pcmockup
     pcmockup/pebble.h
-    pcmockup/pebble.c
     pcmockup/stb_impl.c
 
     pcmockup/pcmockup.h
