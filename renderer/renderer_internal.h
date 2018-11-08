@@ -18,4 +18,6 @@ struct Renderer
     lineSeg_t leftFovSeg, rightFovSeg;
 };
 
+void renderer_transformLine(const Renderer* me, const lineSeg_t* line, lineSeg_t* result);
+
 #endif
