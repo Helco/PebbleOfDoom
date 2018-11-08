@@ -31,9 +31,9 @@ Renderer* renderer_init()
     this->wall3.wallColor.argb = 0b11110011; // magic something
     this->wall3.ceilColor.argb = 0b11000011; // red
 
-    this->pos = xz(real_from_int(68), real_from_int(48));
+    this->pos = xz(real_from_int(20), real_from_int(20));
     this->angle = real_degToRad(real_from_int(223));
-    this->halfFov = real_degToRad(real_from_int(60));
+    this->halfFov = real_degToRad(real_from_int(30));
     xz_t nearPlane, farPlane;
     nearPlane.z = real_from_float(1.0f);
     farPlane.z = real_from_int(500);
