@@ -31,11 +31,11 @@ Renderer* renderer_init()
     this->wall3.wallColor.argb = 0b11110011; // magic something
     this->wall3.ceilColor.argb = 0b11000011; // red
 
-    this->pos = xz(real_from_int(30), real_from_int(20));
-    this->angle = real_degToRad(real_from_int(90));
+    this->pos = xz(real_from_int(68), real_from_int(48));
+    this->angle = real_degToRad(real_from_int(223));
     this->halfFov = real_degToRad(real_from_int(60));
     xz_t nearPlane, farPlane;
-    nearPlane.z = real_div(real_one, real_from_int(1000));
+    nearPlane.z = real_from_float(1.0f);
     farPlane.z = real_from_int(500);
 
     const real_t tanHalfFov = real_tan(this->halfFov);
@@ -139,13 +139,13 @@ void renderer_renderWall(Renderer* this, GColor* framebuffer, const Wall* wall)
     should = (inFovSegLeft && inWallSegLeft) || (inFovSegRight && inWallSegRight) || (isStartIn && isEndIn);
     //if (!should)
         //return;
-    if (real_compare(startT.z, real_zero) <= 0)
+    if (real_compare(startT.z, this->leftFovSeg.start.xz.z) <= 0)
     {
-        startT = (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft)
-            ? leftIntersection
-            : rightIntersection;
+        startT = (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight)
+            ? rightIntersection
+            : leftIntersection;
     }
-    if (real_compare(endT.z, real_zero) <= 0)
+    if (real_compare(endT.z, this->leftFovSeg.start.xz.z) <= 0)
     {
         endT = (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft)
             ? leftIntersection
