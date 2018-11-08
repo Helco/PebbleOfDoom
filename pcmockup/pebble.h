@@ -19,6 +19,10 @@ typedef union GColor {
     };
 } GColor;
 
+GColor GColorFromRGBA(int r, int g, int b, int a);
+
+#define GColorFromRGB(r,g,b) GColorFromRGBA(r,g,b,255)
+
 typedef struct GPoint
 {
     int16_t x;
