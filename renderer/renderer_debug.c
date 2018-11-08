@@ -80,8 +80,7 @@ void renderer_renderDebug(Renderer* me, const DebugInfo* debug)
         curWall++;
     }
 
-    GColor red;
-    red.a = red.r = 3;
+    GColor red = GColorFromRGB(255, 0, 0);
     renderer_setDebugColor(debug, red);
     renderer_renderDebugVector(me, debug, me->pos, angleToVector(me->angle, 30));
     lineSeg_t fovLine;
