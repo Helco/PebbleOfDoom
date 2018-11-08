@@ -71,17 +71,19 @@ real_t real_neg(real_t a)
 
 real_t real_sin(real_t a)
 {
-    return sinf(a);
+    float s = (float)sin_lookup((int)(a * TRIG_MAX_ANGLE / real_2pi));
+    return (s / TRIG_MAX_RATIO);
 }
 
 real_t real_cos(real_t a)
 {
-    return cosf(a);
+    float s = (float)cos_lookup((int)(a * TRIG_MAX_ANGLE / real_2pi));
+    return (s / TRIG_MAX_RATIO);
 }
 
 real_t real_tan(real_t a)
 {
-    return tanf(a);
+    return real_sin(a) / real_cos(a);
 }
 
 real_t real_degToRad(real_t deg)
