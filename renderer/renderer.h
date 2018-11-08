@@ -4,7 +4,9 @@
 #include "algebra.h"
 
 #define RENDERER_WIDTH 168
+#define HALF_RENDERER_WIDTH (RENDERER_WIDTH / 2)
 #define RENDERER_HEIGHT 144
+#define HALF_RENDERER_HEIGHT (RENDERER_HEIGHT / 2)
 
 typedef struct Renderer Renderer;
 Renderer* renderer_init();

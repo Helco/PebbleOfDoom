@@ -145,6 +145,15 @@ TEST_F(TestAlgebraReal, real_reciprocal) {
     EXPECT_EQ(minus_one, real_reciprocal(minus_one));
 }
 
+TEST_F(TestAlgebraReal, real_neg) {
+    expectApproxEq(minus_one, real_neg(real_one));
+    expectApproxEq(real_one, real_neg(minus_one));
+    expectApproxEq(real_one, real_neg(real_neg(real_one)));
+    expectApproxEq(minus_one, real_neg(real_neg(minus_one)));
+    expectApproxEq(real_zero, real_neg(real_zero));
+    expectApproxEq(real_mul(minus_one, real_pi), real_neg(real_pi));
+}
+
 TEST_F(TestAlgebraReal, real_sincostan) {
     expectApproxEq(real_zero, real_sin(real_zero));
     expectApproxEq(real_one, real_sin(halfpi));

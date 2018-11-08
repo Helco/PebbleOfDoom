@@ -1,5 +1,9 @@
 #include "algebra.h"
 
+#undef abs // this conflicts with math.h
+#undef min
+#undef max
+
 #ifdef REAL_USE_FLOAT
 #include <math.h>
 #include <pebble.h>
@@ -58,6 +62,11 @@ real_t real_div(real_t a, real_t b)
 real_t real_reciprocal(real_t a)
 {
     return 1.0f / a;
+}
+
+real_t real_neg(real_t a)
+{
+    return -a;
 }
 
 real_t real_sin(real_t a)

@@ -2,6 +2,13 @@
 #define ALGEBRA_H
 
 //
+// Integer comparisons
+//
+#define min(a,b) ((a)<(b)?(a):(b))
+#define max(a,b) ((a)>(b)?(a):(b))
+#define abs(a) ((a)<0?-(a):(a))
+
+//
 // Boolean
 //
 typedef int bool_t;
@@ -35,6 +42,7 @@ real_t real_sub(real_t a, real_t b);
 real_t real_mul(real_t a, real_t b);
 real_t real_div(real_t a, real_t b);
 real_t real_reciprocal(real_t a);
+real_t real_neg(real_t a);
 
 real_t real_sin(real_t a); // in radians
 real_t real_cos(real_t a);
