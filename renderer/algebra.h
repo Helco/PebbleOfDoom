@@ -4,9 +4,15 @@
 //
 // Integer comparisons
 //
+#ifndef min
 #define min(a,b) ((a)<(b)?(a):(b))
+#endif
+#ifndef max
 #define max(a,b) ((a)>(b)?(a):(b))
+#endif
+#if !defined abs && !defined _MSC_VER
 #define abs(a) ((a)<0?-(a):(a))
+#endif
 
 //
 // Boolean
