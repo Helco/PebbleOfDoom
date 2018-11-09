@@ -21,7 +21,7 @@ real_t real_from_int(int i)
 
 int real_to_int(real_t a)
 {
-    return (real_t)a;
+    return (int)a;
 }
 
 real_t real_from_float(float f)
