@@ -1,6 +1,8 @@
 #include "pcmockup.h"
 #include "../renderer/renderer.h"
 
+#include <string.h>
+
 struct DebugWindow
 {
     SDL_Window* window;
