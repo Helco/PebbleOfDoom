@@ -12,7 +12,7 @@
 #endif
 #if !defined abs && !defined _MSC_VER
 #define abs(a) ((a)<0?-(a):(a))
-#endif abs
+#endif
 
 //
 // Boolean
