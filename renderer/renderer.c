@@ -34,16 +34,17 @@ Renderer* renderer_init()
     this->wall3.wallColor = GColorFromRGB(0, 255, 255);
     this->wall3.ceilColor = GColorFromRGB(255, 0, 0);
 
-    this->playerAttributes.position = xz(real_from_int(20), real_from_int(20));
-    this->playerAttributes.angle = real_degToRad(real_from_int(223));
-    this->playerAttributes.height = real_zero;
-    this->playerAttributes.halfFov = real_degToRad(real_from_int(30));
+    this->playerLocation.position = xz(real_from_int(20), real_from_int(20));
+    this->playerLocation.angle = real_degToRad(real_from_int(223));
+    this->playerLocation.height = real_zero;
+
+    this->halfFov = real_degToRad(real_from_int(30));
 
     xz_t nearPlane, farPlane;
     nearPlane.z = real_from_float(1.0f);
     farPlane.z = real_from_int(500);
 
-    const real_t tanHalfFov = real_tan(this->playerAttributes.halfFov);
+    const real_t tanHalfFov = real_tan(this->halfFov);
     const real_t minus_one = real_from_int(-1);
     nearPlane.x = real_mul(tanHalfFov, nearPlane.z);
     farPlane.x = real_mul(tanHalfFov, farPlane.z);
@@ -75,12 +76,12 @@ static xz_t myxz_rotate(xz_t a, real_t angleInRad)
 
 xz_t renderer_transformVector(const Renderer* me, xz_t vector)
 {
-    return myxz_rotate(vector, me->playerAttributes.angle);
+    return myxz_rotate(vector, me->playerLocation.angle);
 }
 
 xz_t renderer_transformPoint(const Renderer* me, xz_t point)
 {
-    return renderer_transformVector(me, xz_sub(point, me->playerAttributes.position));
+    return renderer_transformVector(me, xz_sub(point, me->playerLocation.position));
 }
 
 void renderer_transformLine(const Renderer* me, const lineSeg_t* line, lineSeg_t* result)
@@ -108,7 +109,7 @@ typedef struct
 void renderer_project(const Renderer* me, const Wall* wall, const lineSeg_t* transformedSeg, WallSection* projected)
 {
     const real_t halfHeight = real_div(wall->height, real_from_int(2));
-    const real_t relHeightOffset = me->playerAttributes.height - wall->heightOffset;
+    const real_t relHeightOffset = me->playerLocation.height - wall->heightOffset;
 #define scale_height(value) (real_mul(real_from_int(HALF_RENDERER_HEIGHT), (value)))
     const real_t scaledWallHeight =    scale_height(real_add(halfHeight, relHeightOffset));
     const real_t negScaledWallHeight = scale_height(real_add(real_neg(halfHeight), relHeightOffset));
@@ -191,38 +192,44 @@ void renderer_render(Renderer* renderer, GColor* framebuffer) {
 
 void renderer_renderRotateRight(Renderer* renderer, GColor* framebuffer)
 {
-    renderer->playerAttributes.angle = real_add(renderer->playerAttributes.angle, real_degToRad(1));
+    renderer->playerLocation.angle = real_add(renderer->playerLocation.angle, real_degToRad(1));
 
     renderer_render(renderer, framebuffer);
 }
 
 void renderer_renderRotateLeft(Renderer* renderer, GColor* framebuffer)
 {
-    renderer->playerAttributes.angle = real_sub(renderer->playerAttributes.angle, real_degToRad(1));
+    renderer->playerLocation.angle = real_sub(renderer->playerLocation.angle, real_degToRad(1));
 
     renderer_render(renderer, framebuffer);
 }
 
 void renderer_renderPlayerRight(Renderer* renderer, GColor* framebuffer) {
-    renderer->playerAttributes.position.x = real_add(renderer->playerAttributes.position.x, real_one);
+    renderer->playerLocation.position.x = real_add(renderer->playerLocation.position.x, real_one);
 
     renderer_render(renderer, framebuffer);
 }
 
 void renderer_renderPlayerLeft(Renderer* renderer, GColor* framebuffer) {
-    renderer->playerAttributes.position.x = real_sub(renderer->playerAttributes.position.x, real_one);
+    renderer->playerLocation.position.x = real_sub(renderer->playerLocation.position.x, real_one);
 
     renderer_render(renderer, framebuffer);
 }
 
 void renderer_renderPlayerBackwards(Renderer* renderer, GColor* framebuffer) {
-    renderer->playerAttributes.position.z = real_add(renderer->playerAttributes.position.z, real_one);
+    renderer->playerLocation.position.z = real_add(renderer->playerLocation.position.z, real_one);
 
     renderer_render(renderer, framebuffer);
 }
 
 void renderer_renderPlayerForward(Renderer* renderer, GColor* framebuffer) {
-    renderer->playerAttributes.position.z = real_sub(renderer->playerAttributes.position.z, real_one);
+    renderer->playerLocation.position.z = real_sub(renderer->playerLocation.position.z, real_one);
+
+    renderer_render(renderer, framebuffer);
+}
+
+void renderer_renderNewPlayerLocation(Renderer* renderer, GColor* framebuffer, PlayerLocation playerLocation) {
+    renderer->playerLocation = playerLocation;
 
     renderer_render(renderer, framebuffer);
 }

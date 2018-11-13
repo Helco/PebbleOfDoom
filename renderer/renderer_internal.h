@@ -9,19 +9,12 @@ typedef struct Wall
     GColor wallColor, floorColor, ceilColor;
 } Wall;
 
-typedef struct {
-    xz_t position;
-    real_t height;
-    real_t angle;
-    real_t halfFov;
-} PlayerAttributes;
-
 struct Renderer
 {
     Wall wall, wall2, wall3;
 
-    PlayerAttributes playerAttributes;
-    real_t  fovStuff;
+    PlayerLocation playerLocation;
+    real_t  fovStuff, halfFov;
     lineSeg_t leftFovSeg, rightFovSeg;
 };
 

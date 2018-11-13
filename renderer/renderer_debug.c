@@ -82,12 +82,12 @@ void renderer_renderDebug(Renderer* me, const DebugInfo* debug)
 
     GColor red = GColorFromRGB(255, 0, 0);
     renderer_setDebugColor(debug, red);
-    renderer_renderDebugVector(me, debug, me->playerAttributes.position, angleToVector(me->playerAttributes.angle, 30));
+    renderer_renderDebugVector(me, debug, me->playerLocation.position, angleToVector(me->playerLocation.angle, 30));
     lineSeg_t fovLine;
-    fovLine.start.xz = me->playerAttributes.position;
-    fovLine.end.xz = xz_add(me->playerAttributes.position, angleToVector(me->playerAttributes.angle + me->playerAttributes.halfFov, 70));
+    fovLine.start.xz = me->playerLocation.position;
+    fovLine.end.xz = xz_add(me->playerLocation.position, angleToVector(me->playerLocation.angle + me->halfFov, 70));
     renderer_renderDebugLine(me, debug, fovLine);
-    fovLine.end.xz = xz_add(me->playerAttributes.position, angleToVector(me->playerAttributes.angle - me->playerAttributes.halfFov, 70));
+    fovLine.end.xz = xz_add(me->playerLocation.position, angleToVector(me->playerLocation.angle - me->halfFov, 70));
     renderer_renderDebugLine(me, debug, fovLine);
 }
 

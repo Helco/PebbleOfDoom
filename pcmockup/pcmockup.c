@@ -77,6 +77,15 @@ int main(int argc, char* argv[])
                     {
                         renderer_renderRotateLeft(renderer, framebuffer);
                     }break;
+                    case (SDLK_SPACE):
+                    { 
+                        PlayerLocation playerLocation;
+                        playerLocation.angle = real_degToRad(real_from_int(223));
+                        playerLocation.height = real_zero;
+                        playerLocation.position = xz(real_from_int(20), real_from_int(20));
+
+                        renderer_renderNewPlayerLocation(renderer, framebuffer, playerLocation);
+                    }break;
                 }
             }
             debugWindowSet_handleUpdate(debugWindowSet, &event);
