@@ -16,6 +16,13 @@ void renderer_free(Renderer* renderer);
  */
 void renderer_render(Renderer* renderer, GColor* framebuffer);
 
+void renderer_renderRotateRight(Renderer* renderer, GColor* framebuffer);
+void renderer_renderRotateLeft(Renderer* renderer, GColor* framebuffer);
+void renderer_renderPlayerRight(Renderer* renderer, GColor* framebuffer);
+void renderer_renderPlayerLeft(Renderer* renderer, GColor* framebuffer);
+void renderer_renderPlayerForward(Renderer* renderer, GColor* framebuffer);
+void renderer_renderPlayerBackwards(Renderer* renderer, GColor* framebuffer);
+
 #ifdef DEBUG_WINDOWS
 #include <SDL.h>
 

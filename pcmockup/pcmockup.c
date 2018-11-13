@@ -40,7 +40,6 @@ int main(int argc, char* argv[])
     {
         const uint32_t frameStart = SDL_GetTicks();
 
-        renderer_render(renderer, framebuffer);
         pebbleWindow_update(pebbleWindow);
         debugWindowSet_update(debugWindowSet);
 
@@ -54,9 +53,29 @@ int main(int argc, char* argv[])
                 switch(event.key.keysym.sym)
                 {
                     case (SDLK_ESCAPE): { isRunning = 0; }break;
-                    case (SDLK_SPACE):
+                    case (SDLK_w):
                     {
-                        renderer_render(renderer, framebuffer);
+                        renderer_renderPlayerForward(renderer, framebuffer);
+                    }break;
+                    case (SDLK_s):
+                    {
+                        renderer_renderPlayerBackwards(renderer, framebuffer);
+                    }break;
+                    case (SDLK_a):
+                    {
+                        renderer_renderPlayerLeft(renderer, framebuffer);
+                    }break;
+                    case (SDLK_d):
+                    {
+                        renderer_renderPlayerRight(renderer, framebuffer);
+                    }break;
+                    case (SDLK_RIGHT):
+                    {
+                        renderer_renderRotateRight(renderer, framebuffer);
+                    }break;
+                    case (SDLK_LEFT):
+                    {
+                        renderer_renderRotateLeft(renderer, framebuffer);
                     }break;
                 }
             }
