@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
                         playerLocation.height = real_zero;
                         playerLocation.position = xz(real_from_int(20), real_from_int(20));
 
-                        renderer_renderNewLocation(renderer, framebuffer, playerLocation);
+                        renderer_renderNewRelativeLocation(renderer, framebuffer, playerLocation);
                     }break;
                 }
             }

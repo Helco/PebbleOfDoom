@@ -245,7 +245,7 @@ void renderer_renderMoveDown(Renderer* renderer, GColor* framebuffer)
     renderer_render(renderer, framebuffer);
 }
 
-void renderer_renderNewLocation(Renderer* renderer, GColor* framebuffer, Location playerLocation)
+void renderer_renderNewRelativeLocation(Renderer* renderer, GColor* framebuffer, Location playerLocation)
 {
     renderer->relativOrigin = playerLocation;
     renderer_render(renderer, framebuffer);

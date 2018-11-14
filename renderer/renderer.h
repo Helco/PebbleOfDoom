@@ -22,7 +22,7 @@ void renderer_free(Renderer* renderer);
  */
 void renderer_render(Renderer* renderer, GColor* framebuffer);
 
-void renderer_renderNewLocation(Renderer* renderer, GColor* framebuffer, Location playerLocation);
+void renderer_renderNewRelativeLocation(Renderer* renderer, GColor* framebuffer, Location playerLocation);
 void renderer_renderRotateRight(Renderer* renderer, GColor* framebuffer);
 void renderer_renderRotateLeft(Renderer* renderer, GColor* framebuffer);
 void renderer_renderMoveRight(Renderer* renderer, GColor* framebuffer);
