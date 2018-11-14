@@ -186,7 +186,7 @@ void renderer_renderWall(Renderer* this, GColor* framebuffer, const Wall* wall)
 void renderer_movePlayerInPlayerSpace(Renderer* renderer, xz_t xz)
 {
     xz = xz_rotate(xz, renderer->playerLocation.angle);
-    me->playerLocation.position = xz_add(renderer->playerLocation.position, xz);
+    renderer->playerLocation.position = xz_add(renderer->playerLocation.position, xz);
 }
 
 void renderer_render(Renderer* renderer, GColor* framebuffer)
