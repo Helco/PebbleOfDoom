@@ -77,6 +77,14 @@ int main(int argc, char* argv[])
                     {
                         renderer_renderRotateLeft(renderer, framebuffer);
                     }break;
+                    case (SDLK_UP):
+                    {
+                        renderer_renderPlayerUp(renderer, framebuffer);
+                    }break;
+                    case (SDLK_DOWN):
+                    {
+                        renderer_renderPlayerDown(renderer, framebuffer);
+                    }break;
                     case (SDLK_SPACE):
                     { 
                         PlayerLocation playerLocation;

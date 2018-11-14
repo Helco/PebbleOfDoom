@@ -233,6 +233,18 @@ void renderer_renderPlayerLeft(Renderer* renderer, GColor* framebuffer)
     renderer_render(renderer, framebuffer);
 }
 
+void renderer_renderPlayerUp(Renderer* renderer, GColor* framebuffer)
+{
+    renderer->playerLocation.height = real_add(renderer->playerLocation.height, real_one);
+    renderer_render(renderer, framebuffer);
+}
+
+void renderer_renderPlayerDown(Renderer* renderer, GColor* framebuffer)
+{
+    renderer->playerLocation.height = real_sub(renderer->playerLocation.height, real_one);
+    renderer_render(renderer, framebuffer);
+}
+
 void renderer_renderNewPlayerLocation(Renderer* renderer, GColor* framebuffer, PlayerLocation playerLocation)
 {
     renderer->playerLocation = playerLocation;
