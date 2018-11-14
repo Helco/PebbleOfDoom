@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
                     case (SDLK_SPACE):
                     { 
                         PlayerLocation playerLocation;
-                        playerLocation.angle = real_degToRad(real_from_int(223));
+                        playerLocation.angle = real_degToRad(real_from_int(0));
                         playerLocation.height = real_zero;
                         playerLocation.position = xz(real_from_int(20), real_from_int(20));
 

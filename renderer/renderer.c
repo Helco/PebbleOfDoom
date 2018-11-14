@@ -35,7 +35,7 @@ Renderer* renderer_init()
     this->wall3.ceilColor = GColorFromRGB(255, 0, 0);
 
     this->playerLocation.position = xz(real_from_int(20), real_from_int(20));
-    this->playerLocation.angle = real_degToRad(real_from_int(223));
+    this->playerLocation.angle = real_degToRad(real_from_int(0));
     this->playerLocation.height = real_zero;
 
     this->halfFov = real_degToRad(real_from_int(30));
@@ -183,7 +183,8 @@ void renderer_renderWall(Renderer* this, GColor* framebuffer, const Wall* wall)
     }
 }
 
-void renderer_render(Renderer* renderer, GColor* framebuffer) {
+void renderer_render(Renderer* renderer, GColor* framebuffer)
+{
     memset(framebuffer, 0, RENDERER_WIDTH * RENDERER_HEIGHT);
     renderer_renderWall(renderer, framebuffer, &renderer->wall);
     renderer_renderWall(renderer, framebuffer, &renderer->wall2);
@@ -193,43 +194,49 @@ void renderer_render(Renderer* renderer, GColor* framebuffer) {
 void renderer_renderRotateRight(Renderer* renderer, GColor* framebuffer)
 {
     renderer->playerLocation.angle = real_add(renderer->playerLocation.angle, real_degToRad(1));
-
     renderer_render(renderer, framebuffer);
 }
 
 void renderer_renderRotateLeft(Renderer* renderer, GColor* framebuffer)
 {
     renderer->playerLocation.angle = real_sub(renderer->playerLocation.angle, real_degToRad(1));
-
     renderer_render(renderer, framebuffer);
 }
 
-void renderer_renderPlayerRight(Renderer* renderer, GColor* framebuffer) {
-    renderer->playerLocation.position.x = real_add(renderer->playerLocation.position.x, real_one);
-
+void renderer_renderPlayerForward(Renderer* renderer, GColor* framebuffer)
+{
+    renderer_movePlayerInPlayerSpace(renderer, xz(real_one, real_zero));
     renderer_render(renderer, framebuffer);
 }
 
-void renderer_renderPlayerLeft(Renderer* renderer, GColor* framebuffer) {
-    renderer->playerLocation.position.x = real_sub(renderer->playerLocation.position.x, real_one);
-
+void renderer_renderPlayerBackwards(Renderer* renderer, GColor* framebuffer)
+{
+    renderer_movePlayerInPlayerSpace(renderer, xz(-real_one, real_zero));
     renderer_render(renderer, framebuffer);
 }
 
-void renderer_renderPlayerBackwards(Renderer* renderer, GColor* framebuffer) {
-    renderer->playerLocation.position.z = real_add(renderer->playerLocation.position.z, real_one);
-
+void renderer_renderPlayerRight(Renderer* renderer, GColor* framebuffer)
+{
+    renderer_movePlayerInPlayerSpace(renderer, xz(real_zero, real_one));
     renderer_render(renderer, framebuffer);
 }
 
-void renderer_renderPlayerForward(Renderer* renderer, GColor* framebuffer) {
-    renderer->playerLocation.position.z = real_sub(renderer->playerLocation.position.z, real_one);
-
+void renderer_renderPlayerLeft(Renderer* renderer, GColor* framebuffer)
+{
+    renderer_movePlayerInPlayerSpace(renderer, xz(real_zero, -real_one));
     renderer_render(renderer, framebuffer);
 }
 
-void renderer_renderNewPlayerLocation(Renderer* renderer, GColor* framebuffer, PlayerLocation playerLocation) {
+void renderer_renderNewPlayerLocation(Renderer* renderer, GColor* framebuffer, PlayerLocation playerLocation)
+{
     renderer->playerLocation = playerLocation;
-
     renderer_render(renderer, framebuffer);
 }
+
+void renderer_movePlayerInPlayerSpace(Renderer* me, xz_t xz)
+{
+    xz = xz_rotate(xz, me->playerLocation.angle);
+    me->playerLocation.position = xz_add(me->playerLocation.position, xz);
+}
+
+

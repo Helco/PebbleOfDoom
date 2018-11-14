@@ -19,5 +19,6 @@ struct Renderer
 };
 
 void renderer_transformLine(const Renderer* me, const lineSeg_t* line, lineSeg_t* result);
+void renderer_movePlayerInPlayerSpace(Renderer* me, xz_t xz);
 
 #endif
