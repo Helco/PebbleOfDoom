@@ -197,47 +197,47 @@ void renderer_render(Renderer* renderer, GColor* framebuffer)
     renderer_renderWall(renderer, framebuffer, &renderer->wall3);
 };
 
-void renderer_renderRotateRight(Renderer* renderer, GColor* framebuffer)
+void renderer_renderRotateRight(Renderer* renderer)
 {
     renderer->relativOrigin.angle = real_add(renderer->relativOrigin.angle, real_degToRad(1));
 }
 
-void renderer_renderRotateLeft(Renderer* renderer, GColor* framebuffer)
+void renderer_renderRotateLeft(Renderer* renderer)
 {
     renderer->relativOrigin.angle = real_sub(renderer->relativOrigin.angle, real_degToRad(1));
 }
 
-void renderer_renderMoveForward(Renderer* renderer, GColor* framebuffer)
+void renderer_renderMoveForward(Renderer* renderer)
 {
     renderer_moveRelativeOrigin(renderer, xz(real_one, real_zero));
 }
 
-void renderer_renderMoveBackwards(Renderer* renderer, GColor* framebuffer)
+void renderer_renderMoveBackwards(Renderer* renderer)
 {
     renderer_moveRelativeOrigin(renderer, xz(-real_one, real_zero));
 }
 
-void renderer_renderMoveRight(Renderer* renderer, GColor* framebuffer)
+void renderer_renderMoveRight(Renderer* renderer)
 {
     renderer_moveRelativeOrigin(renderer, xz(real_zero, real_one));
 }
 
-void renderer_renderMoveLeft(Renderer* renderer, GColor* framebuffer)
+void renderer_renderMoveLeft(Renderer* renderer)
 {
     renderer_moveRelativeOrigin(renderer, xz(real_zero, -real_one));
 }
 
-void renderer_renderMoveUp(Renderer* renderer, GColor* framebuffer)
+void renderer_renderMoveUp(Renderer* renderer)
 {
     renderer->relativOrigin.height = real_add(renderer->relativOrigin.height, real_one);
 }
 
-void renderer_renderMoveDown(Renderer* renderer, GColor* framebuffer)
+void renderer_renderMoveDown(Renderer* renderer)
 {
     renderer->relativOrigin.height = real_sub(renderer->relativOrigin.height, real_one);
 }
 
-void renderer_renderNewRelativeLocation(Renderer* renderer, GColor* framebuffer, Location playerLocation)
+void renderer_renderNewRelativeLocation(Renderer* renderer, Location playerLocation)
 {
     renderer->relativOrigin = playerLocation;
 }
