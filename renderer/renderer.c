@@ -34,9 +34,9 @@ Renderer* renderer_init()
     this->wall3.wallColor = GColorFromRGB(0, 255, 255);
     this->wall3.ceilColor = GColorFromRGB(255, 0, 0);
 
-    this->playerLocation.position = xz(real_from_int(20), real_from_int(20));
-    this->playerLocation.angle = real_degToRad(real_from_int(0));
-    this->playerLocation.height = real_zero;
+    this->relativOrigin.position = xz(real_from_int(20), real_from_int(20));
+    this->relativOrigin.angle = real_degToRad(real_from_int(0));
+    this->relativOrigin.height = real_zero;
 
     this->halfFov = real_degToRad(real_from_int(30));
 
@@ -76,12 +76,12 @@ static xz_t myxz_rotate(xz_t a, real_t angleInRad)
 
 xz_t renderer_transformVector(const Renderer* me, xz_t vector)
 {
-    return myxz_rotate(vector, me->playerLocation.angle);
+    return myxz_rotate(vector, me->relativOrigin.angle);
 }
 
 xz_t renderer_transformPoint(const Renderer* me, xz_t point)
 {
-    return renderer_transformVector(me, xz_sub(point, me->playerLocation.position));
+    return renderer_transformVector(me, xz_sub(point, me->relativOrigin.position));
 }
 
 void renderer_transformLine(const Renderer* me, const lineSeg_t* line, lineSeg_t* result)
@@ -109,7 +109,7 @@ typedef struct
 void renderer_project(const Renderer* me, const Wall* wall, const lineSeg_t* transformedSeg, WallSection* projected)
 {
     const real_t halfHeight = real_div(wall->height, real_from_int(2));
-    const real_t relHeightOffset = me->playerLocation.height - wall->heightOffset;
+    const real_t relHeightOffset = me->relativOrigin.height - wall->heightOffset;
 #define scale_height(value) (real_mul(real_from_int(HALF_RENDERER_HEIGHT), (value)))
     const real_t scaledWallHeight =    scale_height(real_add(halfHeight, relHeightOffset));
     const real_t negScaledWallHeight = scale_height(real_add(real_neg(halfHeight), relHeightOffset));
@@ -183,10 +183,10 @@ void renderer_renderWall(Renderer* this, GColor* framebuffer, const Wall* wall)
     }
 }
 
-void renderer_movePlayerInPlayerSpace(Renderer* renderer, xz_t xz)
+void renderer_moveRelativeOrigin(Renderer* renderer, xz_t xz)
 {
-    xz = xz_rotate(xz, renderer->playerLocation.angle);
-    renderer->playerLocation.position = xz_add(renderer->playerLocation.position, xz);
+    xz = xz_rotate(xz, renderer->relativOrigin.angle);
+    renderer->relativOrigin.position = xz_add(renderer->relativOrigin.position, xz);
 }
 
 void renderer_render(Renderer* renderer, GColor* framebuffer)
@@ -199,54 +199,54 @@ void renderer_render(Renderer* renderer, GColor* framebuffer)
 
 void renderer_renderRotateRight(Renderer* renderer, GColor* framebuffer)
 {
-    renderer->playerLocation.angle = real_add(renderer->playerLocation.angle, real_degToRad(1));
+    renderer->relativOrigin.angle = real_add(renderer->relativOrigin.angle, real_degToRad(1));
     renderer_render(renderer, framebuffer);
 }
 
 void renderer_renderRotateLeft(Renderer* renderer, GColor* framebuffer)
 {
-    renderer->playerLocation.angle = real_sub(renderer->playerLocation.angle, real_degToRad(1));
+    renderer->relativOrigin.angle = real_sub(renderer->relativOrigin.angle, real_degToRad(1));
     renderer_render(renderer, framebuffer);
 }
 
-void renderer_renderPlayerForward(Renderer* renderer, GColor* framebuffer)
+void renderer_renderMoveForward(Renderer* renderer, GColor* framebuffer)
 {
-    renderer_movePlayerInPlayerSpace(renderer, xz(real_one, real_zero));
+    renderer_moveRelativeOrigin(renderer, xz(real_one, real_zero));
     renderer_render(renderer, framebuffer);
 }
 
-void renderer_renderPlayerBackwards(Renderer* renderer, GColor* framebuffer)
+void renderer_renderMoveBackwards(Renderer* renderer, GColor* framebuffer)
 {
-    renderer_movePlayerInPlayerSpace(renderer, xz(-real_one, real_zero));
+    renderer_moveRelativeOrigin(renderer, xz(-real_one, real_zero));
     renderer_render(renderer, framebuffer);
 }
 
-void renderer_renderPlayerRight(Renderer* renderer, GColor* framebuffer)
+void renderer_renderMoveRight(Renderer* renderer, GColor* framebuffer)
 {
-    renderer_movePlayerInPlayerSpace(renderer, xz(real_zero, real_one));
+    renderer_moveRelativeOrigin(renderer, xz(real_zero, real_one));
     renderer_render(renderer, framebuffer);
 }
 
-void renderer_renderPlayerLeft(Renderer* renderer, GColor* framebuffer)
+void renderer_renderMoveLeft(Renderer* renderer, GColor* framebuffer)
 {
-    renderer_movePlayerInPlayerSpace(renderer, xz(real_zero, -real_one));
+    renderer_moveRelativeOrigin(renderer, xz(real_zero, -real_one));
     renderer_render(renderer, framebuffer);
 }
 
-void renderer_renderPlayerUp(Renderer* renderer, GColor* framebuffer)
+void renderer_renderMoveUp(Renderer* renderer, GColor* framebuffer)
 {
-    renderer->playerLocation.height = real_add(renderer->playerLocation.height, real_one);
+    renderer->relativOrigin.height = real_add(renderer->relativOrigin.height, real_one);
     renderer_render(renderer, framebuffer);
 }
 
-void renderer_renderPlayerDown(Renderer* renderer, GColor* framebuffer)
+void renderer_renderMoveDown(Renderer* renderer, GColor* framebuffer)
 {
-    renderer->playerLocation.height = real_sub(renderer->playerLocation.height, real_one);
+    renderer->relativOrigin.height = real_sub(renderer->relativOrigin.height, real_one);
     renderer_render(renderer, framebuffer);
 }
 
-void renderer_renderNewPlayerLocation(Renderer* renderer, GColor* framebuffer, PlayerLocation playerLocation)
+void renderer_renderNewLocation(Renderer* renderer, GColor* framebuffer, Location playerLocation)
 {
-    renderer->playerLocation = playerLocation;
+    renderer->relativOrigin = playerLocation;
     renderer_render(renderer, framebuffer);
 }

@@ -12,7 +12,7 @@ typedef struct {
     xz_t position;
     real_t height;
     real_t angle;
-} PlayerLocation;
+} Location;
 
 typedef struct Renderer Renderer;
 Renderer* renderer_init();
@@ -22,15 +22,15 @@ void renderer_free(Renderer* renderer);
  */
 void renderer_render(Renderer* renderer, GColor* framebuffer);
 
-void renderer_renderNewPlayerLocation(Renderer* renderer, GColor* framebuffer, PlayerLocation playerLocation);
+void renderer_renderNewLocation(Renderer* renderer, GColor* framebuffer, Location playerLocation);
 void renderer_renderRotateRight(Renderer* renderer, GColor* framebuffer);
 void renderer_renderRotateLeft(Renderer* renderer, GColor* framebuffer);
-void renderer_renderPlayerRight(Renderer* renderer, GColor* framebuffer);
-void renderer_renderPlayerLeft(Renderer* renderer, GColor* framebuffer);
-void renderer_renderPlayerUp(Renderer* renderer, GColor* framebuffer);
-void renderer_renderPlayerDown(Renderer* renderer, GColor* framebuffer);
-void renderer_renderPlayerForward(Renderer* renderer, GColor* framebuffer);
-void renderer_renderPlayerBackwards(Renderer* renderer, GColor* framebuffer);
+void renderer_renderMoveRight(Renderer* renderer, GColor* framebuffer);
+void renderer_renderMoveLeft(Renderer* renderer, GColor* framebuffer);
+void renderer_renderMoveUp(Renderer* renderer, GColor* framebuffer);
+void renderer_renderMoveDown(Renderer* renderer, GColor* framebuffer);
+void renderer_renderMoveForward(Renderer* renderer, GColor* framebuffer);
+void renderer_renderMoveBackwards(Renderer* renderer, GColor* framebuffer);
 
 #ifdef DEBUG_WINDOWS
 #include <SDL.h>
