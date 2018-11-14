@@ -33,13 +33,13 @@ int main(int argc, char* argv[])
         return -1;
 
     GColor* framebuffer = pebbleWindow_getPebbleFramebuffer(pebbleWindow);
-    renderer_render(renderer, framebuffer);
 
     int isRunning = 1;
     while (isRunning)
     {
         const uint32_t frameStart = SDL_GetTicks();
 
+        renderer_render(renderer, framebuffer);
         pebbleWindow_update(pebbleWindow);
         debugWindowSet_update(debugWindowSet);
 
