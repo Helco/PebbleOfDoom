@@ -13,7 +13,7 @@ struct Renderer
 {
     Wall wall, wall2, wall3;
 
-    Location relativOrigin;
+    Location location;
     real_t  fovStuff, halfFov;
     lineSeg_t leftFovSeg, rightFovSeg;
 };
