@@ -197,47 +197,47 @@ void renderer_render(Renderer* renderer, GColor* framebuffer)
     renderer_renderWall(renderer, framebuffer, &renderer->wall3);
 };
 
-void renderer_renderRotateRight(Renderer* renderer)
+void renderer_rotateRight(Renderer* renderer)
 {
     renderer->relativOrigin.angle = real_add(renderer->relativOrigin.angle, real_degToRad(1));
 }
 
-void renderer_renderRotateLeft(Renderer* renderer)
+void renderer_rotateLeft(Renderer* renderer)
 {
     renderer->relativOrigin.angle = real_sub(renderer->relativOrigin.angle, real_degToRad(1));
 }
 
-void renderer_renderMoveForward(Renderer* renderer)
+void renderer_moveForward(Renderer* renderer)
 {
     renderer_moveRelativeOrigin(renderer, xz(real_one, real_zero));
 }
 
-void renderer_renderMoveBackwards(Renderer* renderer)
+void renderer_moveBackwards(Renderer* renderer)
 {
     renderer_moveRelativeOrigin(renderer, xz(-real_one, real_zero));
 }
 
-void renderer_renderMoveRight(Renderer* renderer)
+void renderer_moveRight(Renderer* renderer)
 {
     renderer_moveRelativeOrigin(renderer, xz(real_zero, real_one));
 }
 
-void renderer_renderMoveLeft(Renderer* renderer)
+void renderer_moveLeft(Renderer* renderer)
 {
     renderer_moveRelativeOrigin(renderer, xz(real_zero, -real_one));
 }
 
-void renderer_renderMoveUp(Renderer* renderer)
+void renderer_moveUp(Renderer* renderer)
 {
     renderer->relativOrigin.height = real_add(renderer->relativOrigin.height, real_one);
 }
 
-void renderer_renderMoveDown(Renderer* renderer)
+void renderer_moveDown(Renderer* renderer)
 {
     renderer->relativOrigin.height = real_sub(renderer->relativOrigin.height, real_one);
 }
 
-void renderer_renderNewRelativeLocation(Renderer* renderer, Location playerLocation)
+void renderer_moveTo(Renderer* renderer, Location relativOrigin)
 {
-    renderer->relativOrigin = playerLocation;
+    renderer->relativOrigin = relativOrigin;
 }

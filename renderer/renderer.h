@@ -22,15 +22,15 @@ void renderer_free(Renderer* renderer);
  */
 void renderer_render(Renderer* renderer, GColor* framebuffer);
 
-void renderer_renderNewRelativeLocation(Renderer* renderer, Location playerLocation);
-void renderer_renderRotateRight(Renderer* renderer);
-void renderer_renderRotateLeft(Renderer* renderer);
-void renderer_renderMoveRight(Renderer* renderer);
-void renderer_renderMoveLeft(Renderer* renderer);
-void renderer_renderMoveUp(Renderer* renderer);
-void renderer_renderMoveDown(Renderer* renderer);
-void renderer_renderMoveForward(Renderer* renderer);
-void renderer_renderMoveBackwards(Renderer* renderer);
+void renderer_moveTo(Renderer* renderer, Location playerLocation);
+void renderer_rotateRight(Renderer* renderer);
+void renderer_rotateLeft(Renderer* renderer);
+void renderer_moveRight(Renderer* renderer);
+void renderer_moveLeft(Renderer* renderer);
+void renderer_moveUp(Renderer* renderer);
+void renderer_moveDown(Renderer* renderer);
+void renderer_moveForward(Renderer* renderer);
+void renderer_moveBackwards(Renderer* renderer);
 
 #ifdef DEBUG_WINDOWS
 #include <SDL.h>

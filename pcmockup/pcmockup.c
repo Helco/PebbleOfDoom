@@ -55,35 +55,35 @@ int main(int argc, char* argv[])
                     case (SDLK_ESCAPE): { isRunning = 0; }break;
                     case (SDLK_w):
                     {
-                        renderer_renderMoveForward(renderer);
+                        renderer_moveForward(renderer);
                     }break;
                     case (SDLK_s):
                     {
-                        renderer_renderMoveBackwards(renderer);
+                        renderer_moveBackwards(renderer);
                     }break;
                     case (SDLK_a):
                     {
-                        renderer_renderMoveLeft(renderer);
+                        renderer_moveLeft(renderer);
                     }break;
                     case (SDLK_d):
                     {
-                        renderer_renderMoveRight(renderer);
+                        renderer_moveRight(renderer);
                     }break;
                     case (SDLK_RIGHT):
                     {
-                        renderer_renderRotateRight(renderer);
+                        renderer_rotateRight(renderer);
                     }break;
                     case (SDLK_LEFT):
                     {
-                        renderer_renderRotateLeft(renderer);
+                        renderer_rotateLeft(renderer);
                     }break;
                     case (SDLK_UP):
                     {
-                        renderer_renderMoveUp(renderer);
+                        renderer_moveUp(renderer);
                     }break;
                     case (SDLK_DOWN):
                     {
-                        renderer_renderMoveDown(renderer);
+                        renderer_moveDown(renderer);
                     }break;
                     case (SDLK_SPACE):
                     { 
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
                         playerLocation.height = real_zero;
                         playerLocation.position = xz(real_from_int(20), real_from_int(20));
 
-                        renderer_renderNewRelativeLocation(renderer, playerLocation);
+                        renderer_moveTo(renderer, playerLocation);
                     }break;
                 }
             }
