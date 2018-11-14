@@ -33,7 +33,6 @@ int main(int argc, char* argv[])
         return -1;
 
     GColor* framebuffer = pebbleWindow_getPebbleFramebuffer(pebbleWindow);
-    renderer_render(renderer, framebuffer);
 
     int isRunning = 1;
     while (isRunning)
@@ -54,9 +53,46 @@ int main(int argc, char* argv[])
                 switch(event.key.keysym.sym)
                 {
                     case (SDLK_ESCAPE): { isRunning = 0; }break;
-                    case (SDLK_SPACE):
+                    case (SDLK_w):
                     {
-                        renderer_render(renderer, framebuffer);
+                        renderer_moveForward(renderer);
+                    }break;
+                    case (SDLK_s):
+                    {
+                        renderer_moveBackwards(renderer);
+                    }break;
+                    case (SDLK_a):
+                    {
+                        renderer_moveLeft(renderer);
+                    }break;
+                    case (SDLK_d):
+                    {
+                        renderer_moveRight(renderer);
+                    }break;
+                    case (SDLK_RIGHT):
+                    {
+                        renderer_rotateRight(renderer);
+                    }break;
+                    case (SDLK_LEFT):
+                    {
+                        renderer_rotateLeft(renderer);
+                    }break;
+                    case (SDLK_UP):
+                    {
+                        renderer_moveUp(renderer);
+                    }break;
+                    case (SDLK_DOWN):
+                    {
+                        renderer_moveDown(renderer);
+                    }break;
+                    case (SDLK_SPACE):
+                    { 
+                        Location playerLocation;
+                        playerLocation.angle = real_degToRad(real_from_int(0));
+                        playerLocation.height = real_zero;
+                        playerLocation.position = xz(real_from_int(20), real_from_int(20));
+
+                        renderer_moveTo(renderer, playerLocation);
                     }break;
                 }
             }

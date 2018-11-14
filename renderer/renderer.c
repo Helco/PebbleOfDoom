@@ -34,10 +34,12 @@ Renderer* renderer_init()
     this->wall3.wallColor = GColorFromRGB(0, 255, 255);
     this->wall3.ceilColor = GColorFromRGB(255, 0, 0);
 
-    this->pos = xz(real_from_int(20), real_from_int(20));
-    this->height = real_zero;
-    this->angle = real_degToRad(real_from_int(223));
+    this->location.position = xz(real_from_int(20), real_from_int(20));
+    this->location.angle = real_degToRad(real_from_int(0));
+    this->location.height = real_zero;
+
     this->halfFov = real_degToRad(real_from_int(30));
+
     xz_t nearPlane, farPlane;
     nearPlane.z = real_from_float(1.0f);
     farPlane.z = real_from_int(500);
@@ -74,12 +76,12 @@ static xz_t myxz_rotate(xz_t a, real_t angleInRad)
 
 xz_t renderer_transformVector(const Renderer* me, xz_t vector)
 {
-    return myxz_rotate(vector, me->angle);
+    return myxz_rotate(vector, me->location.angle);
 }
 
 xz_t renderer_transformPoint(const Renderer* me, xz_t point)
 {
-    return renderer_transformVector(me, xz_sub(point, me->pos));
+    return renderer_transformVector(me, xz_sub(point, me->location.position));
 }
 
 void renderer_transformLine(const Renderer* me, const lineSeg_t* line, lineSeg_t* result)
@@ -107,7 +109,7 @@ typedef struct
 void renderer_project(const Renderer* me, const Wall* wall, const lineSeg_t* transformedSeg, WallSection* projected)
 {
     const real_t halfHeight = real_div(wall->height, real_from_int(2));
-    const real_t relHeightOffset = me->height - wall->heightOffset;
+    const real_t relHeightOffset = me->location.height - wall->heightOffset;
 #define scale_height(value) (real_mul(real_from_int(HALF_RENDERER_HEIGHT), (value)))
     const real_t scaledWallHeight =    scale_height(real_add(halfHeight, relHeightOffset));
     const real_t negScaledWallHeight = scale_height(real_add(real_neg(halfHeight), relHeightOffset));
@@ -181,12 +183,61 @@ void renderer_renderWall(Renderer* this, GColor* framebuffer, const Wall* wall)
     }
 }
 
+void renderer_moveLocation(Renderer* renderer, xz_t xz)
+{
+    xz = xz_rotate(xz, renderer->location.angle);
+    renderer->location.position = xz_add(renderer->location.position, xz);
+}
+
 void renderer_render(Renderer* renderer, GColor* framebuffer)
 {
-    renderer->angle = real_add(renderer->angle, real_degToRad(1));
-
     memset(framebuffer, 0, RENDERER_WIDTH * RENDERER_HEIGHT);
     renderer_renderWall(renderer, framebuffer, &renderer->wall);
     renderer_renderWall(renderer, framebuffer, &renderer->wall2);
     renderer_renderWall(renderer, framebuffer, &renderer->wall3);
+};
+
+void renderer_rotateRight(Renderer* renderer)
+{
+    renderer->location.angle = real_add(renderer->location.angle, real_degToRad(1));
+}
+
+void renderer_rotateLeft(Renderer* renderer)
+{
+    renderer->location.angle = real_sub(renderer->location.angle, real_degToRad(1));
+}
+
+void renderer_moveForward(Renderer* renderer)
+{
+    renderer_moveLocation(renderer, xz(real_one, real_zero));
+}
+
+void renderer_moveBackwards(Renderer* renderer)
+{
+    renderer_moveLocation(renderer, xz(-real_one, real_zero));
+}
+
+void renderer_moveRight(Renderer* renderer)
+{
+    renderer_moveLocation(renderer, xz(real_zero, real_one));
+}
+
+void renderer_moveLeft(Renderer* renderer)
+{
+    renderer_moveLocation(renderer, xz(real_zero, -real_one));
+}
+
+void renderer_moveUp(Renderer* renderer)
+{
+    renderer->location.height = real_add(renderer->location.height, real_one);
+}
+
+void renderer_moveDown(Renderer* renderer)
+{
+    renderer->location.height = real_sub(renderer->location.height, real_one);
+}
+
+void renderer_moveTo(Renderer* renderer, Location relativOrigin)
+{
+    renderer->location = relativOrigin;
 }

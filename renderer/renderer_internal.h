@@ -13,9 +13,8 @@ struct Renderer
 {
     Wall wall, wall2, wall3;
 
-    xz_t pos;
-    real_t height;
-    real_t angle, halfFov, fovStuff;
+    Location location;
+    real_t  fovStuff, halfFov;
     lineSeg_t leftFovSeg, rightFovSeg;
 };
 

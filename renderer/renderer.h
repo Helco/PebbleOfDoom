@@ -8,6 +8,12 @@
 #define RENDERER_HEIGHT 144
 #define HALF_RENDERER_HEIGHT (RENDERER_HEIGHT / 2)
 
+typedef struct {
+    xz_t position;
+    real_t height;
+    real_t angle;
+} Location;
+
 typedef struct Renderer Renderer;
 Renderer* renderer_init();
 void renderer_free(Renderer* renderer);
@@ -15,6 +21,16 @@ void renderer_free(Renderer* renderer);
  * framebuffer - *column-stored* framebuffer pointer
  */
 void renderer_render(Renderer* renderer, GColor* framebuffer);
+
+void renderer_moveTo(Renderer* renderer, Location playerLocation);
+void renderer_rotateRight(Renderer* renderer);
+void renderer_rotateLeft(Renderer* renderer);
+void renderer_moveRight(Renderer* renderer);
+void renderer_moveLeft(Renderer* renderer);
+void renderer_moveUp(Renderer* renderer);
+void renderer_moveDown(Renderer* renderer);
+void renderer_moveForward(Renderer* renderer);
+void renderer_moveBackwards(Renderer* renderer);
 
 #ifdef DEBUG_WINDOWS
 #include <SDL.h>
