@@ -183,6 +183,12 @@ void renderer_renderWall(Renderer* this, GColor* framebuffer, const Wall* wall)
     }
 }
 
+void renderer_movePlayerInPlayerSpace(Renderer* renderer, xz_t xz)
+{
+    xz = xz_rotate(xz, renderer->playerLocation.angle);
+    me->playerLocation.position = xz_add(renderer->playerLocation.position, xz);
+}
+
 void renderer_render(Renderer* renderer, GColor* framebuffer)
 {
     memset(framebuffer, 0, RENDERER_WIDTH * RENDERER_HEIGHT);
@@ -232,11 +238,3 @@ void renderer_renderNewPlayerLocation(Renderer* renderer, GColor* framebuffer, P
     renderer->playerLocation = playerLocation;
     renderer_render(renderer, framebuffer);
 }
-
-void renderer_movePlayerInPlayerSpace(Renderer* me, xz_t xz)
-{
-    xz = xz_rotate(xz, me->playerLocation.angle);
-    me->playerLocation.position = xz_add(me->playerLocation.position, xz);
-}
-
-
