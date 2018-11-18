@@ -9,7 +9,7 @@ struct DebugWindowSet
     Renderer* renderer;
 };
 
-DebugWindowSet* debugWindowSet_init(SDL_Rect mainWindowBounds, Renderer* renderer)
+DebugWindowSet* debugWindowSet_init(const WindowGrid* grid, Renderer* renderer)
 {
     DebugWindowSet* me = (DebugWindowSet*)malloc(sizeof(DebugWindowSet));
     if (me == NULL)
@@ -28,13 +28,11 @@ DebugWindowSet* debugWindowSet_init(SDL_Rect mainWindowBounds, Renderer* rendere
     }
     memset(me->windows, 0, sizeof(DebugWindow*) * me->count);
 
-    SDL_Rect curBounds = mainWindowBounds;
-    curBounds.x += mainWindowBounds.w + WINDOW_GAP;
-
     for (int i = 0; i < me->count; i++)
     {
         me->windows[i] = debugWindow_init(
-            curBounds, i,
+            windowGrid_getSingleBounds(grid, -1 - i),
+            i,
             renderer_getDebugName(renderer, i)
         );
         if (me->windows[i] == NULL)
@@ -42,8 +40,6 @@ DebugWindowSet* debugWindowSet_init(SDL_Rect mainWindowBounds, Renderer* rendere
             debugWindowSet_free(me);
             return NULL;
         }
-
-        curBounds.y += mainWindowBounds.h + WINDOW_GAP;
     }
 #endif
 

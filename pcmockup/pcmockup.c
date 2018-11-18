@@ -18,15 +18,21 @@ int main(int argc, char* argv[])
     if (renderer == NULL)
         return -1;
 
+    SDL_DisplayMode displayMode;
+    SDL_GetCurrentDisplayMode(0, &displayMode);
+    WindowGrid windowGrid;
+    windowGrid.windowCount = 1 + renderer_getDebugCount(renderer);
+    windowGrid.totalSize = GSize(displayMode.w, displayMode.h);
+
     PebbleWindow* pebbleWindow = pebbleWindow_init(
-        GSize(START_WINDOW_WIDTH, START_WINDOW_HEIGHT),
+        windowGrid_getSingleBounds(&windowGrid, 0),
         GSize(RENDERER_WIDTH, RENDERER_HEIGHT)
     );
     if (pebbleWindow == NULL)
         return -1;
 
     DebugWindowSet* debugWindowSet = debugWindowSet_init(
-        pebbleWindow_getBounds(pebbleWindow),
+        &windowGrid,
         renderer
     );
     if (debugWindowSet == NULL)

@@ -12,7 +12,7 @@ struct PebbleWindow
     GSize pebbleSize;
 };
 
-PebbleWindow* pebbleWindow_init(GSize windowSize, GSize pebbleSize)
+PebbleWindow* pebbleWindow_init(SDL_Rect initialBounds, GSize pebbleSize)
 {
     PebbleWindow* this = (PebbleWindow*)malloc(sizeof(PebbleWindow));
     if (this == NULL)
@@ -20,8 +20,8 @@ PebbleWindow* pebbleWindow_init(GSize windowSize, GSize pebbleSize)
     memset(this, 0, sizeof(PebbleWindow));
 
     this->window = SDL_CreateWindow("PebbleOfDoom - PCMockup",
-        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        windowSize.w, windowSize.h,
+        initialBounds.x, initialBounds.y,
+        initialBounds.w, initialBounds.h,
         SDL_WINDOW_RESIZABLE);
     if (this->window == NULL)
     {
