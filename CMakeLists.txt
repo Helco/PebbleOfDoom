@@ -138,6 +138,7 @@ set(sources_pcmockup
     pcmockup/pebblewindow.c
     pcmockup/debugwindow.c
     pcmockup/debugwindowset.c
+    pcmockup/windowgrid.c
 )
 assign_source_group(${sources_pcmockup})
 

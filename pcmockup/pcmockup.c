@@ -132,3 +132,13 @@ SDL_Rect findBestFit(SDL_Rect src, float dstAspect)
     }
     return dst;
 }
+
+SDL_Rect padRect(SDL_Rect rect, GSize amount)
+{
+    return (SDL_Rect) {
+        rect.x + amount.w / 2,
+        rect.y + amount.h / 2,
+        rect.w - amount.w,
+        rect.h - amount.h
+    };
+}
