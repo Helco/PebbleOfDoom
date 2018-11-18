@@ -5,12 +5,11 @@ branches:
   only:
   - master
 
-script:
-  - mkdir -p build
-  - cd build
-  - cmake ..
-  - make
-  - ctest
+jobs:
+  include:
+    - stage: Build&Test
+      name: Linux PCMockup
+      script: bash ./travis/cmake_script.sh
 
 addons:
   apt:
