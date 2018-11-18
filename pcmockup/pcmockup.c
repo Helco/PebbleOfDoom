@@ -2,118 +2,177 @@
 #include "pcmockup.h"
 #include "../renderer/renderer.h"
 
-static const int START_WINDOW_WIDTH = RENDERER_WIDTH * 2;
-static const int START_WINDOW_HEIGHT = RENDERER_HEIGHT * 2;
 static const int MAX_FRAMERATE = 60;
 
-#undef main
-int main(int argc, char* argv[])
+struct PCMockup
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    Renderer *renderer;
+    PebbleWindow *pebbleWindow;
+    DebugWindowSet *debugWindowSet;
+    bool_t isRunning;
+};
+
+PCMockup *pcmockup_init()
+{
+    PCMockup *me = (PCMockup *)malloc(sizeof(PCMockup));
+    if (me == NULL)
     {
-        fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());
-        return -1;
+        fprintf(stderr, "Could not allocate PCMockup context\n");
+        return NULL;
     }
-    Renderer* renderer = renderer_init();
-    if (renderer == NULL)
-        return -1;
+    memset(me, 0, sizeof(PCMockup));
+
+    me->renderer = renderer_init();
+    if (me->renderer == NULL)
+    {
+        pcmockup_free(me);
+        return NULL;
+    }
 
     SDL_DisplayMode displayMode;
     SDL_GetCurrentDisplayMode(0, &displayMode);
     WindowGrid windowGrid;
-    windowGrid.windowCount = 1 + renderer_getDebugCount(renderer);
+    windowGrid.windowCount = 1 + renderer_getDebugCount(me->renderer);
     windowGrid.totalSize = GSize(displayMode.w, displayMode.h);
 
-    PebbleWindow* pebbleWindow = pebbleWindow_init(
+    me->pebbleWindow = pebbleWindow_init(
         windowGrid_getSingleBounds(&windowGrid, 0),
         GSize(RENDERER_WIDTH, RENDERER_HEIGHT)
     );
-    if (pebbleWindow == NULL)
-        return -1;
+    if (me->pebbleWindow == NULL)
+        return NULL;
 
-    DebugWindowSet* debugWindowSet = debugWindowSet_init(
+    me->debugWindowSet = debugWindowSet_init(
         &windowGrid,
-        renderer
+        me->renderer
     );
-    if (debugWindowSet == NULL)
-        return -1;
+    if (me->debugWindowSet == NULL)
+        return NULL;
 
-    GColor* framebuffer = pebbleWindow_getPebbleFramebuffer(pebbleWindow);
+    me->isRunning = true;
+    return me;
+}
 
-    int isRunning = 1;
-    while (isRunning)
+void pcmockup_free(PCMockup *me)
+{
+    if (me == NULL)
+        return;
+    if (me->debugWindowSet == NULL)
+        debugWindowSet_free(me->debugWindowSet);
+    if (me->pebbleWindow == NULL)
+        pebbleWindow_free(me->pebbleWindow);
+    if (me->renderer == NULL)
+        renderer_free(me->renderer);
+    free(me);
+}
+
+void pcmockup_update(PCMockup *me)
+{
+    GColor *framebuffer = pebbleWindow_getPebbleFramebuffer(me->pebbleWindow);
+    renderer_render(me->renderer, framebuffer);
+    pebbleWindow_update(me->pebbleWindow);
+    debugWindowSet_update(me->debugWindowSet);
+
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+    {
+        if (event.type == SDL_QUIT)
+            me->isRunning = 0;
+        else if (event.type == SDL_KEYDOWN)
+        {
+            switch (event.key.keysym.sym)
+            {
+            case (SDLK_ESCAPE):
+            {
+                me->isRunning = 0;
+            }
+            break;
+            case (SDLK_w):
+            {
+                renderer_moveForward(me->renderer);
+            }
+            break;
+            case (SDLK_s):
+            {
+                renderer_moveBackwards(me->renderer);
+            }
+            break;
+            case (SDLK_a):
+            {
+                renderer_moveLeft(me->renderer);
+            }
+            break;
+            case (SDLK_d):
+            {
+                renderer_moveRight(me->renderer);
+            }
+            break;
+            case (SDLK_RIGHT):
+            {
+                renderer_rotateRight(me->renderer);
+            }
+            break;
+            case (SDLK_LEFT):
+            {
+                renderer_rotateLeft(me->renderer);
+            }
+            break;
+            case (SDLK_UP):
+            {
+                renderer_moveUp(me->renderer);
+            }
+            break;
+            case (SDLK_DOWN):
+            {
+                renderer_moveDown(me->renderer);
+            }
+            break;
+            case (SDLK_SPACE):
+            {
+                Location playerLocation;
+                playerLocation.angle = real_degToRad(real_from_int(0));
+                playerLocation.height = real_zero;
+                playerLocation.position = xz(real_from_int(20), real_from_int(20));
+
+                renderer_moveTo(me->renderer, playerLocation);
+            }
+            break;
+            }
+        }
+        debugWindowSet_handleUpdate(me->debugWindowSet, &event);
+    }
+}
+
+void pcmockup_mainLoop(PCMockup *me)
+{
+    while (me->isRunning)
     {
         const uint32_t frameStart = SDL_GetTicks();
 
-        renderer_render(renderer, framebuffer);
-        pebbleWindow_update(pebbleWindow);
-        debugWindowSet_update(debugWindowSet);
-
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_QUIT)
-                isRunning = 0;
-            else if (event.type == SDL_KEYDOWN)
-            {
-                switch(event.key.keysym.sym)
-                {
-                    case (SDLK_ESCAPE): { isRunning = 0; }break;
-                    case (SDLK_w):
-                    {
-                        renderer_moveForward(renderer);
-                    }break;
-                    case (SDLK_s):
-                    {
-                        renderer_moveBackwards(renderer);
-                    }break;
-                    case (SDLK_a):
-                    {
-                        renderer_moveLeft(renderer);
-                    }break;
-                    case (SDLK_d):
-                    {
-                        renderer_moveRight(renderer);
-                    }break;
-                    case (SDLK_RIGHT):
-                    {
-                        renderer_rotateRight(renderer);
-                    }break;
-                    case (SDLK_LEFT):
-                    {
-                        renderer_rotateLeft(renderer);
-                    }break;
-                    case (SDLK_UP):
-                    {
-                        renderer_moveUp(renderer);
-                    }break;
-                    case (SDLK_DOWN):
-                    {
-                        renderer_moveDown(renderer);
-                    }break;
-                    case (SDLK_SPACE):
-                    { 
-                        Location playerLocation;
-                        playerLocation.angle = real_degToRad(real_from_int(0));
-                        playerLocation.height = real_zero;
-                        playerLocation.position = xz(real_from_int(20), real_from_int(20));
-
-                        renderer_moveTo(renderer, playerLocation);
-                    }break;
-                }
-            }
-            debugWindowSet_handleUpdate(debugWindowSet, &event);
-        }
+        pcmockup_update(me);
 
         const uint32_t frameEnd = SDL_GetTicks();
         const int delay = (1000 / MAX_FRAMERATE) - (int)(frameEnd - frameStart);
         if (delay > 0)
             SDL_Delay(delay);
     }
+}
 
-    renderer_free(renderer);
-    pebbleWindow_free(pebbleWindow);
-    debugWindowSet_free(debugWindowSet);
+#undef main
+int main(int argc, char *argv[])
+{
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());
+        return -1;
+    }
+    PCMockup* pcmockup = pcmockup_init();
+    if (pcmockup == NULL)
+        return -1;
+
+    pcmockup_mainLoop(pcmockup);
+
+    pcmockup_free(pcmockup);
     SDL_Quit();
     return 0;
 }

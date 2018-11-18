@@ -36,4 +36,10 @@ void debugWindowSet_free(DebugWindowSet* set);
 void debugWindowSet_update(DebugWindowSet* set);
 void debugWindowSet_handleUpdate(DebugWindowSet* set, const SDL_Event* ev);
 
+typedef struct PCMockup PCMockup;
+PCMockup* pcmockup_init();
+void pcmockup_free(PCMockup* me);
+void pcmockup_update(PCMockup* me);
+void pcmockup_mainLoop(PCMockup* me);
+
 #endif
