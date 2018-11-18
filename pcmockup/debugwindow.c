@@ -1,5 +1,5 @@
 #include "pcmockup.h"
-#include "../renderer/renderer.h"
+#include "renderer.h"
 
 #include <string.h>
 

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "pcmockup.h"
-#include "../renderer/renderer.h"
-#include "../renderer/platform.h"
+#include "renderer.h"
+#include "platform.h"
 
 static const int MAX_FRAMERATE = 60;
 

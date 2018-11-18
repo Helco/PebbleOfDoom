@@ -16,4 +16,7 @@ target_link_libraries(test_podrenderer
     podrenderer
     gtest_main
 )
+target_include_directories(test_podrenderer PUBLIC
+    "../renderer/"
+)
 add_googletest(test_podrenderer "def.")

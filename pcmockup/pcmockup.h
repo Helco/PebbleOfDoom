@@ -2,7 +2,7 @@
 #define PCMOCKUP_H
 #include "sdl.include.h"
 #include "pebble.h"
-#include "../renderer/renderer.h"
+#include "renderer.h"
 
 SDL_Rect findBestFit(SDL_Rect target, float aspect);
 SDL_Rect padRect(SDL_Rect rect, GSize amount);
