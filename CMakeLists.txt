@@ -2,27 +2,6 @@ cmake_minimum_required (VERSION 3.9.2)
 project(pebbleofdoom)
 
 ###################################################################
-# Dependencies
-###################################################################
-
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/" ${CMAKE_MODULE_PATH})
-
-find_package(SDL2 REQUIRED)
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 11)
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    link_libraries(m)
-endif()
-
-include(CTest)
-include(GoogleTest)
-
-if (MSVC AND CMAKE_C_COMPILER_ID STREQUAL "MSVC")
-    message(FATAL_ERROR " Microsoft C Compiler is not supported, please use GCC or Clang")
-endif()
-
-###################################################################
 # Utilities
 ###################################################################
 
@@ -40,15 +19,6 @@ function(assign_source_group)
     endforeach()
 endfunction(assign_source_group)
 
-# To add googletests in the best way regarding cmake version
-function(add_googletest TARGET PREFIX)
-    if (CMAKE_VERSION VERSION_LESS "3.10.0")
-        gtest_add_tests(TARGET ${TARGET} TEST_PREFIX ${PREFIX})
-    else()
-        gtest_discover_tests(${TARGET} TEST_PREFIX ${PREFIX})
-    endif()
-endfunction(add_googletest)
-
 # To enable many many warnings and treat them as errors (portable across msvc/gcc)
 function(enable_warnings TARGET)
     if (MSVC)
@@ -63,55 +33,27 @@ function(enable_warnings TARGET)
 endfunction(enable_warnings)
 
 ###################################################################
-# googletest
+# Dependencies
 ###################################################################
 
-configure_file(external/GTest.CMakeLists.txt.in googletest-download/CMakeLists.txt)
-execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
-if(result)
-  message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-endif()
-execute_process(COMMAND ${CMAKE_COMMAND} --build .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
-if(result)
-  message(FATAL_ERROR "Build step for googletest failed: ${result}")
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/" ${CMAKE_MODULE_PATH})
+
+find_package(SDL2 REQUIRED)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 11)
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    link_libraries(m)
 endif()
 
-# Prevent overriding the parent project's compiler/linker
-# settings on Windows
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+include(CTest)
+include(GoogleTest)
+include("${CMAKE_SOURCE_DIR}/cmake/GTest.cmake")
+include("${CMAKE_SOURCE_DIR}/cmake/stb.cmake")
 
-# Add googletest directly to our build. This defines
-# the gtest and gtest_main targets.
-add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
-                 ${CMAKE_BINARY_DIR}/googletest-build
-                 EXCLUDE_FROM_ALL)
-
-# The gtest/gtest_main targets carry header search path
-# dependencies automatically when using CMake 2.8.11 or
-# later. Otherwise we have to add them here ourselves.
-if (CMAKE_VERSION VERSION_LESS 2.8.11)
-  include_directories("${gtest_SOURCE_DIR}/include")
+if (MSVC AND CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+    message(FATAL_ERROR " Microsoft C Compiler is not supported, please use GCC or Clang")
 endif()
-
-###################################################################
-# stb_image(_write)
-###################################################################
-
-set(sources_stb
-    pcmockup/stb_impl.c
-    external/stb/stb_image.h
-    external/stb/stb_image_write.h
-)
-assign_source_group(${sources_stb})
-
-add_library(stb ${sources_stb})
-target_include_directories(stb PUBLIC
-    "external/stb/"
-)
 
 ###################################################################
 # PoD renderer
@@ -182,11 +124,11 @@ assign_source_group(${sources_pcmockup})
 add_executable(pcmockup ${sources_pcmockup})
 target_link_libraries(pcmockup
     ${SDL2_LIBRARY}
-    stb
+    ${STB_LIBRARY}
     podrenderer
 )
 target_include_directories(pcmockup PUBLIC
-    "external/stb/"
+    ${STB_INCLUDE_DIR}
     "renderer/"
 )
 enable_warnings(pcmockup)
