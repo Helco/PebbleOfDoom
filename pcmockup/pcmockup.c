@@ -139,7 +139,7 @@ void pcmockup_update(PCMockup *me)
             break;
             }
         }
-        debugWindowSet_handleUpdate(me->debugWindowSet, &event);
+        debugWindowSet_handleEvent(me->debugWindowSet, &event);
     }
 }
 

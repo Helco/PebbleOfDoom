@@ -76,7 +76,7 @@ void debugWindowSet_update(DebugWindowSet* me)
 #endif
 }
 
-void debugWindowSet_handleUpdate(DebugWindowSet* me, const SDL_Event* ev)
+void debugWindowSet_handleEvent(DebugWindowSet* me, const SDL_Event* ev)
 {
     for (int i = 0; i < me->count; i++)
         debugWindow_handleEvent(me->windows[i], ev);

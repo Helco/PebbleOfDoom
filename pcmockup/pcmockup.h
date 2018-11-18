@@ -34,7 +34,7 @@ typedef struct DebugWindowSet DebugWindowSet;
 DebugWindowSet* debugWindowSet_init(const WindowGrid* grid, Renderer* renderer);
 void debugWindowSet_free(DebugWindowSet* set);
 void debugWindowSet_update(DebugWindowSet* set);
-void debugWindowSet_handleUpdate(DebugWindowSet* set, const SDL_Event* ev);
+void debugWindowSet_handleEvent(DebugWindowSet* set, const SDL_Event* ev);
 
 typedef struct PCMockup PCMockup;
 PCMockup* pcmockup_init();
