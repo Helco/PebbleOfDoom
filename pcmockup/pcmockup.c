@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "pcmockup.h"
 #include "../renderer/renderer.h"
+#include "../renderer/platform.h"
 
 static const int MAX_FRAMERATE = 60;
 
@@ -161,6 +162,7 @@ void pcmockup_mainLoop(PCMockup *me)
 #undef main
 int main(int argc, char *argv[])
 {
+    UNUSED(argc, argv);
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());

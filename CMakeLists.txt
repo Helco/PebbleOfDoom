@@ -49,6 +49,19 @@ function(add_googletest TARGET PREFIX)
     endif()
 endfunction(add_googletest)
 
+# To enable many many warnings and treat them as errors (portable across msvc/gcc)
+function(enable_warnings TARGET)
+    if (MSVC)
+        target_compile_options(${TARGET} PRIVATE "/W4" "/WX")
+    else()
+        target_compile_options(${TARGET} PRIVATE
+            "-Werror" "-Wall" "-Wextra"
+            "-Wpointer-arith" "-Wlogical-op"
+            "-Wdisabled-optimization" "-Wunsafe-loop-optimizations"
+        )
+    endif()
+endfunction(enable_warnings)
+
 ###################################################################
 # googletest
 ###################################################################
@@ -85,6 +98,22 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
 endif()
 
 ###################################################################
+# stb_image(_write)
+###################################################################
+
+set(sources_stb
+    pcmockup/stb_impl.c
+    external/stb/stb_image.h
+    external/stb/stb_image_write.h
+)
+assign_source_group(${sources_stb})
+
+add_library(stb ${sources_stb})
+target_include_directories(stb PUBLIC
+    "external/stb/"
+)
+
+###################################################################
 # PoD renderer
 ###################################################################
 
@@ -109,6 +138,7 @@ target_compile_definitions(podrenderer
     PUBLIC REAL_USE_FLOAT
     PUBLIC DEBUG_WINDOWS
 )
+enable_warnings(podrenderer)
 
 ###################################################################
 # tests
@@ -137,6 +167,7 @@ add_googletest(test_podrenderer "def.")
 set(sources_pcmockup
     pcmockup/pebble.h
     pcmockup/sdl.include.h
+    pcmockup/stb.include.h
     pcmockup/stb_impl.c
 
     pcmockup/pcmockup.h
@@ -149,14 +180,13 @@ set(sources_pcmockup
 assign_source_group(${sources_pcmockup})
 
 add_executable(pcmockup ${sources_pcmockup})
-add_dependencies(pcmockup
-    podrenderer
-)
 target_link_libraries(pcmockup
     ${SDL2_LIBRARY}
+    stb
     podrenderer
 )
 target_include_directories(pcmockup PUBLIC
     "external/stb/"
     "renderer/"
 )
+enable_warnings(pcmockup)

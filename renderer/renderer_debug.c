@@ -1,13 +1,16 @@
 #ifdef DEBUG_WINDOWS
 #include "renderer_internal.h"
+#include "platform.h"
 
 int renderer_getDebugCount(Renderer* renderer)
 {
+    UNUSED(renderer);
     return 2;
 }
 
 const char* renderer_getDebugName(Renderer* renderer, int index)
 {
+    UNUSED(renderer);
     if (index < 0 || index > 1)
         return "";
     static const char* const NAMES[] = {
