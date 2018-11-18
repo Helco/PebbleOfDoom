@@ -56,79 +56,9 @@ if (MSVC AND CMAKE_C_COMPILER_ID STREQUAL "MSVC")
 endif()
 
 ###################################################################
-# PoD renderer
+# sub-directories
 ###################################################################
 
-set(sources_podrenderer
-    renderer/renderer.h
-    renderer/renderer.c
-    renderer/renderer_debug.c
-    renderer/algebra_float.c
-    renderer/algebra.h
-    renderer/algebra.c
-
-    pcmockup/pebble.c
-)
-assign_source_group(${sources_podrenderer})
-
-add_library(podrenderer ${sources_podrenderer})
-target_include_directories(podrenderer PUBLIC
-    "pcmockup/" # to access pebble.h
-    ${SDL2_INCLUDE_DIR} # for debug output
-)
-target_compile_definitions(podrenderer
-    PUBLIC REAL_USE_FLOAT
-    PUBLIC DEBUG_WINDOWS
-)
-enable_warnings(podrenderer)
-
-###################################################################
-# tests
-###################################################################
-
-set(sources_test_podrenderer
-    test/fixtures.h
-    test/test_real.cpp
-    test/test_vector.cpp
-    test/test_intersection.cpp
-    test/test_integer.cpp
-)
-assign_source_group(${sources_test_podrenderer})
-
-add_executable(test_podrenderer ${sources_test_podrenderer})
-target_link_libraries(test_podrenderer
-    podrenderer
-    gtest_main
-)
-add_googletest(test_podrenderer "def.")
-
-###################################################################
-# PC Mockup
-###################################################################
-
-set(sources_pcmockup
-    pcmockup/pebble.h
-    pcmockup/sdl.include.h
-    pcmockup/stb.include.h
-    pcmockup/stb_impl.c
-
-    pcmockup/pcmockup.h
-    pcmockup/pcmockup.c
-    pcmockup/pebblewindow.c
-    pcmockup/debugwindow.c
-    pcmockup/debugwindowset.c
-    pcmockup/windowgrid.c
-)
-assign_source_group(${sources_pcmockup})
-
-add_executable(pcmockup ${sources_pcmockup})
-target_link_libraries(pcmockup
-    ${SDL2_LIBRARY}
-    ${STB_LIBRARY}
-    podrenderer
-)
-target_include_directories(pcmockup PUBLIC
-    ${STB_INCLUDE_DIR}
-    "renderer/"
-)
-enable_warnings(pcmockup)
+add_subdirectory("renderer")
+add_subdirectory("test")
+add_subdirectory("pcmockup")

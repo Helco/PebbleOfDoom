@@ -13,7 +13,10 @@ set(sources_stb
 assign_source_group(${sources_stb})
 
 add_library(stb ${sources_stb})
-target_include_directories(stb PUBLIC ${STB_DIR})
+target_include_directories(stb PUBLIC
+    ${STB_DIR}
+    "pcmockup"
+)
 
 set(STB_LIBRARY "stb")
 set(STB_INCLUDE_DIR ${STB_DIR})
