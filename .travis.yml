@@ -1,12 +1,9 @@
 language: cpp
+sudo: false
 
 branches:
   only:
   - master
-
-before_install:
-  - sudo apt-get install -y libegl1-mesa-dev libgles2-mesa-dev
-  - sudo apt-get install -y libsdl2-dev
 
 script:
   - mkdir -p build
@@ -14,3 +11,13 @@ script:
   - cmake ..
   - make
   - ctest
+
+addons:
+  apt:
+    packages:
+    - python2.7-dev
+    - python-pip
+    - python-virtualenv
+    - libegl1-mesa-dev
+    - libgles2-mesa-dev
+    - libsdl2-dev
