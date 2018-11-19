@@ -4,6 +4,19 @@
 Please remember to clone this repository with the parameter `--recurse-submodules` or use `git submodule update --init --recursive` to download dependencies after cloning
 ```
 
+## Coordinate system
+
+This project uses the left-hand y-up coordinate system for both screen- and world-space, thus it looks like this:
+
+```
+y
+^
+|   z
+| /
+|/
++--------> x
+```
+
 ## PCMockup build instructions
 
 In any case you need a recent version of CMake and the SDL2 library (prebuilt) on your computer. It is much recommended that you create a `build` folder and then run `cmake ..` in your favorite terminal.
