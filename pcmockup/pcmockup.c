@@ -18,15 +18,21 @@ int main(int argc, char* argv[])
     if (renderer == NULL)
         return -1;
 
+    SDL_DisplayMode displayMode;
+    SDL_GetCurrentDisplayMode(0, &displayMode);
+    WindowGrid windowGrid;
+    windowGrid.windowCount = 1 + renderer_getDebugCount(renderer);
+    windowGrid.totalSize = GSize(displayMode.w, displayMode.h);
+
     PebbleWindow* pebbleWindow = pebbleWindow_init(
-        GSize(START_WINDOW_WIDTH, START_WINDOW_HEIGHT),
+        windowGrid_getSingleBounds(&windowGrid, 0),
         GSize(RENDERER_WIDTH, RENDERER_HEIGHT)
     );
     if (pebbleWindow == NULL)
         return -1;
 
     DebugWindowSet* debugWindowSet = debugWindowSet_init(
-        pebbleWindow_getBounds(pebbleWindow),
+        &windowGrid,
         renderer
     );
     if (debugWindowSet == NULL)
@@ -131,4 +137,14 @@ SDL_Rect findBestFit(SDL_Rect src, float dstAspect)
         dst.y = (src.h / 2) - (dst.h / 2);
     }
     return dst;
+}
+
+SDL_Rect padRect(SDL_Rect rect, GSize amount)
+{
+    return (SDL_Rect) {
+        rect.x + amount.w / 2,
+        rect.y + amount.h / 2,
+        rect.w - amount.w,
+        rect.h - amount.h
+    };
 }

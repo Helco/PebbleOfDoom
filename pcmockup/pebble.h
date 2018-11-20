@@ -29,7 +29,7 @@ typedef struct GPoint
     int16_t x;
     int16_t y;
 } GPoint;
-#define GPoint(x, y) (__makeGPoint((x), (y))
+#define GPoint(x, y) (__makeGPoint((x), (y)))
 GPoint __makeGPoint(int16_t x, int16_t y);
 
 typedef struct GSize
