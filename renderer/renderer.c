@@ -170,8 +170,8 @@ void renderer_renderWall(Renderer* this, GColor* framebuffer, const Wall* wall)
     // render wall
     for (int x = max(0, p.left.x); x <= min(RENDERER_WIDTH - 1, p.right.x); x++) {
         GColor* curPixel = framebuffer + x * RENDERER_HEIGHT;
-        int yCurStart = (x - p.left.x) * (p.right.yStart - p.left.yStart) / (p.right.x - p.left.x) + p.left.yStart;
-        int yCurEnd = (x - p.left.x) * (p.right.yEnd - p.left.yEnd) / (p.right.x - p.left.x) + p.left.yEnd;
+        int yCurStart = lerpi(x, p.left.x, p.right.x, p.left.yStart, p.right.yStart);
+        int yCurEnd = lerpi(x, p.left.x, p.right.x, p.left.yEnd, p.right.yEnd);
 
         int y;
         for (y = 0; y < max(0, yCurStart); y++)
