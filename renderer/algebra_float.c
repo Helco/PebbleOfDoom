@@ -8,122 +8,122 @@
 #include <math.h>
 #include <pebble.h>
 
-const real_t real_one = 1.0f;
-const real_t real_zero = 0.0f;
+const real_t real_one = { 1.0f };
+const real_t real_zero = { 0.0f };
 #define REAL_PI 3.141592653f
-const real_t real_pi = REAL_PI;
-const real_t real_2pi = 2 * REAL_PI;
+const real_t real_pi = { REAL_PI };
+const real_t real_2pi = { 2 * REAL_PI };
 
 real_t real_from_int(int i)
 {
-    return (real_t)i;
+    return (real_t) { (float)i };
 }
 
 int real_to_int(real_t a)
 {
-    return (int)a;
+    return (int)a.v;
 }
 
 real_t real_from_float(float f)
 {
-    return (real_t)f;
+    return (real_t) { f };
 }
 
 float real_to_float(real_t a)
 {
-    return (float)a;
+    return (float)a.v;
 }
 
 int real_to_string(real_t a, char* str, int maxlen)
 {
-    return snprintf(str, maxlen, "%f", a);
+    return snprintf(str, maxlen, "%f", a.v);
 }
 
 real_t real_add(real_t a, real_t b)
 {
-    return a + b;
+    return (real_t){ a.v + b.v };
 }
 
 real_t real_sub(real_t a, real_t b)
 {
-    return a - b;
+    return (real_t){ a.v - b.v };
 }
 
 real_t real_mul(real_t a, real_t b)
 {
-    return a * b;
+    return (real_t){ a.v * b.v };
 }
 
 real_t real_div(real_t a, real_t b)
 {
-    return a / b;
+    return (real_t){ a.v / b.v };
 }
 
 real_t real_reciprocal(real_t a)
 {
-    return 1.0f / a;
+    return (real_t){ 1.0f / a.v };
 }
 
 real_t real_neg(real_t a)
 {
-    return -a;
+    return (real_t){ -a.v };
 }
 
 real_t real_sin(real_t a)
 {
-    float s = (float)sin_lookup((int)(a * TRIG_MAX_ANGLE / real_2pi));
-    return (s / TRIG_MAX_RATIO);
+    float s = (float)sin_lookup((int)(a.v * TRIG_MAX_ANGLE / real_2pi.v));
+    return (real_t){ s / TRIG_MAX_RATIO };
 }
 
 real_t real_cos(real_t a)
 {
-    float s = (float)cos_lookup((int)(a * TRIG_MAX_ANGLE / real_2pi));
-    return (s / TRIG_MAX_RATIO);
+    float s = (float)cos_lookup((int)(a.v * TRIG_MAX_ANGLE / real_2pi.v));
+    return (real_t){ s / TRIG_MAX_RATIO };
 }
 
 real_t real_tan(real_t a)
 {
-    return real_sin(a) / real_cos(a);
+    return (real_t){ real_sin(a).v / real_cos(a).v };
 }
 
 real_t real_degToRad(real_t deg)
 {
-    return deg * real_pi / 180.0f;
+    return (real_t){ deg.v * real_pi.v / 180.0f };
 }
 
 real_t real_radToDeg(real_t rad)
 {
-    return rad * 180.0f / real_pi;
+    return (real_t){ rad.v * 180.0f / real_pi.v };
 }
 
 int real_compare(real_t a, real_t b)
 {
-    return (a > b) - (a < b);
+    return (a.v > b.v) - (a.v < b.v);
 }
 
 bool_t real_inBetween(real_t value, real_t min, real_t max)
 {
-    return value >= min && value <= max;
+    return value.v >= min.v && value.v <= max.v;
 }
 
 real_t real_min(real_t a, real_t b)
 {
-    return a < b ? a : b;
+    return (real_t){ a.v < b.v ? a.v : b.v };
 }
 
 real_t real_max(real_t a, real_t b)
 {
-    return a > b ? a : b;
+    return (real_t){ a.v > b.v ? a.v : b.v };
 }
 
 real_t real_abs(real_t a)
 {
-    return a < 0 ? -a : a;
+    return (real_t){ a.v < 0 ? -a.v : a.v };
 }
 
 int real_signInt(real_t a)
 {
-    return a < 0 ? -1 : 1;
+    return a.v < 0 ? -1 : 1;
 }
 
 real_t real_lerp(real_t value, real_t start, real_t end)
@@ -139,33 +139,33 @@ real_t real_clamp(real_t minimum, real_t value, real_t maximum)
 
 real_t real_floor(real_t a)
 {
-    return floorf(a);
+    return (real_t){ floorf(a.v) };
 }
 
 real_t real_ceil(real_t a)
 {
-    return ceilf(a);
+    return (real_t){ ceilf(a.v) };
 }
 
 real_t real_round(real_t a)
 {
-    return roundf(a);
+    return (real_t){ roundf(a.v) };
 }
 
 real_t real_fractional(real_t a)
 {
     float dummy;
-    return modff(a, &dummy);
+    return (real_t){ modff(a.v, &dummy) };
 }
 
 real_t real_sqrt(real_t a)
 {
-    return sqrtf(a);
+    return (real_t){ sqrtf(a.v) };
 }
 
 real_t real_invSqrt(real_t a)
 {
-    return 1.0f / sqrtf(a);
+    return (real_t){ 1.0f / sqrtf(a.v) };
 }
 
 #endif
