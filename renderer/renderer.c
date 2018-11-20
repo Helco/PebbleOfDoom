@@ -82,7 +82,7 @@ typedef struct
     } left, right;
 } WallSection;
 
-bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
+bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg, TexCoord* texCoord)
 {
     xz_t leftIntersection, rightIntersection;
     bool_t intersectsLeft = xz_lineIntersect(*wallSeg, me->leftFovSeg, &leftIntersection);
@@ -108,7 +108,38 @@ bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
             : inWallSegLeft ? leftIntersection : (result = false, xz_zero);
     }
 
+    real_t texCoordAmpl = real_abs(real_sub(texCoord->start, texCoord->end));
+    real_t texCoordStart = real_min(texCoord->start, texCoord->end);
+    if (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight)
+        texCoord->start = real_add(real_mul(wallPhaseRight, texCoordAmpl), texCoordStart);
+    if (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft)
+        texCoord->end = real_add(real_mul(wallPhaseLeft, texCoordAmpl), texCoordStart);
     return result;
+}
+
+typedef struct {
+    GColor* colors;
+    int width, height;
+} Bild;
+
+static const Bild* genBild()
+{
+    static GColor pixels[64*64];
+    static Bild bild;
+    bild.width = 64;
+    bild.height = 64;
+    bild.colors = pixels;
+    for (int i = 0; i <64*64; i++)
+    {
+        int x = i % 64;
+        int y = i / 64;
+        int c = x ^ y;
+        pixels[i].r = (c >> 0) & 2;
+        pixels[i].g = (c >> 2) & 2;
+        pixels[i].b = (c >> 4) & 2;
+        pixels[i].a = 3;
+    }
+    return &bild;
 }
 
 void renderer_project(const Renderer* me, const Sector* sector, const lineSeg_t* transformedSeg, WallSection* projected)
@@ -139,12 +170,15 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
     const Sector* const sector = request->sector;
     const Wall* const wall = &sector->walls[wallIndex];
     const real_t nearPlane = me->leftFovSeg.start.xz.z;
+    const Bild* bild = genBild();
+
     lineSeg_t wallSeg;
     renderer_transformWall(me, sector, wallIndex, &wallSeg);
     if (real_compare(wallSeg.start.xz.z, nearPlane) < 0 && real_compare(wallSeg.end.xz.z, nearPlane) < 0)
         return;
 
-    if (!renderer_clipByFov(me, &wallSeg))
+    TexCoord texCoord = (TexCoord) { real_zero, real_one };
+    if (!renderer_clipByFov(me, &wallSeg, &texCoord))
         return;
 
     WallSection p;
@@ -177,17 +211,39 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
             me->yTop[x] = yPortalEnd = clampi(yBottom, lerpi(portalNomEnd, 0, sector->height, yCurStart, yCurEnd), yTop);
         }
 
+        int texCol = real_to_int(real_mul(
+            (x - max(0, p.left.x)) * (texCoord.end - texCoord.start) / (min(RENDERER_WIDTH - 1, p.right.x) - max(0, p.left.x) + 1) + texCoord.start,
+            real_from_int(bild->width)));
+        real_t texRow = yCurStart >= 0 ? real_zero
+            : real_mul(real_div(real_from_int(-yCurStart), real_from_int(yCurEnd - yCurStart)), real_from_int(bild->height));
+        real_t texRowIncr = real_div(real_from_int(bild->height), real_from_int(yCurEnd - yCurStart + 1));
+
         int y;
         for (y = yBottom; y < max(yBottom, yCurStart); y++)
             *(curPixel++) = sector->floorColor;
         for (; y <= min(yTop, yPortalStart - 1); y++)
-            *(curPixel++) = wall->color;
+        {
+            int texRowI = real_to_int(texRow);
+            *(curPixel++) = bild->colors[
+                (texRowI % bild->height) * bild->width +
+                (texCol % bild->width)
+            ];
+            texRow = real_add(texRow, texRowIncr);
+        }
         if (wall->portalTo >= 0) {
             //for (; y <= min(yTop, yPortalEnd); y++)
                 //*(curPixel++) = ((y / 4) % 2) ? GColorFromRGB(255, 0, 255) : GColorFromRGB(0, 0, 0);
+            texRow = real_add(texRow, real_mul(texRowIncr, real_from_int(min(yTop, yPortalEnd) - y + 1)));
             curPixel += yPortalEnd - y;
             for (y = yPortalEnd; y <= min(yTop, yCurEnd); y++)
-                *(curPixel++) = wall->color;
+            {
+                int texRowI = real_to_int(texRow);
+                *(curPixel++) = bild->colors[
+                    (texRowI % bild->height) * bild->width +
+                    (texCol % bild->width)
+                ];
+                texRow = real_add(texRow, texRowIncr);
+            }
         }
         for (; y <= yTop; y++)
             *(curPixel++) = sector->ceilColor;
