@@ -2,7 +2,7 @@
 #define ALGEBRA_H
 
 //
-// Integer comparisons
+// Integer
 //
 #ifndef min
 #define min(a,b) ((a)<(b)?(a):(b))
@@ -13,6 +13,9 @@
 #if !defined abs && !defined _MSC_VER
 #define abs(a) ((a)<0?-(a):(a))
 #endif
+
+int lerpi(int value, int inputStart, int inputEnd, int outputStart, int outputEnd);
+int clampi(int start, int value, int end);
 
 //
 // Boolean
@@ -62,6 +65,8 @@ real_t real_min(real_t a, real_t b);
 real_t real_max(real_t a, real_t b);
 real_t real_abs(real_t a);
 int real_signInt(real_t a);
+real_t real_lerp(real_t value, real_t start, real_t end); // input amplitude is normal 1
+real_t real_clamp(real_t minimum, real_t value, real_t maximum);
 
 real_t real_floor(real_t a);
 real_t real_ceil(real_t a);

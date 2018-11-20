@@ -126,6 +126,17 @@ int real_signInt(real_t a)
     return a < 0 ? -1 : 1;
 }
 
+real_t real_lerp(real_t value, real_t start, real_t end)
+{
+    const real_t ampl = real_sub(end, start);
+    return real_add(real_mul(value, ampl), start);
+}
+
+real_t real_clamp(real_t minimum, real_t value, real_t maximum)
+{
+    return real_max(minimum, real_min(value, maximum));
+}
+
 real_t real_floor(real_t a)
 {
     return floorf(a);

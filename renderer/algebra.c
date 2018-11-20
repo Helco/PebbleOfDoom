@@ -2,6 +2,21 @@
 #include <math.h>
 
 //
+// Integer
+//
+int lerpi(int value, int inputStart, int inputEnd, int outputStart, int outputEnd)
+{
+    const int inputAmpl = inputEnd - inputStart;
+    const int outputAmpl = outputEnd - outputStart;
+    return (value - inputStart) * outputAmpl / inputAmpl + outputStart;
+}
+
+int clampi(int start, int value, int end)
+{
+    return max(start, min(value, end));
+}
+
+//
 // 2-dimensional vector
 //
 xy_t xy(real_t x, real_t y)
