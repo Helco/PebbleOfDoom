@@ -134,7 +134,7 @@ void renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
 void renderer_project(const Renderer* me, const Wall* wall, const lineSeg_t* transformedSeg, WallSection* projected)
 {
     const real_t halfHeight = real_div(wall->height, real_from_int(2));
-    const real_t relHeightOffset = me->location.height - wall->heightOffset;
+    const real_t relHeightOffset = real_sub(me->location.height, wall->heightOffset);
 #define scale_height(value) (real_mul(real_from_int(HALF_RENDERER_HEIGHT), (value)))
     const real_t scaledWallHeight =    scale_height(real_add(halfHeight, relHeightOffset));
     const real_t negScaledWallHeight = scale_height(real_add(real_neg(halfHeight), relHeightOffset));
@@ -143,8 +143,8 @@ void renderer_project(const Renderer* me, const Wall* wall, const lineSeg_t* tra
     const xz_t endT = transformedSeg->end.xz;
 
 #define div_and_int(value, z) (real_to_int(real_div((value), (z))))
-    projected->left.x =       div_and_int(real_mul(startT.x, me->fovStuff), startT.z) + HALF_RENDERER_WIDTH;
-    projected->left.x =       real_sub(projected->left.x, real_from_float(0.5f)); // fixes rounding error
+    real_t projectedLeftX =   real_sub(real_div(real_mul(startT.x, me->fovStuff), startT.z), real_from_float(0.5f)); // -0.5 fixes rounding error
+    projected->left.x =       real_to_int(projectedLeftX)                             + HALF_RENDERER_WIDTH;
     projected->left.yStart =  div_and_int(negScaledWallHeight, startT.z)              + HALF_RENDERER_HEIGHT;
     projected->left.yEnd =    div_and_int(scaledWallHeight, startT.z)                 + HALF_RENDERER_HEIGHT;
 
@@ -158,7 +158,7 @@ void renderer_renderWall(Renderer* this, GColor* framebuffer, const Wall* wall)
 {
     lineSeg_t wallSeg;
     renderer_transformWall(this, wall, &wallSeg);
-    if (wallSeg.start.xz.z < 0 && wallSeg.end.xz.z < 0)
+    if (real_compare(wallSeg.start.xz.z, real_zero) < 0 && real_compare(wallSeg.end.xz.z, real_zero) < 0)
         return;
 
     renderer_clipByFov(this, &wallSeg);
@@ -200,12 +200,12 @@ void renderer_render(Renderer* renderer, GColor* framebuffer)
 
 void renderer_rotateRight(Renderer* renderer)
 {
-    renderer->location.angle = real_add(renderer->location.angle, real_degToRad(1));
+    renderer->location.angle = real_add(renderer->location.angle, real_degToRad(real_from_int(1)));
 }
 
 void renderer_rotateLeft(Renderer* renderer)
 {
-    renderer->location.angle = real_sub(renderer->location.angle, real_degToRad(1));
+    renderer->location.angle = real_sub(renderer->location.angle, real_degToRad(real_from_int(1)));
 }
 
 void renderer_moveForward(Renderer* renderer)
@@ -215,7 +215,7 @@ void renderer_moveForward(Renderer* renderer)
 
 void renderer_moveBackwards(Renderer* renderer)
 {
-    renderer_moveLocation(renderer, xz(-real_one, real_zero));
+    renderer_moveLocation(renderer, xz(real_neg(real_one), real_zero));
 }
 
 void renderer_moveRight(Renderer* renderer)
@@ -225,7 +225,7 @@ void renderer_moveRight(Renderer* renderer)
 
 void renderer_moveLeft(Renderer* renderer)
 {
-    renderer_moveLocation(renderer, xz(real_zero, -real_one));
+    renderer_moveLocation(renderer, xz(real_zero, real_neg(real_one)));
 }
 
 void renderer_moveUp(Renderer* renderer)

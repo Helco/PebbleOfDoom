@@ -16,12 +16,12 @@ TEST_F(TestAlgebraVector, constants) {
 
 TEST_F(TestAlgebraVector, constructor) {
     xy_t v1 = xy(real_one, real_zero);
-    EXPECT_EQ(real_one, v1.x);
-    EXPECT_EQ(real_zero, v1.y);
+    expectApproxEq(real_one, v1.x);
+    expectApproxEq(real_zero, v1.y);
 
     xz_t v2 = xz(real_2pi, real_pi);
-    EXPECT_EQ(real_2pi, v2.x);
-    EXPECT_EQ(real_pi, v2.z);
+    expectApproxEq(real_2pi, v2.x);
+    expectApproxEq(real_pi, v2.z);
 }
 
 TEST_F(TestAlgebraVector, add) {
@@ -115,16 +115,16 @@ TEST_F(TestAlgebraVector, normalize) {
 }
 
 TEST_F(TestAlgebraVector, rotate) {
-    xy_t v1 = xy_rotate(xy_right, real_degToRad(90));
+    xy_t v1 = xy_rotate(xy_right, real_degToRad(real_from_int(90)));
     expectApproxEq(real_zero, v1.x);
     expectApproxEq(real_one, v1.y);
 
-    xy_t v2 = xy_rotate(xy_one, real_degToRad(45));
+    xy_t v2 = xy_rotate(xy_one, real_degToRad(real_from_int(45)));
     real_t sqrtTwo = real_sqrt(two);
     expectApproxEq(real_zero, v2.x);
     expectApproxEq(sqrtTwo, v2.y);
 
-    xy_t v3 = xy_rotate(xy(minus_one, two), real_degToRad(-90));
+    xy_t v3 = xy_rotate(xy(minus_one, two), real_degToRad(real_from_int(-90)));
     expectApproxEq(two, v3.x);
     expectApproxEq(real_one, v3.y);
 
