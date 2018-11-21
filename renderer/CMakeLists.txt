@@ -15,9 +15,10 @@ set(sources_podrenderer
 assign_source_group(${sources_podrenderer})
 
 add_library(podrenderer ${sources_podrenderer})
-target_include_directories(podrenderer PUBLIC
-    "../pcmockup/" # to access pebble.h
-    ${SDL2_INCLUDE_DIR} # for debug output
+target_include_directories(podrenderer
+    INTERFACE "."
+    PRIVATE "../pcmockup/" # to access pebble.h
+    PRIVATE ${SDL2_INCLUDE_DIR} # for debug output
 )
 target_compile_definitions(podrenderer
     PUBLIC REAL_USE_FLOAT

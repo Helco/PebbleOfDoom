@@ -21,4 +21,7 @@ target_link_libraries(pcmockup
     ${STB_LIBRARY}
     podrenderer
 )
+target_include_directories(pcmockup
+    PRIVATE ${SDL2_INCLUDE_DIR}
+)
 enable_warnings(pcmockup)

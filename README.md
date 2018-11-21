@@ -35,7 +35,7 @@ As such a typical CMake call on Windows to develop this project looks like this:
 cmake -DSDL2_PATH="C:/libs/SDL2-2.0.5/" -T llvm ..
 ```
 
-You might have to copy your `SDL.dll` in the `build/Debug` or `build/Release` directory to start pcmockup.
+You might have to copy your `SDL.dll` in the `build/pcmockup/Debug` or `build/pcmockup/Release` directory to start pcmockup.
 
 ### With make/gcc
 
