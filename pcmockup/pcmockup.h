@@ -1,6 +1,6 @@
 #ifndef PCMOCKUP_H
 #define PCMOCKUP_H
-#include <SDL.h>
+#include "sdl.include.h"
 #include "pebble.h"
 #include "../renderer/renderer.h"
 

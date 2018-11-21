@@ -33,7 +33,7 @@ void renderer_moveForward(Renderer* renderer);
 void renderer_moveBackwards(Renderer* renderer);
 
 #ifdef DEBUG_WINDOWS
-#include <SDL.h>
+#include <sdl.include.h>
 
 typedef struct DebugInfo
 {
