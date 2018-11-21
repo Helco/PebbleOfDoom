@@ -23,12 +23,10 @@ SDL_Rect pebbleWindow_getBounds(PebbleWindow* window);
 GColor* pebbleWindow_getPebbleFramebuffer(PebbleWindow* window);
 
 typedef struct DebugWindow DebugWindow;
-DebugWindow* debugWindow_init(SDL_Rect bounds, int index, const char* title);
+DebugWindow* debugWindow_init(SDL_Rect bounds, const DebugView* debugView, Renderer* renderer);
 void debugWindow_free(DebugWindow* window);
-void debugWindow_startUpdate(DebugWindow* window);
-void debugWindow_endUpdate(DebugWindow* window);
+void debugWindow_update(DebugWindow* window);
 void debugWindow_handleEvent(DebugWindow* window, const SDL_Event* ev);
-const DebugInfo* debugWindow_getDebugInfo(DebugWindow* window);
 
 typedef struct DebugWindowSet DebugWindowSet;
 DebugWindowSet* debugWindowSet_init(const WindowGrid* grid, Renderer* renderer);

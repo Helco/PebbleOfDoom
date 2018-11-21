@@ -33,18 +33,27 @@ void renderer_moveForward(Renderer* renderer);
 void renderer_moveBackwards(Renderer* renderer);
 
 #ifdef DEBUG_WINDOWS
-#include <sdl.include.h>
+struct SDL_Renderer; // no need to include SDL here
 
-typedef struct DebugInfo
+typedef enum DebugViewType
 {
-    int index;
-    SDL_Renderer* ren;
-    xz_t offset;
-} DebugInfo;
+    DebugViewType_SDL
+} DebugViewType;
 
-int renderer_getDebugCount(Renderer* renderer);
-const char* renderer_getDebugName(Renderer* renderer, int index);
-void renderer_renderDebug(Renderer* me, const DebugInfo* debug);
+typedef void (*DebugViewCallback_SDL)(Renderer* me, struct SDL_Renderer* sdlRenderer, xz_t offset, const void* userdata);
+
+typedef struct DebugView
+{
+    const char* name;
+    DebugViewType type;
+    union {
+        DebugViewCallback_SDL sdl;
+    } callback;
+    const void* userdata; // given to the callbacks
+} DebugView;
+
+int renderer_getDebugCount(const Renderer* renderer);
+const DebugView* renderer_getDebugViews(const Renderer* renderer);
 #endif
 
 #endif
