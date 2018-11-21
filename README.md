@@ -27,6 +27,16 @@ For Visual Studio you have to download the *VC* development library of SDL2 at [
 
 CAUTION: If cmake could not find your SDL2 path you might have to delete the contents of your build folder before trying again, otherwise even correct cmake launches *may not work*!
 
+Further more this is a C11 project, as such the MSVC compiler will not work! To use Visual Studio you have to install [Clang/LLVM](http://releases.llvm.org/download.html) and the [LLVM Toolchain Extension](https://marketplace.visualstudio.com/items?itemName=LLVMExtensions.llvm-toolchain). Also you have to add the parameter `-T llvm` to your CMake call.
+
+As such a typical CMake call on Windows to develop this project looks like this:
+
+```
+cmake -DSDL2_PATH="C:/libs/SDL2-2.0.5/" -T llvm ..
+```
+
+You might have to copy your `SDL.dll` in the `build/Debug` or `build/Release` directory to start pcmockup.
+
 ### With make/gcc
 
 As CMake is generating release makefiles as default you might want to add the parameter `-DCMAKE_BUILD_TYPE=Debug`. With this configuration you can install SDL2 at toolchain/system level and don't have to declare the location of it.

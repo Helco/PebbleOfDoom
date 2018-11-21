@@ -18,6 +18,10 @@ endif()
 include(CTest)
 include(GoogleTest)
 
+if (MSVC AND CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+    message(FATAL_ERROR " Microsoft C Compiler is not supported, please use GCC or Clang")
+endif()
+
 ###################################################################
 # Utilities
 ###################################################################
@@ -131,6 +135,7 @@ add_googletest(test_podrenderer "def.")
 
 set(sources_pcmockup
     pcmockup/pebble.h
+    pcmockup/sdl.include.h
     pcmockup/stb_impl.c
 
     pcmockup/pcmockup.h
@@ -151,7 +156,6 @@ target_link_libraries(pcmockup
     podrenderer
 )
 target_include_directories(pcmockup PUBLIC
-    ${SDL2_INCLUDE_DIR}
     "external/stb/"
     "renderer/"
 )
