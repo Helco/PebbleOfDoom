@@ -3,6 +3,7 @@
 #include <pebble.h>
 #include "algebra.h"
 #include "level.h"
+#include "texture.h"
 
 #define RENDERER_WIDTH 168
 #define HALF_RENDERER_WIDTH (RENDERER_WIDTH / 2)
@@ -13,6 +14,7 @@ typedef struct Renderer Renderer;
 Renderer* renderer_init();
 void renderer_free(Renderer* renderer);
 void renderer_setLevel(Renderer* renderer, const Level* level);
+void renderer_setTextureManager(Renderer* renderer, TextureManagerHandle handle);
 /*
  * framebuffer - *column-stored* framebuffer pointer
  */
