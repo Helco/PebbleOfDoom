@@ -48,4 +48,11 @@ void pcmockup_free(PCMockup* me);
 void pcmockup_update(PCMockup* me);
 void pcmockup_mainLoop(PCMockup* me);
 
+typedef struct TextureManager TextureManager;
+TextureManager* textureManager_init();
+void textureManager_free(TextureManager* me); // asserts that all textures are freed
+TextureId textureManager_registerFile(TextureManager* me, const char* filename); // relative to texture folder
+const Texture* textureManager_loadTexture(TextureManager* me, TextureId id);
+void textureManager_freeTexture(TextureManager* me, const Texture* texture);
+
 #endif

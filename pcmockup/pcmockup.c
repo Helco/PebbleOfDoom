@@ -9,6 +9,7 @@ struct PCMockup
 {
     Renderer *renderer;
     Level* level;
+    TextureManager* textureManager;
     PebbleWindow *pebbleWindow;
     DebugWindowSet *debugWindowSet;
     bool_t isRunning;
@@ -37,7 +38,15 @@ PCMockup *pcmockup_init()
         pcmockup_free(me);
         return NULL;
     }
+
+    me->textureManager = textureManager_init();
+    if (me->textureManager == NULL)
+    {
+        pcmockup_free(me);
+        return NULL;
+    }
     renderer_setLevel(me->renderer, me->level);
+    renderer_setTextureManager(me->renderer, me->textureManager);
 
     SDL_DisplayMode displayMode;
     SDL_GetCurrentDisplayMode(0, &displayMode);
@@ -79,6 +88,8 @@ void pcmockup_free(PCMockup *me)
         pebbleWindow_free(me->pebbleWindow);
     if (me->level != NULL)
         level_free(me->level);
+    if (me->textureManager != NULL)
+        textureManager_free(me->textureManager);
     if (me->renderer != NULL)
         renderer_free(me->renderer);
     free(me);

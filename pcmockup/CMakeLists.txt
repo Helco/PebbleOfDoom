@@ -13,6 +13,8 @@ set(sources_pcmockup
     debugwindowset.c
     windowgrid.c
     safeframebuffer.c
+    rendererinterface.c
+    texturemanager.c
 )
 assign_source_group(${sources_pcmockup})
 
