@@ -9,6 +9,8 @@ set(sources_podrenderer
     algebra_float.c
     algebra.h
     algebra.c
+    level.h
+    level.c
 
     ../pcmockup/pebble.c
 )

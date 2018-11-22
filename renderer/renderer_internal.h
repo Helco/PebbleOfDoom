@@ -2,17 +2,9 @@
 #define RENDERER_INTERNAL_H
 #include "renderer.h"
 
-typedef struct Wall
-{
-    xz_t start, end;
-    real_t height, heightOffset;
-    GColor wallColor, floorColor, ceilColor;
-} Wall;
-
 struct Renderer
 {
-    Wall wall, wall2, wall3;
-
+    const Level* level;
     Location location;
     real_t  fovStuff, halfFov;
     lineSeg_t leftFovSeg, rightFovSeg;

@@ -8,6 +8,7 @@ static const int MAX_FRAMERATE = 60;
 struct PCMockup
 {
     Renderer *renderer;
+    Level* level;
     PebbleWindow *pebbleWindow;
     DebugWindowSet *debugWindowSet;
     bool_t isRunning;
@@ -29,6 +30,14 @@ PCMockup *pcmockup_init()
         pcmockup_free(me);
         return NULL;
     }
+
+    me->level = level_load(0);
+    if (me->level == NULL)
+    {
+        pcmockup_free(me);
+        return NULL;
+    }
+    renderer_setLevel(me->renderer, me->level);
 
     SDL_DisplayMode displayMode;
     SDL_GetCurrentDisplayMode(0, &displayMode);
@@ -68,6 +77,8 @@ void pcmockup_free(PCMockup *me)
         debugWindowSet_free(me->debugWindowSet);
     if (me->pebbleWindow != NULL)
         pebbleWindow_free(me->pebbleWindow);
+    if (me->level != NULL)
+        level_free(me->level);
     if (me->renderer != NULL)
         renderer_free(me->renderer);
     free(me);

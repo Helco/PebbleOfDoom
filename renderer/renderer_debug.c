@@ -58,26 +58,25 @@ xz_t angleToVector(real_t angle, real_t length)
     ), length);
 }
 
+void renderer_renderDebugSector(Renderer* me, SDL_Renderer* sdlRenderer, xz_t offset, const Sector* sector, const RenderWorldOptions* opts)
+{
+    const Wall* curWall = sector->walls;
+    for (int i = 0; i < sector->wallCount; i++, curWall++)
+    {
+        lineSeg_t wallLine;
+        wallLine.start.xz = curWall->startCorner;
+        wallLine.end.xz = sector->walls[(i + 1) % sector->wallCount].startCorner;
+        renderer_setDebugColor(sdlRenderer, curWall->color);
+        renderer_renderSDLDebugLine(me, sdlRenderer, offset, wallLine, opts);
+    }
+}
+
 void renderer_debug_renderWorld(Renderer* me, SDL_Renderer* sdlRenderer, xz_t offset, const void* userdata)
 {
     const RenderWorldOptions* opts = (const RenderWorldOptions*)userdata;
-
-    const Wall* walls[] = {
-        &me->wall,
-        &me->wall2,
-        &me->wall3,
-        NULL
-    };
-    const Wall** curWall = walls;
-    while (*curWall != NULL)
-    {
-        lineSeg_t wallLine;
-        wallLine.start.xz = (*curWall)->start;
-        wallLine.end.xz = (*curWall)->end;
-        renderer_setDebugColor(sdlRenderer, (*curWall)->wallColor);
-        renderer_renderSDLDebugLine(me, sdlRenderer, offset, wallLine, opts);
-        curWall++;
-    }
+    const Sector* curSector = me->level->sectors;
+    for (int i = 0; i < me->level->sectorCount; i++, curSector++)
+        renderer_renderDebugSector(me, sdlRenderer, offset, curSector, opts);
 
     GColor red = GColorFromRGB(255, 0, 0);
     renderer_setDebugColor(sdlRenderer, red);
