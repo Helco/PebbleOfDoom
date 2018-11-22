@@ -96,6 +96,32 @@ TEST_F(TestAlgebraReal, real_signInt) {
     EXPECT_EQ(-1, real_signInt(minus_one));
 }
 
+TEST_F(TestAlgebraReal, real_lerp) {
+    const real_t three_fourths = real_from_float(0.75f);
+    expectApproxEq(real_zero,          real_lerp(real_zero,     real_zero, ten));
+    expectApproxEq(ten,                real_lerp(real_one,      real_zero, ten));
+    expectApproxEq(five,               real_lerp(one_half,      real_zero, ten));
+    expectApproxEq(five,               real_lerp(real_zero,     five, ten));
+    expectApproxEq(real_neg(ten),      real_lerp(real_zero,     real_neg(ten), ten));
+    expectApproxEq(five,               real_lerp(three_fourths, real_neg(ten), ten));
+    expectApproxEq(real_from_int(20),  real_lerp(two,           real_zero, ten));
+    expectApproxEq(real_from_int(-20), real_lerp(real_neg(two), real_zero, ten));
+}
+
+TEST_F(TestAlgebraReal, real_clamp) {
+    const real_t eleven = real_from_int(11);
+    expectApproxEq(five,           real_clamp(real_zero, five, ten));
+    expectApproxEq(real_zero,      real_clamp(real_zero, real_zero, ten));
+    expectApproxEq(real_zero,      real_clamp(real_zero, minus_one, ten));
+    expectApproxEq(ten,            real_clamp(real_zero, eleven, ten));
+    expectApproxEq(real_neg(ten),  real_clamp(real_neg(ten), real_neg(ten), real_zero));
+    expectApproxEq(real_neg(ten),  real_clamp(real_neg(ten), real_neg(eleven), real_zero));
+    expectApproxEq(real_neg(ten),  real_clamp(real_neg(ten), real_neg(ten), real_neg(five)));
+    expectApproxEq(real_neg(ten),  real_clamp(real_neg(ten), real_neg(eleven), real_neg(five)));
+    expectApproxEq(real_neg(five), real_clamp(real_neg(ten), five, real_neg(five)));
+}
+
+
 TEST_F(TestAlgebraReal, real_add) {
     EXPECT_EQ(real_one, real_add(real_zero, real_one));
     EXPECT_EQ(real_zero, real_add(minus_one, real_one));
