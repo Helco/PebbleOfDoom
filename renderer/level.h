@@ -6,7 +6,7 @@
 typedef int TextureId;
 
 typedef struct TexCoord {
-    real_t start, end;
+    xy_t start, end;
 } TexCoord;
 
 typedef struct Location {

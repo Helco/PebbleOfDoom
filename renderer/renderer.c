@@ -108,12 +108,12 @@ bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg, TexCoord* texC
             : inWallSegLeft ? leftIntersection : (result = false, xz_zero);
     }
 
-    real_t texCoordAmpl = real_abs(real_sub(texCoord->start, texCoord->end));
-    real_t texCoordStart = real_min(texCoord->start, texCoord->end);
+    real_t texCoordAmpl = real_abs(real_sub(texCoord->start.x, texCoord->end.x));
+    real_t texCoordStart = real_min(texCoord->start.x, texCoord->end.x);
     if (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight)
-        texCoord->start = real_add(real_mul(wallPhaseRight, texCoordAmpl), texCoordStart);
+        texCoord->start.x = real_add(real_mul(wallPhaseRight, texCoordAmpl), texCoordStart);
     if (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft)
-        texCoord->end = real_add(real_mul(wallPhaseLeft, texCoordAmpl), texCoordStart);
+        texCoord->end.x = real_add(real_mul(wallPhaseLeft, texCoordAmpl), texCoordStart);
     return result;
 }
 
@@ -177,7 +177,7 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
     if (real_compare(wallSeg.start.xz.z, nearPlane) < 0 && real_compare(wallSeg.end.xz.z, nearPlane) < 0)
         return;
 
-    TexCoord texCoord = (TexCoord) { real_zero, real_one };
+    TexCoord texCoord = (TexCoord) { xy_zero, xy_one };
     if (!renderer_clipByFov(me, &wallSeg, &texCoord))
         return;
 
@@ -216,11 +216,14 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
 
         real_t xNormalized = real_div(real_from_int(x - renderLeft), renderAmpl);
         int texCol = real_to_int(
-            real_mul(real_lerp(xNormalized, texCoord.start, texCoord.end), real_from_int(bild->width))
+            real_mul(real_lerp(xNormalized, texCoord.start.x, texCoord.end.x), real_from_int(bild->width))
         );
-        real_t texRow = yCurStart >= 0 ? real_zero
-            : real_mul(real_div(real_from_int(-yCurStart), real_from_int(yCurEnd - yCurStart)), real_from_int(bild->height));
-        real_t texRowIncr = real_div(real_from_int(bild->height), real_from_int(yCurEnd - yCurStart + 1));
+        real_t yNormalized = yCurStart >= 0 ? real_zero
+            : real_div(real_from_int(-yCurStart), real_from_int(yCurEnd - yCurStart));
+        real_t texRow = real_mul(real_lerp(yNormalized, texCoord.start.y, texCoord.end.y), real_from_int(bild->height));
+        real_t texRowIncr = real_div(
+            real_mul(real_sub(texCoord.end.y, texCoord.start.y), real_from_int(bild->height)),
+            real_from_int(yCurEnd - yCurStart + 1));
 
         int y;
         for (y = yBottom; y < max(yBottom, yCurStart); y++)
