@@ -196,10 +196,13 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
     }
 
     // render wall
-    for (int x = max(request->left, p.left.x); x <= min(request->right, p.right.x); x++) {
+    const int renderLeft = max(0, p.left.x);
+    const int renderRight = min(RENDERER_WIDTH - 1, p.right.x);
+    const real_t renderAmpl = real_from_int(renderRight - renderLeft + 1);
+    for (int x = renderLeft; x <= renderRight; x++) {
         const int yBottom = me->yBottom[x];
         const int yTop = me->yTop[x];
-        GColor* curPixel = framebuffer + x * RENDERER_HEIGHT + yBottom;
+        GColor* curPixel = framebuffer + x * RENDERER_HEIGHT;
         int yCurStart = lerpi(x, p.left.x, p.right.x, p.left.yStart, p.right.yStart);
         int yCurEnd = lerpi(x, p.left.x, p.right.x, p.left.yEnd, p.right.yEnd);
         if (yCurEnd < yBottom || yCurStart > yTop || yCurStart >= yCurEnd)
@@ -211,9 +214,10 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
             me->yTop[x] = yPortalEnd = clampi(yBottom, lerpi(portalNomEnd, 0, sector->height, yCurStart, yCurEnd), yTop);
         }
 
-        int texCol = real_to_int(real_mul(
-            (x - max(0, p.left.x)) * (texCoord.end - texCoord.start) / (min(RENDERER_WIDTH - 1, p.right.x) - max(0, p.left.x) + 1) + texCoord.start,
-            real_from_int(bild->width)));
+        real_t xNormalized = real_div(real_from_int(x - renderLeft), renderAmpl);
+        int texCol = real_to_int(
+            real_mul(real_lerp(xNormalized, texCoord.start, texCoord.end), real_from_int(bild->width))
+        );
         real_t texRow = yCurStart >= 0 ? real_zero
             : real_mul(real_div(real_from_int(-yCurStart), real_from_int(yCurEnd - yCurStart)), real_from_int(bild->height));
         real_t texRowIncr = real_div(real_from_int(bild->height), real_from_int(yCurEnd - yCurStart + 1));
