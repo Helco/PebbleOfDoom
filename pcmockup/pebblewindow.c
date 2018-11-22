@@ -2,13 +2,15 @@
 #include <stdio.h>
 #include <string.h>
 
+#define CANARY_BUFFER_SIZE (2) // in framebuffers
+
 struct PebbleWindow
 {
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_Texture* pebbleTexture;
     SDL_PixelFormat* texturePixelFormat;
-    GColor* pebbleFramebuffer;
+    SafeFramebuffer* framebuffer;
     GSize pebbleSize;
 };
 
@@ -57,10 +59,9 @@ PebbleWindow* pebbleWindow_init(SDL_Rect initialBounds, GSize pebbleSize)
         return NULL;
     }
 
-    me->pebbleFramebuffer = (GColor*)malloc(sizeof(GColor) * pebbleSize.w * pebbleSize.h);
-    if (me->pebbleFramebuffer == NULL)
+    me->framebuffer = safeFramebuffer_init(pebbleSize, CANARY_BUFFER_SIZE);
+    if (me->framebuffer == NULL)
     {
-        fprintf(stderr, "Could not allocate pebble framebuffer!\n");
         pebbleWindow_free(me);
         return NULL;
     }
@@ -74,8 +75,8 @@ void pebbleWindow_free(PebbleWindow* me)
 {
     if (me == NULL)
         return;
-    if (me->pebbleFramebuffer != NULL)
-        free(me->pebbleFramebuffer);
+    if (me->framebuffer != NULL)
+        safeFramebuffer_free(me->framebuffer);
     if (me->texturePixelFormat != NULL)
         SDL_FreeFormat(me->texturePixelFormat);
     if (me->pebbleTexture != NULL)
@@ -107,7 +108,7 @@ static inline SDL_Color prv_convertGColorTo32Bit(GColor pebbleColor)
 
 static void prv_pebbleWindow_convertPebbleToTexture(PebbleWindow* me)
 {
-    const GColor* pebblePixels = me->pebbleFramebuffer;
+    const GColor* pebblePixels = pebbleWindow_getPebbleFramebuffer(me);
     char* texPixels;
     int texPitch;
     SDL_LockTexture(me->pebbleTexture, NULL, (void**)&texPixels, &texPitch);
@@ -134,8 +135,14 @@ static void prv_pebbleWindow_convertPebbleToTexture(PebbleWindow* me)
     SDL_UnlockTexture(me->pebbleTexture);
 }
 
-void pebbleWindow_update(PebbleWindow* me)
+void pebbleWindow_startUpdate(PebbleWindow* me)
 {
+    safeFramebuffer_prepare(me->framebuffer);
+}
+
+void pebbleWindow_endUpdate(PebbleWindow* me)
+{
+    safeFramebuffer_check(me->framebuffer);
     prv_pebbleWindow_convertPebbleToTexture(me);
 
     SDL_SetRenderDrawColor(me->renderer, 255, 0, 255, 255);
@@ -155,5 +162,5 @@ SDL_Rect pebbleWindow_getBounds(PebbleWindow* me)
 
 GColor* pebbleWindow_getPebbleFramebuffer(PebbleWindow* window)
 {
-    return window->pebbleFramebuffer;
+    return safeFramebuffer_getScreenBuffer(window->framebuffer);
 }

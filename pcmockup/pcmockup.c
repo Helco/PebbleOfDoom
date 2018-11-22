@@ -76,8 +76,9 @@ void pcmockup_free(PCMockup *me)
 void pcmockup_update(PCMockup *me)
 {
     GColor *framebuffer = pebbleWindow_getPebbleFramebuffer(me->pebbleWindow);
+    pebbleWindow_startUpdate(me->pebbleWindow);
     renderer_render(me->renderer, framebuffer);
-    pebbleWindow_update(me->pebbleWindow);
+    pebbleWindow_endUpdate(me->pebbleWindow);
     debugWindowSet_update(me->debugWindowSet);
 
     SDL_Event event;

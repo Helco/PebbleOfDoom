@@ -12,6 +12,7 @@ set(sources_pcmockup
     debugwindow.c
     debugwindowset.c
     windowgrid.c
+    safeframebuffer.c
 )
 assign_source_group(${sources_pcmockup})
 
