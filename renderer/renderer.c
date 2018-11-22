@@ -173,6 +173,8 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const Wall* wall)
         GColor* curPixel = framebuffer + x * RENDERER_HEIGHT;
         int yCurStart = lerpi(x, p.left.x, p.right.x, p.left.yStart, p.right.yStart);
         int yCurEnd = lerpi(x, p.left.x, p.right.x, p.left.yEnd, p.right.yEnd);
+        if (yCurEnd < 0 || yCurStart >= RENDERER_HEIGHT)
+            continue;
 
         int y;
         for (y = 0; y < max(0, yCurStart); y++)
@@ -196,7 +198,7 @@ void renderer_render(Renderer* renderer, GColor* framebuffer)
     renderer_renderWall(renderer, framebuffer, &renderer->wall);
     renderer_renderWall(renderer, framebuffer, &renderer->wall2);
     renderer_renderWall(renderer, framebuffer, &renderer->wall3);
-};
+}
 
 void renderer_rotateRight(Renderer* renderer)
 {
