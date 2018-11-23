@@ -24,7 +24,7 @@ bool_t texGen_xor_execute(GColor* output, int logSize, const void* rawParams)
         if (params->useColor)
         {
             output->g = (c >> 2) & 3;
-            output->b = (c >> 2) & 3;
+            output->b = (c >> 4) & 3;
         }
     }
     return true;

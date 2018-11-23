@@ -67,6 +67,8 @@ TextureId texgen_getTextureId(TexGenerationContext* ctx);
 #define TexGenParam_XOR_UseColor (TexGenParamID('C', 'O', 'L', '\0'))
 
 #define TexGenerator_Rand (TexGeneratorID('R', 'A', 'N', 'D'))
-#define TexGenParam_Rand_UseColor (TexGenParamID('C', 'O', 'L', '\0'))
+#define TexGenParam_Rand_UseColor (TexGenParamID('U', 'C', 'O', 'L'))
+#define TexGenParam_Rand_UseSeed (TexGenParamID('U', 'S', 'E', 'E'))
+#define TexGenParam_Rand_Seed (TexGenParamID('S', 'E', 'E', 'D'))
 
 #endif

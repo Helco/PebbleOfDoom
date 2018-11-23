@@ -5,7 +5,9 @@
  */
 
 extern TEXGENERATOR_HEADER(XOR);
+extern TEXGENERATOR_HEADER(Rand);
 
 static const TexGeneratorInitializer rawtexgen_registry[] = {
-    TEXGENERATOR_SYMBOL(XOR)
+    TEXGENERATOR_SYMBOL(XOR),
+    TEXGENERATOR_SYMBOL(Rand)
 };
