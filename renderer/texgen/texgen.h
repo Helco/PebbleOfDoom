@@ -27,7 +27,7 @@ typedef union TexGenParamID {
 
 typedef enum TexGeneratorParamType {
     TexGenParamType_Int = 0,
-    TexGenParamType_Real,
+    TexGenParamType_Float,
     TexGenParamType_Bool,
 } TexGeneratorParamType;
 
@@ -52,15 +52,15 @@ bool_t texgen_getGeneratorByID(TexGeneratorInfo* info, TexGeneratorID id);
 bool_t texgen_getParameterByIndex(TexGeneratorParameterInfo* info, TexGeneratorID id, int index);
 bool_t texgen_getParameterByID(TexGeneratorParameterInfo* info, TexGeneratorID genId, TexGenParamID paramId);
 
-TexGenerationContext* texgen_init(TexGeneratorID id, int size);
+TexGenerationContext* texgen_init(TextureManagerHandle textureManager, TexGeneratorID id, int size);
 void texgen_free(TexGenerationContext* ctx);
 void texgen_setParamInt(TexGenerationContext* ctx, TexGenParamID id, int value);
-void texgen_setParamReal(TexGenerationContext* ctx, TexGenParamID id, real_t value);
+void texgen_setParamFloat(TexGenerationContext* ctx, TexGenParamID id, float value);
 void texgen_setParamBool(TexGenerationContext* ctx, TexGenParamID id, bool_t value);
 void texgen_setParams(TexGenerationContext* ctx, const void* paramBlock);
 void texgen_getParams(TexGenerationContext* ctx, void* outParamBlock);
 void texgen_execute(TexGenerationContext* ctx);
-const Texture* texgen_getTexture(TexGenerationContext* ctx);
+TextureId texgen_getTextureId(TexGenerationContext* ctx);
 
 #define TexGenerator_XOR (TexGeneratorID('X', 'O', 'R', '\0'))
 #define TexParam_XOR_UseColor (TexGenParamID('C', 'O', 'L', '\0'))

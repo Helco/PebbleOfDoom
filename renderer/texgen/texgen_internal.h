@@ -18,8 +18,8 @@
     }
 #define TEXGENPARAM_INT(id,description,type,member) \
     TEXGENPARAM(id, description, TexGenParamType_Int, type, member)
-#define TEXGENPARAM_REAL(id,description,type,member) \
-    TEXGENPARAM(id, description, TexGenParamType_Real, type, member)
+#define TEXGENPARAM_FLOAT(id,description,type,member) \
+    TEXGENPARAM(id, description, TexGenParamType_Float, type, member)
 #define TEXGENPARAM_BOOL(id,description,type,member) \
     TEXGENPARAM(id, description, TexGenParamType_Bool, type, member)
 
@@ -51,6 +51,17 @@ typedef struct TexGenerator {
     TexGeneratorCallback callback;
     const TexGeneratorParam* params;
 } TexGenerator;
+
+struct TexGenerationContext {
+    TextureManagerHandle textureManager;
+    const TexGenerator* generator;
+    const Texture* texture;
+    GColor* pixels;
+    void* paramBlock;
+    int logSize;
+};
+
+// List of registered texture generators
 
 extern const TexGenerator TEXGENERATOR_SYMBOL(XOR);
 
