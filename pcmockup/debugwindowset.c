@@ -32,8 +32,8 @@ DebugWindowSet* debugWindowSet_init(const WindowGrid* grid, Renderer* renderer)
     {
         me->windows[i] = debugWindow_init(
             windowGrid_getSingleBounds(grid, -1 - i),
-            i,
-            renderer_getDebugName(renderer, i)
+            &renderer_getDebugViews(renderer)[i],
+            renderer
         );
         if (me->windows[i] == NULL)
         {
@@ -68,15 +68,12 @@ void debugWindowSet_update(DebugWindowSet* me)
 #ifdef DEBUG_WINDOWS
     for (int i = 0; i < me->count; i++)
     {
-        debugWindow_startUpdate(me->windows[i]);
-        const DebugInfo* info = debugWindow_getDebugInfo(me->windows[i]);
-        renderer_renderDebug(me->renderer, info);
-        debugWindow_endUpdate(me->windows[i]);
+        debugWindow_update(me->windows[i]);
     }
 #endif
 }
 
-void debugWindowSet_handleUpdate(DebugWindowSet* me, const SDL_Event* ev)
+void debugWindowSet_handleEvent(DebugWindowSet* me, const SDL_Event* ev)
 {
     for (int i = 0; i < me->count; i++)
         debugWindow_handleEvent(me->windows[i], ev);

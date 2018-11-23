@@ -1,5 +1,5 @@
 #include "pcmockup.h"
-#include "../renderer/renderer.h"
+#include "renderer.h"
 
 #include <string.h>
 
@@ -9,19 +9,20 @@ struct DebugWindow
     SDL_Renderer* renderer;
     SDL_Texture* texture;
     SDL_Rect texturePos;
-    DebugInfo info;
-    xz_t position;
+    Renderer* podRenderer;
+    const DebugView* view;
+    xz_t position, offset;
     real_t zoom;
 };
 
-DebugWindow* debugWindow_init(SDL_Rect bounds, int index, const char* title)
+DebugWindow* debugWindow_init(SDL_Rect bounds, const DebugView* view, Renderer* podRenderer)
 {
     DebugWindow* me = (DebugWindow*)malloc(sizeof(DebugWindow));
     if (me == NULL)
         return NULL;
     memset(me, 0, sizeof(DebugWindow));
 
-    me->window = SDL_CreateWindow(title,
+    me->window = SDL_CreateWindow(view->name,
         bounds.x, bounds.y,
         bounds.w, bounds.h,
         SDL_WINDOW_RESIZABLE);
@@ -42,9 +43,9 @@ DebugWindow* debugWindow_init(SDL_Rect bounds, int index, const char* title)
 
     me->position = xz(real_zero, real_zero);
     me->zoom = real_one;
-    me->info.index = index;
-    me->info.offset = xz(real_from_int(bounds.w / 2), real_from_int(bounds.h / 2));
-    me->info.ren = me->renderer;
+    me->offset = xz(real_from_int(bounds.w / 2), real_from_int(bounds.h / 2));
+    me->podRenderer = podRenderer;
+    me->view = view;
     return me;
 }
 
@@ -104,6 +105,13 @@ void debugWindow_endUpdate(DebugWindow* me)
     SDL_RenderPresent(me->renderer);
 }
 
+void debugWindow_update(DebugWindow* me)
+{
+    debugWindow_startUpdate(me);
+    me->view->callback.sdl(me->podRenderer, me->renderer, me->offset, me->view->userdata);
+    debugWindow_endUpdate(me);
+}
+
 void debugWindow_handleEvent(DebugWindow* me, const SDL_Event* ev)
 {
     Uint32 windowID = SDL_GetWindowID(me->window);
@@ -128,13 +136,8 @@ void debugWindow_handleEvent(DebugWindow* me, const SDL_Event* ev)
     int textureW, textureH;
     SDL_QueryTexture(me->texture, NULL, NULL, &textureW, &textureH);
     xz_t halfSize = xz(real_from_int(textureW / 2), real_from_int(textureH / 2));
-    me->info.offset = xz_sub(
+    me->offset = xz_sub(
         xz_invScale(halfSize, me->zoom),
         me->position
     );
-}
-
-const DebugInfo* debugWindow_getDebugInfo(DebugWindow* me)
-{
-    return &me->info;
 }

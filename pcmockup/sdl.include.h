@@ -18,7 +18,9 @@
  */
 
 #pragma GCC diagnostic push
+#ifdef __clang__
 #pragma GCC diagnostic ignored "-Wpragma-pack"
 #pragma GCC diagnostic ignored "-Wmacro-redefined"
+#endif
 #include<SDL.h>
 #pragma GCC diagnostic pop
