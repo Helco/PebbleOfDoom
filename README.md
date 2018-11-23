@@ -1,4 +1,4 @@
-# PebbleOfDoom [![Build Status](https://travis-ci.com/Helco/PebbleOfDoom.svg?token=ppZoE6wRQrszEciSQ3hJ&branch=master)](https://travis-ci.com/Helco/PebbleOfDoom)
+# PebbleOfDoom [![Build Status](https://travis-ci.com/Helco/PebbleOfDoom.svg?token=ppZoE6wRQrszEciSQ3hJ&branch=master)](https://travis-ci.com/Helco/PebbleOfDoom) [![CodeFactor](https://www.codefactor.io/repository/github/helco/pebbleofdoom/badge)](https://www.codefactor.io/repository/github/helco/pebbleofdoom)
 
 ```
 Please remember to clone this repository with the parameter `--recurse-submodules` or use `git submodule update --init --recursive` to download dependencies after cloning
