@@ -4,13 +4,27 @@ branches:
   only:
   - master
 
-before_install:
-  - sudo apt-get install -y libegl1-mesa-dev libgles2-mesa-dev
-  - sudo apt-get install -y libsdl2-dev
+jobs:
+  include:
+    - stage: Build&Test
+      name: Linux PCMockup
+      script: bash ./travis/cmake_script.sh
+    - stage: Build&Test
+      name: Pebble
+      before_script: bash ./travis/pebble_before_script.sh
+      script: bash ./travis/pebble_script.sh
+      cache:
+        directories:
+          - $HOME/pebble-dev
+          - $HOME/.cache/pip
+          - $HOME/.pebble-sdk
 
-script:
-  - mkdir -p build
-  - cd build
-  - cmake ..
-  - make
-  - ctest
+addons:
+  apt:
+    packages:
+    - python2.7-dev
+    - python-pip
+    - python-virtualenv
+    - libegl1-mesa-dev
+    - libgles2-mesa-dev
+    - libsdl2-dev
