@@ -29,7 +29,7 @@ typedef int bool_t;
 //
 
 #if defined REAL_USE_FLOAT
-typedef float real_t;
+typedef struct { float v; } real_t;
 #else
 #error You did not specify a real_t implementation
 #endif

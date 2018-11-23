@@ -40,12 +40,12 @@ void renderer_renderDebugVector(Renderer* me, SDL_Renderer* sdlRenderer, xz_t of
 
     real_t arrowLength = real_div(xz_length(direction), real_from_int(3));
     direction = xz_normalize(direction);
-    xz_t arrow = xz_scale(xz_rotate(direction, real_degToRad(160)), arrowLength);
+    xz_t arrow = xz_scale(xz_rotate(direction, real_degToRad(real_from_int(160))), arrowLength);
     seg.start.xz = seg.end.xz;
     seg.end.xz = xz_add(seg.start.xz, arrow);
     renderer_renderSDLDebugLine(me, sdlRenderer, offset, seg, opts);
 
-    arrow = xz_scale(xz_rotate(direction, real_degToRad(-160)), arrowLength);
+    arrow = xz_scale(xz_rotate(direction, real_degToRad(real_from_int(-160))), arrowLength);
     seg.end.xz = xz_add(seg.start.xz, arrow);
     renderer_renderSDLDebugLine(me, sdlRenderer, offset, seg, opts);
 }
@@ -81,12 +81,12 @@ void renderer_debug_renderWorld(Renderer* me, SDL_Renderer* sdlRenderer, xz_t of
 
     GColor red = GColorFromRGB(255, 0, 0);
     renderer_setDebugColor(sdlRenderer, red);
-    renderer_renderDebugVector(me, sdlRenderer, offset, me->location.position, angleToVector(me->location.angle, 30), opts);
+    renderer_renderDebugVector(me, sdlRenderer, offset, me->location.position, angleToVector(me->location.angle, real_from_int(30)), opts);
     lineSeg_t fovLine;
     fovLine.start.xz = me->location.position;
-    fovLine.end.xz = xz_add(me->location.position, angleToVector(me->location.angle + me->halfFov, 70));
+    fovLine.end.xz = xz_add(me->location.position, angleToVector(real_add(me->location.angle, me->halfFov), real_from_int(70)));
     renderer_renderSDLDebugLine(me, sdlRenderer, offset, fovLine, opts);
-    fovLine.end.xz = xz_add(me->location.position, angleToVector(me->location.angle - me->halfFov, 70));
+    fovLine.end.xz = xz_add(me->location.position, angleToVector(real_sub(me->location.angle, me->halfFov), real_from_int(70)));
     renderer_renderSDLDebugLine(me, sdlRenderer, offset, fovLine, opts);
 }
 

@@ -2,6 +2,16 @@
 
 class TestAlgebraReal : public MathFixture { };
 
+// for EXPECT_[EQ|NE] to work (note *exact* comparison is wanted)
+static bool operator== (real_t a, real_t b)
+{
+    return a.v == b.v;
+}
+static bool operator!= (real_t a, real_t b)
+{
+    return a.v != b.v;
+}
+
 TEST_F(TestAlgebraReal, real_constants) {
     EXPECT_EQ(real_one, real_from_int(1));
     EXPECT_EQ(real_zero, real_from_int(0));

@@ -23,9 +23,9 @@ protected:
 #if defined REAL_USE_FLOAT
     void expectApproxEq(real_t expected, real_t actual)
     {
-        real_t precision = 0.0001f;
-        EXPECT_LE(expected - precision, actual);
-        EXPECT_LE(actual, expected + precision);
+        const float precision = 0.0001f;
+        EXPECT_LE(expected.v - precision, actual.v);
+        EXPECT_LE(actual.v, expected.v + precision);
     }
 #else
 #error "No real_t implementation specified"
