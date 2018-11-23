@@ -106,28 +106,6 @@ typedef struct
     } left, right;
 } WallSection;
 
-void renderer_project(const Renderer* me, const Wall* wall, const lineSeg_t* transformedSeg, WallSection* projected)
-{
-    const real_t halfHeight = real_div(wall->height, real_from_int(2));
-    const real_t relHeightOffset = me->location.height - wall->heightOffset;
-#define scale_height(value) (real_mul(real_from_int(HALF_RENDERER_HEIGHT), (value)))
-    const real_t scaledWallHeight =    scale_height(real_add(halfHeight, relHeightOffset));
-    const real_t negScaledWallHeight = scale_height(real_add(real_neg(halfHeight), relHeightOffset));
-#undef scale_height
-    const xz_t startT = transformedSeg->start.xz;
-    const xz_t endT = transformedSeg->end.xz;
-
-#define div_and_int(value, z) (real_to_int(real_div((value), (z))))
-    projected->left.x =       div_and_int(real_mul(startT.x, me->fovStuff), startT.z) + HALF_RENDERER_WIDTH;
-    projected->left.yStart =  div_and_int(negScaledWallHeight, startT.z)              + HALF_RENDERER_HEIGHT;
-    projected->left.yEnd =    div_and_int(scaledWallHeight, startT.z)                 + HALF_RENDERER_HEIGHT;
-
-    projected->right.x =      div_and_int(real_mul(endT.x, me->fovStuff), endT.z)     + HALF_RENDERER_WIDTH;
-    projected->right.yStart = div_and_int(negScaledWallHeight, endT.z)                + HALF_RENDERER_HEIGHT;
-    projected->right.yEnd =   div_and_int(scaledWallHeight, endT.z)                   + HALF_RENDERER_HEIGHT;
-#undef div_and_int
-}
-
 void renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
 {
     xz_t leftIntersection, rightIntersection;
@@ -151,6 +129,29 @@ void renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
             ? leftIntersection
             : rightIntersection;
     }
+}
+
+void renderer_project(const Renderer* me, const Wall* wall, const lineSeg_t* transformedSeg, WallSection* projected)
+{
+    const real_t halfHeight = real_div(wall->height, real_from_int(2));
+    const real_t relHeightOffset = me->location.height - wall->heightOffset;
+#define scale_height(value) (real_mul(real_from_int(HALF_RENDERER_HEIGHT), (value)))
+    const real_t scaledWallHeight =    scale_height(real_add(halfHeight, relHeightOffset));
+    const real_t negScaledWallHeight = scale_height(real_add(real_neg(halfHeight), relHeightOffset));
+#undef scale_height
+    const xz_t startT = transformedSeg->start.xz;
+    const xz_t endT = transformedSeg->end.xz;
+
+#define div_and_int(value, z) (real_to_int(real_div((value), (z))))
+    projected->left.x =       div_and_int(real_mul(startT.x, me->fovStuff), startT.z) + HALF_RENDERER_WIDTH;
+    projected->left.x =       real_sub(projected->left.x, real_from_float(0.5f)); // fixes rounding error
+    projected->left.yStart =  div_and_int(negScaledWallHeight, startT.z)              + HALF_RENDERER_HEIGHT;
+    projected->left.yEnd =    div_and_int(scaledWallHeight, startT.z)                 + HALF_RENDERER_HEIGHT;
+
+    projected->right.x =      div_and_int(real_mul(endT.x, me->fovStuff), endT.z)     + HALF_RENDERER_WIDTH;
+    projected->right.yStart = div_and_int(negScaledWallHeight, endT.z)                + HALF_RENDERER_HEIGHT;
+    projected->right.yEnd =   div_and_int(scaledWallHeight, endT.z)                   + HALF_RENDERER_HEIGHT;
+#undef div_and_int
 }
 
 void renderer_renderWall(Renderer* this, GColor* framebuffer, const Wall* wall)
