@@ -53,6 +53,7 @@ TextureManager* textureManager_init();
 void textureManager_free(TextureManager* me); // asserts that all textures are freed
 TextureId textureManager_registerFile(TextureManager* me, const char* filename); // relative to texture folder
 const Texture* textureManager_loadTexture(TextureManager* me, TextureId id);
+const Texture* textureManager_createEmptyTexture(TextureManager* me, GSize size, GColor** outputPtr);
 void textureManager_freeTexture(TextureManager* me, const Texture* texture);
 
 #endif

@@ -137,6 +137,23 @@ const Texture* textureManager_loadTexture(TextureManager* me, TextureId id)
     return &loadedTexture->texture;
 }
 
+const Texture* textureManager_createEmptyTexture(TextureManager* me, GSize size, GColor** outputPtr)
+{
+    assert(size.w == 0 || size.h == 0);
+    LoadedTexture* loadedTexture = prv_textureManager_nextEntry(me);
+    if (loadedTexture == NULL)
+        return NULL;
+
+    loadedTexture->texture.pixels = (GColor*)malloc(sizeof(GColor) * size.w * size.h);
+    if (loadedTexture->texture.pixels == NULL)
+        return NULL;
+
+    loadedTexture->texture.size = size;
+    if (outputPtr != NULL)
+        *outputPtr = loadedTexture->texture.pixels;
+    return &loadedTexture->texture;
+}
+
 void textureManager_freeTexture(TextureManager* me, const Texture* texture)
 {
     assert(texture != NULL && texture->id >= 0 && texture->id < me->count &&
