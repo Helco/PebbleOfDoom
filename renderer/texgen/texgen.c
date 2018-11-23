@@ -1,4 +1,5 @@
 #include "texgen_internal.h"
+#include "texgen_registry.h"
 
 void* rawtexgen_getParamPointer(const TexGeneratorParam* param, void* paramBlock)
 {
@@ -7,35 +8,28 @@ void* rawtexgen_getParamPointer(const TexGeneratorParam* param, void* paramBlock
 
 int texgen_getGeneratorCount()
 {
-    const TexGenerator** generators = rawtexgen_getGenerators();
-    int count = 0;
-    while (*(generators++) != NULL)
-        count++;
-    return count;
+    return sizeof(rawtexgen_registry) / sizeof(TexGeneratorInitializer);
 }
 
 bool_t texgen_getGeneratorByIndex(TexGeneratorInfo* info, int index)
 {
-    if (index < 0)
+    if (index < 0 || index >= texgen_getGeneratorCount())
         return false;
-    const TexGenerator** generators = rawtexgen_getGenerators();
-    while (*generators != NULL && index != 0)
-    {
-        generators++;
-        index--;
-    }
-    if (*generators == NULL)
-        return false;
-    memcpy(info, &(*generators)->info, sizeof(TexGeneratorInfo));
+    const TexGenerator* generator = rawtexgen_registry[index]();
+    memcpy(info, &generator->info, sizeof(TexGeneratorInfo));
     return true;
 }
 
 const TexGenerator* rawtexgen_getGeneratorByID(TexGeneratorID id)
 {
-    const TexGenerator** generators = rawtexgen_getGenerators();
-    while (*generators != NULL && (*generators)->info.id.raw != id.raw)
-        generators++;
-    return *generators;
+    const int count = texgen_getGeneratorCount();
+    for (int i = 0; i < count; i++)
+    {
+        const TexGenerator* generator = rawtexgen_registry[i]();
+        if (generator->info.id.raw == id.raw)
+            return generator;
+    }
+    return NULL;
 }
 
 bool_t texgen_getGeneratorByID(TexGeneratorInfo* info, TexGeneratorID id)
@@ -173,9 +167,9 @@ void texgen_getParams(TexGenerationContext* me, void* outParamBlock)
     memcpy(outParamBlock, me->paramBlock, me->generator->info.paramBlockSize);
 }
 
-void texgen_execute(TexGenerationContext* me)
+bool_t texgen_execute(TexGenerationContext* me)
 {
-    me->generator->callback(me->pixels, me->logSize, me->paramBlock);
+    return me->generator->callback(me->pixels, me->logSize, me->paramBlock);
 }
 
 TextureId texgen_getTextureId(TexGenerationContext* me)

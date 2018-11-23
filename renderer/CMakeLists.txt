@@ -14,6 +14,7 @@ set(sources_podrenderer
 
     texgen/texgen.h
     texgen/texgen_internal.h
+    texgen/texgen_registry.h
     texgen/texgen.c
 
     ../pcmockup/pebble.c

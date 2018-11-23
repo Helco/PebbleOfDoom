@@ -15,7 +15,7 @@ typedef union TexGeneratorID {
 } TexGeneratorID;
 
 #define TexGeneratorID(a,b,c,d) \
-    (((TexGeneratorID){ .fourcc = { (a), (b), (c), (d) } }).raw)
+    (((TexGeneratorID){ .fourcc = { (a), (b), (c), (d) } }))
 
 typedef union TexGenParamID {
     uint32_t raw;
@@ -23,7 +23,7 @@ typedef union TexGenParamID {
 } TexGenParamID;
 
 #define TexGenParamID(a,b,c,d) \
-    (((TexGenParamID){ .fourcc = { (a), (b), (c), (d) } }).raw)
+    (((TexGenParamID){ .fourcc = { (a), (b), (c), (d) } }))
 
 typedef enum TexGeneratorParamType {
     TexGenParamType_Int = 0,
@@ -40,6 +40,7 @@ typedef struct TexGeneratorInfo {
 
 typedef struct TexGeneratorParameterInfo {
     TexGenParamID id;
+    const char* name;
     const char* description;
     TexGeneratorParamType type;
 } TexGeneratorParameterInfo;
@@ -59,13 +60,13 @@ void texgen_setParamFloat(TexGenerationContext* ctx, TexGenParamID id, float val
 void texgen_setParamBool(TexGenerationContext* ctx, TexGenParamID id, bool_t value);
 void texgen_setParams(TexGenerationContext* ctx, const void* paramBlock);
 void texgen_getParams(TexGenerationContext* ctx, void* outParamBlock);
-void texgen_execute(TexGenerationContext* ctx);
+bool_t texgen_execute(TexGenerationContext* ctx);
 TextureId texgen_getTextureId(TexGenerationContext* ctx);
 
 #define TexGenerator_XOR (TexGeneratorID('X', 'O', 'R', '\0'))
-#define TexParam_XOR_UseColor (TexGenParamID('C', 'O', 'L', '\0'))
+#define TexGenParam_XOR_UseColor (TexGenParamID('C', 'O', 'L', '\0'))
 
 #define TexGenerator_Rand (TexGeneratorID('R', 'A', 'N', 'D'))
-#define TexParam_Rand_UseColor (TexGenParamID('C', 'O', 'L', '\0'))
+#define TexGenParam_Rand_UseColor (TexGenParamID('C', 'O', 'L', '\0'))
 
 #endif
