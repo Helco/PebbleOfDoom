@@ -3,65 +3,65 @@
 
 Renderer* renderer_init()
 {
-    Renderer* this = (Renderer*)malloc(sizeof(Renderer));
-    if (this == NULL)
+    Renderer* me = (Renderer*)malloc(sizeof(Renderer));
+    if (me == NULL)
     {
         APP_LOG(APP_LOG_LEVEL_ERROR, "Could not allocate renderer");
         return NULL;
     }
 
-    this->wall.end = xz(real_from_int(0), real_from_int(50));
-    this->wall.start = xz(real_from_int(70), real_from_int(50));
-    this->wall.height = real_from_int(25);
-    this->wall.heightOffset = real_zero;
-    this->wall.floorColor = GColorFromRGB(0, 0, 255);
-    this->wall.wallColor = GColorFromRGB(0, 255, 0);
-    this->wall.ceilColor = GColorFromRGB(255, 0, 0);
+    me->wall.end = xz(real_from_int(0), real_from_int(50));
+    me->wall.start = xz(real_from_int(70), real_from_int(50));
+    me->wall.height = real_from_int(25);
+    me->wall.heightOffset = real_zero;
+    me->wall.floorColor = GColorFromRGB(0, 0, 255);
+    me->wall.wallColor = GColorFromRGB(0, 255, 0);
+    me->wall.ceilColor = GColorFromRGB(255, 0, 0);
 
-    this->wall2.start = xz(real_from_int(0), real_from_int(50));
-    this->wall2.end = xz(real_from_int(0), real_from_int(-30));
-    this->wall2.height = real_from_int(25);
-    this->wall2.heightOffset = real_zero;
-    this->wall2.floorColor = GColorFromRGB(0, 0, 255);
-    this->wall2.wallColor = GColorFromRGB(255, 0, 255);
-    this->wall2.ceilColor = GColorFromRGB(255, 0, 0);
+    me->wall2.start = xz(real_from_int(0), real_from_int(50));
+    me->wall2.end = xz(real_from_int(0), real_from_int(-30));
+    me->wall2.height = real_from_int(25);
+    me->wall2.heightOffset = real_zero;
+    me->wall2.floorColor = GColorFromRGB(0, 0, 255);
+    me->wall2.wallColor = GColorFromRGB(255, 0, 255);
+    me->wall2.ceilColor = GColorFromRGB(255, 0, 0);
 
-    this->wall3.start = xz(real_from_int(0), real_from_int(-30));
-    this->wall3.end = xz(real_from_int(70), real_from_int(50));
-    this->wall3.height = real_from_int(25);
-    this->wall3.heightOffset = real_zero;
-    this->wall3.floorColor = GColorFromRGB(0, 0, 255);
-    this->wall3.wallColor = GColorFromRGB(0, 255, 255);
-    this->wall3.ceilColor = GColorFromRGB(255, 0, 0);
+    me->wall3.start = xz(real_from_int(0), real_from_int(-30));
+    me->wall3.end = xz(real_from_int(70), real_from_int(50));
+    me->wall3.height = real_from_int(25);
+    me->wall3.heightOffset = real_zero;
+    me->wall3.floorColor = GColorFromRGB(0, 0, 255);
+    me->wall3.wallColor = GColorFromRGB(0, 255, 255);
+    me->wall3.ceilColor = GColorFromRGB(255, 0, 0);
 
-    this->location.position = xz(real_from_int(20), real_from_int(20));
-    this->location.angle = real_degToRad(real_from_int(0));
-    this->location.height = real_zero;
+    me->location.position = xz(real_from_int(20), real_from_int(20));
+    me->location.angle = real_degToRad(real_from_int(0));
+    me->location.height = real_zero;
 
-    this->halfFov = real_degToRad(real_from_int(30));
+    me->halfFov = real_degToRad(real_from_int(30));
 
     xz_t nearPlane, farPlane;
     nearPlane.z = real_from_float(1.0f);
     farPlane.z = real_from_int(500);
 
-    const real_t tanHalfFov = real_tan(this->halfFov);
+    const real_t tanHalfFov = real_tan(me->halfFov);
     const real_t minus_one = real_from_int(-1);
     nearPlane.x = real_mul(tanHalfFov, nearPlane.z);
     farPlane.x = real_mul(tanHalfFov, farPlane.z);
-    this->leftFovSeg.start.xz = xz(real_mul(minus_one, nearPlane.x), nearPlane.z);
-    this->leftFovSeg.end.xz = xz(real_mul(minus_one, farPlane.x), farPlane.z);
-    this->rightFovSeg.start.xz = nearPlane;
-    this->rightFovSeg.end.xz = farPlane;
-    this->fovStuff = real_div(real_from_int(-HALF_RENDERER_WIDTH), tanHalfFov);
+    me->leftFovSeg.start.xz = xz(real_mul(minus_one, nearPlane.x), nearPlane.z);
+    me->leftFovSeg.end.xz = xz(real_mul(minus_one, farPlane.x), farPlane.z);
+    me->rightFovSeg.start.xz = nearPlane;
+    me->rightFovSeg.end.xz = farPlane;
+    me->fovStuff = real_div(real_from_int(-HALF_RENDERER_WIDTH), tanHalfFov);
 
-    return this;
+    return me;
 }
 
-void renderer_free(Renderer* this)
+void renderer_free(Renderer* me)
 {
-    if (this == NULL)
+    if (me == NULL)
         return;
-    free(this);
+    free(me);
 }
 
 static xz_t myxz_rotate(xz_t a, real_t angleInRad)
@@ -154,17 +154,17 @@ void renderer_project(const Renderer* me, const Wall* wall, const lineSeg_t* tra
 #undef div_and_int
 }
 
-void renderer_renderWall(Renderer* this, GColor* framebuffer, const Wall* wall)
+void renderer_renderWall(Renderer* me, GColor* framebuffer, const Wall* wall)
 {
     lineSeg_t wallSeg;
-    renderer_transformWall(this, wall, &wallSeg);
+    renderer_transformWall(me, wall, &wallSeg);
     if (real_compare(wallSeg.start.xz.z, real_zero) < 0 && real_compare(wallSeg.end.xz.z, real_zero) < 0)
         return;
 
-    renderer_clipByFov(this, &wallSeg);
+    renderer_clipByFov(me, &wallSeg);
 
     WallSection p;
-    renderer_project(this, wall, &wallSeg, &p);
+    renderer_project(me, wall, &wallSeg, &p);
     if (p.left.x >= p.right.x || p.right.x < 0 || p.left.x >= RENDERER_WIDTH)
         return;
 

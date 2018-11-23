@@ -28,6 +28,7 @@ function(enable_warnings TARGET)
             "-Werror" "-Wall" "-Wextra"
             "-Wpointer-arith" "-Wlogical-op"
             "-Wdisabled-optimization" "-Wunsafe-loop-optimizations"
+            "-Wc++-compat"
         )
     endif()
 endfunction(enable_warnings)

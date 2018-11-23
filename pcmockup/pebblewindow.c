@@ -14,84 +14,84 @@ struct PebbleWindow
 
 PebbleWindow* pebbleWindow_init(SDL_Rect initialBounds, GSize pebbleSize)
 {
-    PebbleWindow* this = (PebbleWindow*)malloc(sizeof(PebbleWindow));
-    if (this == NULL)
+    PebbleWindow* me = (PebbleWindow*)malloc(sizeof(PebbleWindow));
+    if (me == NULL)
         return NULL;
-    memset(this, 0, sizeof(PebbleWindow));
+    memset(me, 0, sizeof(PebbleWindow));
 
-    this->window = SDL_CreateWindow("PebbleOfDoom - PCMockup",
+    me->window = SDL_CreateWindow("PebbleOfDoom - PCMockup",
         initialBounds.x, initialBounds.y,
         initialBounds.w, initialBounds.h,
         SDL_WINDOW_RESIZABLE);
-    if (this->window == NULL)
+    if (me->window == NULL)
     {
         fprintf(stderr, "SDL_CreateWindow: %s\n", SDL_GetError());
-        pebbleWindow_free(this);
+        pebbleWindow_free(me);
         return NULL;
     }
 
-    this->renderer = SDL_CreateRenderer(this->window, -1, 0);
-    if (this->renderer == NULL)
+    me->renderer = SDL_CreateRenderer(me->window, -1, 0);
+    if (me->renderer == NULL)
     {
         fprintf(stderr, "SDL_CreateRenderer: %s\n", SDL_GetError());
-        pebbleWindow_free(this);
+        pebbleWindow_free(me);
         return NULL;
     }
 
-    this->pebbleTexture = SDL_CreateTexture(this->renderer,
+    me->pebbleTexture = SDL_CreateTexture(me->renderer,
         SDL_PIXELFORMAT_ARGB8888,
         SDL_TEXTUREACCESS_STREAMING,
         pebbleSize.w, pebbleSize.h);
-    if (this->pebbleTexture == NULL)
+    if (me->pebbleTexture == NULL)
     {
         fprintf(stderr, "SDL_CreateTexture: %s\n", SDL_GetError());
-        pebbleWindow_free(this);
+        pebbleWindow_free(me);
         return NULL;
     }
 
-    this->texturePixelFormat = SDL_AllocFormat(SDL_PIXELFORMAT_ARGB8888);
-    if (this->texturePixelFormat == NULL)
+    me->texturePixelFormat = SDL_AllocFormat(SDL_PIXELFORMAT_ARGB8888);
+    if (me->texturePixelFormat == NULL)
     {
         fprintf(stderr, "SDL_AllocFormat: %s\n", SDL_GetError());
-        pebbleWindow_free(this);
+        pebbleWindow_free(me);
         return NULL;
     }
 
-    this->pebbleFramebuffer = (GColor*)malloc(sizeof(GColor) * pebbleSize.w * pebbleSize.h);
-    if (this->pebbleFramebuffer == NULL)
+    me->pebbleFramebuffer = (GColor*)malloc(sizeof(GColor) * pebbleSize.w * pebbleSize.h);
+    if (me->pebbleFramebuffer == NULL)
     {
         fprintf(stderr, "Could not allocate pebble framebuffer!\n");
-        pebbleWindow_free(this);
+        pebbleWindow_free(me);
         return NULL;
     }
 
-    this->pebbleSize = pebbleSize;
+    me->pebbleSize = pebbleSize;
 
-    return this;
+    return me;
 }
 
-void pebbleWindow_free(PebbleWindow* this)
+void pebbleWindow_free(PebbleWindow* me)
 {
-    if (this == NULL)
+    if (me == NULL)
         return;
-    if (this->pebbleFramebuffer != NULL)
-        free(this->pebbleFramebuffer);
-    if (this->texturePixelFormat != NULL)
-        SDL_FreeFormat(this->texturePixelFormat);
-    if (this->pebbleTexture != NULL)
-        SDL_DestroyTexture(this->pebbleTexture);
-    if (this->renderer != NULL)
-        SDL_DestroyRenderer(this->renderer);
-    if (this->window != NULL)
-        SDL_DestroyWindow(this->window);
-    free(this);
+    if (me->pebbleFramebuffer != NULL)
+        free(me->pebbleFramebuffer);
+    if (me->texturePixelFormat != NULL)
+        SDL_FreeFormat(me->texturePixelFormat);
+    if (me->pebbleTexture != NULL)
+        SDL_DestroyTexture(me->pebbleTexture);
+    if (me->renderer != NULL)
+        SDL_DestroyRenderer(me->renderer);
+    if (me->window != NULL)
+        SDL_DestroyWindow(me->window);
+    free(me);
 }
 
-static SDL_Rect prv_pebbleWindow_fitPebbleScreen(const PebbleWindow* this)
+static SDL_Rect prv_pebbleWindow_fitPebbleScreen(const PebbleWindow* me)
 {
     SDL_Rect src;
-    SDL_GetWindowSize(this->window, &src.w, &src.h);
-    const float pebbleAspect = (float)this->pebbleSize.w / this->pebbleSize.h;
+    SDL_GetWindowSize(me->window, &src.w, &src.h);
+    const float pebbleAspect = (float)me->pebbleSize.w / me->pebbleSize.h;
     return findBestFit(src, pebbleAspect);
 }
 
@@ -105,23 +105,23 @@ static inline SDL_Color prv_convertGColorTo32Bit(GColor pebbleColor)
     return color;
 }
 
-static void prv_pebbleWindow_convertPebbleToTexture(PebbleWindow* this)
+static void prv_pebbleWindow_convertPebbleToTexture(PebbleWindow* me)
 {
-    const GColor* pebblePixels = this->pebbleFramebuffer;
+    const GColor* pebblePixels = me->pebbleFramebuffer;
     char* texPixels;
     int texPitch;
-    SDL_LockTexture(this->pebbleTexture, NULL, (void**)&texPixels, &texPitch);
+    SDL_LockTexture(me->pebbleTexture, NULL, (void**)&texPixels, &texPitch);
 
     uint32_t* itTexPixel;
     const GColor* itPebblePixel;
-    for (int y = 0; y < this->pebbleSize.h; y++)
+    for (int y = 0; y < me->pebbleSize.h; y++)
     {
         itTexPixel = (uint32_t*)texPixels;
-        for (int x = 0; x < this->pebbleSize.w; x++)
+        for (int x = 0; x < me->pebbleSize.w; x++)
         {
-            itPebblePixel = pebblePixels + x * this->pebbleSize.h + y;
+            itPebblePixel = pebblePixels + x * me->pebbleSize.h + y;
             SDL_Color color = prv_convertGColorTo32Bit(*itPebblePixel);
-            *itTexPixel = SDL_MapRGBA(this->texturePixelFormat,
+            *itTexPixel = SDL_MapRGBA(me->texturePixelFormat,
                 color.r, color.g, color.b, color.a);
 
             itTexPixel++;
@@ -131,18 +131,18 @@ static void prv_pebbleWindow_convertPebbleToTexture(PebbleWindow* this)
         texPixels += texPitch;
     }
 
-    SDL_UnlockTexture(this->pebbleTexture);
+    SDL_UnlockTexture(me->pebbleTexture);
 }
 
-void pebbleWindow_update(PebbleWindow* this)
+void pebbleWindow_update(PebbleWindow* me)
 {
-    prv_pebbleWindow_convertPebbleToTexture(this);
+    prv_pebbleWindow_convertPebbleToTexture(me);
 
-    SDL_SetRenderDrawColor(this->renderer, 255, 0, 255, 255);
-    SDL_RenderClear(this->renderer);
-    const SDL_Rect dst = prv_pebbleWindow_fitPebbleScreen(this);
-    SDL_RenderCopy(this->renderer, this->pebbleTexture, NULL, &dst);
-    SDL_RenderPresent(this->renderer);
+    SDL_SetRenderDrawColor(me->renderer, 255, 0, 255, 255);
+    SDL_RenderClear(me->renderer);
+    const SDL_Rect dst = prv_pebbleWindow_fitPebbleScreen(me);
+    SDL_RenderCopy(me->renderer, me->pebbleTexture, NULL, &dst);
+    SDL_RenderPresent(me->renderer);
 }
 
 SDL_Rect pebbleWindow_getBounds(PebbleWindow* me)
