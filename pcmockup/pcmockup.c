@@ -41,14 +41,20 @@ PCMockup *pcmockup_init()
         GSize(RENDERER_WIDTH, RENDERER_HEIGHT)
     );
     if (me->pebbleWindow == NULL)
+    {
+        pcmockup_free(me);
         return NULL;
+    }
 
     me->debugWindowSet = debugWindowSet_init(
         &windowGrid,
         me->renderer
     );
     if (me->debugWindowSet == NULL)
+    {
+        pcmockup_free(me);
         return NULL;
+    }
 
     me->isRunning = true;
     return me;
@@ -58,11 +64,11 @@ void pcmockup_free(PCMockup *me)
 {
     if (me == NULL)
         return;
-    if (me->debugWindowSet == NULL)
+    if (me->debugWindowSet != NULL)
         debugWindowSet_free(me->debugWindowSet);
-    if (me->pebbleWindow == NULL)
+    if (me->pebbleWindow != NULL)
         pebbleWindow_free(me->pebbleWindow);
-    if (me->renderer == NULL)
+    if (me->renderer != NULL)
         renderer_free(me->renderer);
     free(me);
 }
