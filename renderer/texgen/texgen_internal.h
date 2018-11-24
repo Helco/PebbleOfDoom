@@ -9,7 +9,6 @@
     typedef type _texgen_type; \
     TEXGENERATOR_HEADER(name) { \
         static const TexGeneratorParam _texgeneratorParams_##name [] = {
-
 #define TEXGENPARAM(_id,_description,_typeenum,_member) { \
     .info = { \
         .id = _id, \
