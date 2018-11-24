@@ -31,6 +31,7 @@
         static TexGenerator generator = { .callback = NULL }; \
         if (generator.callback == NULL) { \
             generator.info.id = _id; \
+            generator.info.name = #_name; \
             generator.info.description = _description; \
             generator.info.paramCount = sizeof(_texgeneratorParams_##_name) / sizeof(TexGeneratorParam); \
             generator.info.paramBlockSize = sizeof(_texgen_type); \

@@ -33,6 +33,7 @@ typedef enum TexGeneratorParamType {
 
 typedef struct TexGeneratorInfo {
     TexGeneratorID id;
+    const char* name;
     const char* description;
     int paramCount;
     int paramBlockSize;
