@@ -98,7 +98,7 @@ static void prv_optsReader_printHelpAndExit(const OptionsReader* reader)
     {
         printf("  %s", curHandler->opt);
         if (curHandler->description != NULL)
-            printf(" - %s", curHandler->description);
+            printf(" %s", curHandler->description);
         putchar('\n');
         curHandler++;
     }

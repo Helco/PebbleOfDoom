@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <errno.h>
 #include "stb.include.h"
 #include "platform.h"
 #include "texgen/texgen.h"
@@ -35,14 +36,23 @@
     "  --output\n"
     "\n";*/
 
-//static const TexGeneratorID InvalidGeneratorID = TexGeneratorID(0, 0, 0, 0);
+static const TexGeneratorID InvalidGeneratorID = TexGeneratorID(0, 0, 0, 0);
 //static const TexGenParamID InvalidGenParamID = TexGenParamID(0, 0, 0, 0);
 
 typedef struct TexGenCLI
 {
-    TexGeneratorID generator;
+    TexGeneratorInfo generator;
     TexGenerationContext* generationContext;
+    int size;
 } TexGenCLI;
+
+bool texgencli_is_pot(int number)
+{
+    int pot = 1;
+    while (pot != 0 && pot != number)
+        pot <<= 1;
+    return pot == number;
+}
 
 void texgencli_print_fourcc(const char* codes)
 {
@@ -69,6 +79,37 @@ void texgencli_print_generator_param(const TexGeneratorParameterInfo* info)
     printf("  - %s ", TYPE_NAMES[info->type]);
     texgencli_print_fourcc(info->id.fourcc);
     printf(" \"%s\" - %s\n", info->name, info->description);
+}
+
+bool texgencli_parse_int(const char* param, int* value)
+{
+    char* end;
+    *value = (int)strtol(param, &end, 0);
+    bool success = param != end && errno != ERANGE;
+    if (!success)
+        printf("Could not parse integer: %s\n", param);
+    return success;
+}
+
+bool texgencli_parse_float(const char* param, float* value)
+{
+    char* end;
+    *value = strtof(param, &end);
+    bool success = param != end && errno != ERANGE;
+    if (!success)
+        printf("Could not parse floating-point: %s\n", param);
+    return success;
+}
+
+bool texgencli_parse_bool(const char* param, bool* value)
+{
+    *value =
+        strcmp(param, "1") == 0 ||
+        strcmp(param, "true") == 0 ||
+        strcmp(param, "TRUE") == 0 ||
+        strcmp(param, "yes") == 0 ||
+        strcmp(param, "YES") == 0;
+    return true;
 }
 
 bool texgencli_parse_fourcc(const char* param, char* fourcc)
@@ -98,6 +139,25 @@ bool texgencli_find_generator(TexGeneratorInfo* info, const char* param)
 
     printf("Could not find generator: %s\n", param);
     return false;
+}
+
+bool texgencli_require_context(TexGenCLI* cli)
+{
+    if (cli->generationContext != NULL)
+        return true;
+    if (cli->generator.id.raw == InvalidGeneratorID.raw)
+    {
+        puts("no generator specified");
+        return false;
+    }
+    if (cli->size < 0)
+    {
+        puts("no texture size specified");
+        return false;
+    }
+
+    cli->generationContext = texgen_init(NULL, cli->generator.id, cli->size);
+    return cli->generationContext != NULL;
 }
 
 bool texgencli_opt_list_generators(const char* const * params, void* userdata)
@@ -130,6 +190,36 @@ bool texgencli_opt_generator_info(const char* const * params, void* userdata)
     return true;
 }
 
+bool texgencli_opt_use_generator(const char* const * params, void* userdata)
+{
+    TexGeneratorInfo info;
+    if (!texgencli_find_generator(&info, params[0]))
+        return false;
+
+    TexGenCLI* cli = (TexGenCLI*)userdata;
+    if (cli->generationContext != NULL)
+    {
+        texgen_free(cli->generationContext);
+        cli->generationContext = NULL;
+    }
+
+    cli->generator = info;
+    return true;
+}
+
+bool texgencli_opt_set_size(const char* const * params, void* userdata)
+{
+    TexGenCLI* cli = (TexGenCLI*)userdata;
+    if (!texgencli_parse_int(params[0], &cli->size))
+        return false;
+    if (!texgencli_is_pot(cli->size))
+    {
+        puts("Invalid size");
+        return false;
+    }
+    return true;
+}
+
 static const OptionsSpecification texgencli_spec = {
     .extraHelpText =
         "<gid> / <pid> - may be name or FourCC (if printable)\n"
@@ -139,18 +229,30 @@ static const OptionsSpecification texgencli_spec = {
     .handlers = {
         {
             .opt = "-h|--help",
-            .description = "Shows this help text and stops",
+            .description = "- Shows this help text and stops",
             .callback = OptionHelpCallback
         },
         {
             .opt = "-l|--list",
-            .description = "Prints list of all available generators",
+            .description = "- Prints list of all available generators",
             .callback = texgencli_opt_list_generators
         },
         {
             .opt = "-i|--info",
-            .description = "Prints all info about a generator",
+            .description = "<gid> - Prints all info about a generator",
             .callback = texgencli_opt_generator_info,
+            .paramCount = 1
+        },
+        {
+            .opt = "-g|--generator",
+            .description = "<gid> - Uses specified generator further on",
+            .callback = texgencli_opt_use_generator,
+            .paramCount = 1
+        },
+        {
+            .opt = "-s|--size",
+            .description = "<int> - Sets size (has to be power of two)",
+            .callback = texgencli_opt_set_size,
             .paramCount = 1
         },
         { .isLast = true }
@@ -159,7 +261,11 @@ static const OptionsSpecification texgencli_spec = {
 
 int main(int argc, char* argv[])
 {
-    TexGenCLI cli;
+    TexGenCLI cli = {
+        .generator = { .id = InvalidGeneratorID },
+        .generationContext = NULL,
+        .size = -1
+    };
     memset(&cli, 0, sizeof(cli));
 
     readOptions(argc, argv, &texgencli_spec, &cli);
