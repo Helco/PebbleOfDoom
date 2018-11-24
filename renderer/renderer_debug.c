@@ -89,6 +89,27 @@ void renderer_debug_renderWorld(Renderer* me, SDL_Renderer* sdlRenderer, xz_t of
     renderer_renderSDLDebugLine(me, sdlRenderer, offset, fovLine, opts);
 }
 
+void renderer_debug_renderTexture(Renderer* me, SDL_Renderer* sdlRenderer, xz_t offset, const void* userdata)
+{
+    UNUSED(offset, userdata);
+    const int pxsize = 4;
+    const Texture* texture = texture_load(me->textureManager, 0);
+    for (int y = 0; y < texture->size.h; y++)
+    {
+        for (int x = 0; x < texture->size.w; x++)
+        {
+            renderer_setDebugColor(sdlRenderer, texture->pixels[y * texture->size.w + x]);
+            SDL_Rect rct = {
+                x * pxsize + real_to_int(offset.x),
+                y * pxsize + real_to_int(offset.z),
+                pxsize, pxsize
+            };
+            SDL_RenderFillRect(sdlRenderer, &rct);
+        }
+    }
+    texture_free(me->textureManager, texture);
+}
+
 static const DebugView debugViews[] = {
     {
         .name = "world-space",
@@ -101,6 +122,12 @@ static const DebugView debugViews[] = {
         .type = DebugViewType_SDL,
         .callback = { .sdl = renderer_debug_renderWorld },
         .userdata = &playerSpaceOptions
+    },
+    {
+        .name = "texture",
+        .type = DebugViewType_SDL,
+        .callback = { .sdl = renderer_debug_renderTexture },
+        .userdata = NULL
     }
 };
 
