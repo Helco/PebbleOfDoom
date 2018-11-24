@@ -36,6 +36,7 @@ def build(ctx):
         app_elf = '{}/pebble-app.elf'.format(ctx.env.BUILD_DIR)
         ctx.pbl_build(source=ctx.path.ant_glob([
             'renderer/*.c',
+            'renderer/texgen/*.c',
             'pebbleapp/*.c',
         ]), target=app_elf, bin_type='app')
 
