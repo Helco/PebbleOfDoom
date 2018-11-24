@@ -7,7 +7,8 @@
 
 #define BEGIN_TEXGENERATOR(name,type) \
     typedef type _texgen_type; \
-    static const TexGeneratorParam _texgeneratorParams_##name [] = {
+    TEXGENERATOR_HEADER(name) { \
+        static const TexGeneratorParam _texgeneratorParams_##name [] = {
 
 #define TEXGENPARAM(_id,_description,_typeenum,_member) { \
     .info = { \
@@ -27,19 +28,18 @@
 
 #define END_TEXGENERATOR(_name,_id,_description,_defaultParams,_callback) \
     }; \
-    TEXGENERATOR_HEADER(_name) { \
-        static TexGenerator generator = { .callback = NULL }; \
-        if (generator.callback == NULL) { \
-            generator.info.id = _id; \
-            generator.info.name = #_name; \
-            generator.info.description = _description; \
-            generator.info.paramCount = sizeof(_texgeneratorParams_##_name) / sizeof(TexGeneratorParam); \
-            generator.info.paramBlockSize = sizeof(_texgen_type); \
-            generator.callback = _callback; \
-            generator.params = _texgeneratorParams_##_name; \
-            generator.defaultParamBlock = &_defaultParams; \
-        } \
-        return &generator; \
+    static TexGenerator generator = { .callback = NULL }; \
+    if (generator.callback == NULL) { \
+        generator.info.id = _id; \
+        generator.info.name = #_name; \
+        generator.info.description = _description; \
+        generator.info.paramCount = sizeof(_texgeneratorParams_##_name) / sizeof(TexGeneratorParam); \
+        generator.info.paramBlockSize = sizeof(_texgen_type); \
+        generator.callback = _callback; \
+        generator.params = _texgeneratorParams_##_name; \
+        generator.defaultParamBlock = &_defaultParams; \
+    } \
+    return &generator; \
     }
 
 #define TEXGENERATOR_SYMBOL(_name) _texgenerator_##_name

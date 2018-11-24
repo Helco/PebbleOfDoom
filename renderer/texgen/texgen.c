@@ -26,7 +26,7 @@ const TexGenerator* rawtexgen_getGeneratorByID(TexGeneratorID id)
     for (int i = 0; i < count; i++)
     {
         const TexGenerator* generator = rawtexgen_registry[i]();
-        if (generator->info.id.raw == id.raw)
+        if (generator->info.id == id)
             return generator;
     }
     return NULL;
@@ -56,7 +56,7 @@ const TexGeneratorParam* rawtexgen_getParameterByID(const TexGenerator* generato
     const TexGeneratorParam* curParam = generator->params;
     for (int i = 0; i < generator->info.paramCount; i++, curParam++)
     {
-        if (curParam->info.id.raw == paramId.raw)
+        if (curParam->info.id == paramId)
             return curParam;
     }
     return NULL;

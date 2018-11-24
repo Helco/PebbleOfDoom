@@ -26,18 +26,22 @@ bool texgencli_is_pot(int number)
     return pot == number;
 }
 
-void texgencli_print_fourcc(const char* codes)
+void texgencli_print_fourcc(uint32_t raw)
 {
-    int len = strlen(codes);
+    union {
+        uint32_t raw;
+        char codes[4];
+    } d;
+    d.raw = raw;
     putchar('{');
     for (int i = 0; i < 4; i++)
-        putchar(len > i ? codes[i] : ' ');
+        putchar(d.codes[i] ? d.codes[i] : ' ');
     putchar('}');
 }
 
 void texgencli_print_generator_header(const TexGeneratorInfo* info)
 {
-    texgencli_print_fourcc(info->id.fourcc);
+    texgencli_print_fourcc(info->id);
     printf(" \"%s\" - %s\n", info->name, info->description);
 }
 
@@ -49,7 +53,7 @@ void texgencli_print_generator_param(const TexGeneratorParameterInfo* info)
         [TexGenParamType_Bool] =  "bool "
     };
     printf("  - %s ", TYPE_NAMES[info->type]);
-    texgencli_print_fourcc(info->id.fourcc);
+    texgencli_print_fourcc(info->id);
     printf(" \"%s\" - %s\n", info->name, info->description);
 }
 
@@ -84,20 +88,25 @@ bool texgencli_parse_bool(const char* param, bool* value)
     return true;
 }
 
-bool texgencli_parse_fourcc(const char* param, char* fourcc)
+bool texgencli_parse_fourcc(const char* param, uint32_t* fourcc)
 {
+    union {
+        uint32_t raw;
+        char codes[4];
+    } d;
     int len = strlen(param);
     if (len > 4)
         return false;
     for (int i = 0; i < 4; i++)
-        fourcc[i] = len > i ? param[i] : '\0';
+        d.codes[i] = len > i ? param[i] : '\0';
+    *fourcc = d.raw;
     return true;
 }
 
 bool texgencli_find_generator(TexGeneratorInfo* info, const char* param)
 {
     TexGeneratorID id;
-    if (texgencli_parse_fourcc(param, id.fourcc) &&
+    if (texgencli_parse_fourcc(param, &id) &&
         texgen_getGeneratorByID(info, id))
         return true;
 
@@ -117,7 +126,7 @@ bool texgencli_find_parameter(TexGenCLI* cli, TexGeneratorParameterInfo* info, c
 {
     const TexGeneratorID genId = cli->generator.id;
     TexGenParamID id;
-    if (texgencli_parse_fourcc(param, id.fourcc) &&
+    if (texgencli_parse_fourcc(param, &id) &&
         texgen_getParameterByID(info, genId, id))
         return true;
 
@@ -136,7 +145,7 @@ bool texgencli_require_context(TexGenCLI* cli)
 {
     if (cli->generationContext != NULL)
         return true;
-    if (cli->generator.id.raw == InvalidGeneratorID.raw)
+    if (cli->generator.id == InvalidGeneratorID)
     {
         puts("no generator specified");
         return false;

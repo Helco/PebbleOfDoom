@@ -1,5 +1,6 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
+#include <stdint.h>
 
 // Platform/Compiler-specific utilities
 
@@ -16,5 +17,13 @@
     (void)(__VA_ARGS__); \
     _Pragma("GCC diagnostic pop") \
     } while(0)
+
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define FOURCC(a,b,c,d)  \
+    ((uint32_t)(((a & 0xff) << 24) | ((b & 0xff) << 16) | ((c & 0xff) << 8) | ((d & 0xff) << 0)))
+#else
+#define FOURCC(a,b,c,d)  \
+    ((uint32_t)(((a & 0xff) << 0) | ((b & 0xff) << 8) | ((c & 0xff) << 16) | ((d & 0xff) << 24)))
+#endif
 
 #endif

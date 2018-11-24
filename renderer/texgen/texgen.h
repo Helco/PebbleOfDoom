@@ -1,5 +1,6 @@
 #ifndef TEXGEN_H
 #define TEXGEN_H
+#include "../platform.h"
 #include "../algebra.h"
 #include "../texture.h"
 
@@ -9,21 +10,11 @@
  * See texgen_xor for an example
  */
 
-typedef union TexGeneratorID {
-    uint32_t raw;
-    char fourcc[4];
-} TexGeneratorID;
+typedef uint32_t TexGeneratorID;
+#define TexGeneratorID(a,b,c,d) FOURCC(a,b,c,d)
 
-#define TexGeneratorID(a,b,c,d) \
-    (((TexGeneratorID){ .fourcc = { (a), (b), (c), (d) } }))
-
-typedef union TexGenParamID {
-    uint32_t raw;
-    char fourcc[4];
-} TexGenParamID;
-
-#define TexGenParamID(a,b,c,d) \
-    (((TexGenParamID){ .fourcc = { (a), (b), (c), (d) } }))
+typedef uint32_t TexGenParamID;
+#define TexGenParamID(a,b,c,d) FOURCC(a,b,c,d)
 
 typedef enum TexGeneratorParamType {
     TexGenParamType_Int = 0,
