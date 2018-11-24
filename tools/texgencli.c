@@ -141,6 +141,25 @@ bool texgencli_find_generator(TexGeneratorInfo* info, const char* param)
     return false;
 }
 
+bool texgencli_find_parameter(TexGenCLI* cli, TexGeneratorParameterInfo* info, const char* param)
+{
+    const TexGeneratorID genId = cli->generator.id;
+    TexGenParamID id;
+    if (texgencli_parse_fourcc(param, id.fourcc) &&
+        texgen_getParameterByID(info, genId, id))
+        return true;
+
+    for (int i = 0; i < cli->generator.paramCount; i++)
+    {
+        if (texgen_getParameterByIndex(info, genId, i) &&
+            strcmp(info->name, param) == 0)
+            return true;
+    }
+
+    printf("Could not find parameter %s in generator %s\n", param, cli->generator.name);
+    return false;
+}
+
 bool texgencli_require_context(TexGenCLI* cli)
 {
     if (cli->generationContext != NULL)
@@ -220,6 +239,51 @@ bool texgencli_opt_set_size(const char* const * params, void* userdata)
     return true;
 }
 
+bool texgencli_opt_set_int_param(const char* const * params, void* userdata)
+{
+    TexGenCLI* cli = (TexGenCLI*)userdata;
+    if (!texgencli_require_context(cli))
+        return false;
+    TexGeneratorParameterInfo info;
+    if (!texgencli_find_parameter(cli, &info, params[0]))
+        return false;
+    int value;
+    if (!texgencli_parse_int(params[1], &value))
+        return false;
+    texgen_setParamInt(cli->generationContext, info.id, value);
+    return true;
+}
+
+bool texgencli_opt_set_float_param(const char* const * params, void* userdata)
+{
+    TexGenCLI* cli = (TexGenCLI*)userdata;
+    if (!texgencli_require_context(cli))
+        return false;
+    TexGeneratorParameterInfo info;
+    if (!texgencli_find_parameter(cli, &info, params[0]))
+        return false;
+    float value;
+    if (!texgencli_parse_float(params[1], &value))
+        return false;
+    texgen_setParamFloat(cli->generationContext, info.id, value);
+    return true;
+}
+
+bool texgencli_opt_set_bool_param(const char* const * params, void* userdata)
+{
+    TexGenCLI* cli = (TexGenCLI*)userdata;
+    if (!texgencli_require_context(cli))
+        return false;
+    TexGeneratorParameterInfo info;
+    if (!texgencli_find_parameter(cli, &info, params[0]))
+        return false;
+    bool value;
+    if (!texgencli_parse_bool(params[1], &value))
+        return false;
+    texgen_setParamBool(cli->generationContext, info.id, value);
+    return true;
+}
+
 static const OptionsSpecification texgencli_spec = {
     .extraHelpText =
         "<gid> / <pid> - may be name or FourCC (if printable)\n"
@@ -254,6 +318,24 @@ static const OptionsSpecification texgencli_spec = {
             .description = "<int> - Sets size (has to be power of two)",
             .callback = texgencli_opt_set_size,
             .paramCount = 1
+        },
+        {
+            .opt = "-pi|--param-int",
+            .description = "<pid> <int> - Sets integer parameter",
+            .callback = texgencli_opt_set_int_param,
+            .paramCount = 2
+        },
+        {
+            .opt = "-pf|--param-float",
+            .description = "<pid> <float> - Sets floating-point parameter",
+            .callback = texgencli_opt_set_float_param,
+            .paramCount = 2
+        },
+        {
+            .opt = "-pb|--param-bool",
+            .description = "<pid> <bool> - Sets boolean parameter",
+            .callback = texgencli_opt_set_bool_param,
+            .paramCount = 2
         },
         { .isLast = true }
     }

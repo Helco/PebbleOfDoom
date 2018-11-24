@@ -111,6 +111,7 @@ TexGenerationContext* texgen_init(TextureManagerHandle textureManager, TexGenera
         return NULL;
     }
 
+    me->generator = generator;
     me->textureManager = textureManager;
     me->logSize = logSize;
     return me;
