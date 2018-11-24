@@ -76,8 +76,8 @@ bool_t texgen_getParameterByID(TexGeneratorParameterInfo* info, TexGeneratorID g
 static int prv_abs_to_logsize(int absSize)
 {
     int logSize = 1;
-    while (logSize != 0 && logSize != absSize)
-        logSize <<= 1;
+    while ((1 << logSize) != 0 && (1 << logSize) != absSize)
+        logSize++;
     return logSize;
 }
 
@@ -176,4 +176,9 @@ bool_t texgen_execute(TexGenerationContext* me)
 TextureId texgen_getTextureId(TexGenerationContext* me)
 {
     return me->texture->id;
+}
+
+const Texture* texgen_getTexture(TexGenerationContext* me)
+{
+    return me->texture;
 }

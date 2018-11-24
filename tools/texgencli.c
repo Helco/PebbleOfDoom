@@ -9,35 +9,7 @@
 #define OPTSREADER_IMPLEMENTATION
 #include "optsReader.h"
 
-/*static const char* help_text =
-    "usage: texgencli {<option> [<argument>]}\n"
-    "options:\n"
-    "  -h --help         Shows this help text and stops\n"
-    "  -l --list         Prints list all available generators\n"
-    "  -i --info <gid>   Prints all info about a generator\n"
-    "  -g <gid>          Uses specified generator\n"
-    "  --generator\n"
-    "  -s --size <int>   Sets size (has to be power of two)\n"
-    "  -pi <pid> <int>   Sets integer parameter\n"
-    "  --param-int\n"
-    "  -pf <pid> <float> Sets floating-point parameter\n"
-    "  --param-float\n"
-    "  -pb <pid> <bool>  Sets boolean parameter\n"
-    "  --param-bool\n"
-    "  -bi <path>        Loads parameter block from file\n"
-    "  --block-input\n"
-    "  -bo <path>        Saves parameter block to file\n"
-    "  --block-output\n"
-    "  -gi <path>        Loads generation-specifying file\n"
-    "  --gen-input\n"
-    "  -go <path>        Saves generation-specifying file\n"
-    "  --gen-output\n"
-    "  -o <path>         Saves generated texture to file (as PNG)\n"
-    "  --output\n"
-    "\n";*/
-
 static const TexGeneratorID InvalidGeneratorID = TexGeneratorID(0, 0, 0, 0);
-//static const TexGenParamID InvalidGenParamID = TexGenParamID(0, 0, 0, 0);
 
 typedef struct TexGenCLI
 {
@@ -179,6 +151,35 @@ bool texgencli_require_context(TexGenCLI* cli)
     return cli->generationContext != NULL;
 }
 
+void texgencli_convert_texture_to_rgba(const Texture* texture, uint8_t* rgbaPixels)
+{
+    int pixelCount = texture->size.w * texture->size.h;
+    const GColor* pebblePixels = texture->pixels;
+    while (pixelCount--)
+    {
+        rgbaPixels[0] = pebblePixels->r * (255 / 3);
+        rgbaPixels[1] = pebblePixels->g * (255 / 3);
+        rgbaPixels[2] = pebblePixels->b * (255 / 3);
+        rgbaPixels[3] = pebblePixels->a * (255 / 3);
+        rgbaPixels += 4;
+        pebblePixels++;
+    }
+}
+
+void texgencli_write_texture(const Texture* texture, const char* path)
+{
+    uint8_t* rgbaPixels = (uint8_t*)malloc(4 * texture->size.w * texture->size.h);
+    assert(rgbaPixels != NULL);
+    texgencli_convert_texture_to_rgba(texture, rgbaPixels);
+
+    stbi_write_png(
+        path,
+        texture->size.w, texture->size.h, 4,
+        rgbaPixels,
+        4 * texture->size.w);
+    free(rgbaPixels);
+}
+
 bool texgencli_opt_list_generators(const char* const * params, void* userdata)
 {
     UNUSED(params, userdata);
@@ -284,12 +285,23 @@ bool texgencli_opt_set_bool_param(const char* const * params, void* userdata)
     return true;
 }
 
+bool texgencli_opt_generate(const char* const * params, void* userdata)
+{
+    TexGenCLI* cli = (TexGenCLI*)userdata;
+    if (!texgencli_require_context(cli))
+        return false;
+    if (!texgen_execute(cli->generationContext))
+        printf("texture generation failed\n");
+    else
+        texgencli_write_texture(texgen_getTexture(cli->generationContext), params[0]);
+    return true;
+}
+
 static const OptionsSpecification texgencli_spec = {
     .extraHelpText =
         "<gid> / <pid> - may be name or FourCC (if printable)\n"
         "<int> - may be signed or unsigned (range -2^31 -> 2^31-1)\n"
-        "<bool> - everything other than '1', 'true' or 'yes' is false\n"
-        "<path> - may be stdin/stdout",
+        "<bool> - everything other than '1', 'true' or 'yes' is false\n",
     .handlers = {
         {
             .opt = "-h|--help",
@@ -336,6 +348,12 @@ static const OptionsSpecification texgencli_spec = {
             .description = "<pid> <bool> - Sets boolean parameter",
             .callback = texgencli_opt_set_bool_param,
             .paramCount = 2
+        },
+        {
+            .opt = "-o|--output",
+            .description = "<path> - Generates texture to png file",
+            .callback = texgencli_opt_generate,
+            .paramCount = 1
         },
         { .isLast = true }
     }

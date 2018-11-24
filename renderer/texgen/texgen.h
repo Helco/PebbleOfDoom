@@ -63,6 +63,7 @@ void texgen_setParams(TexGenerationContext* ctx, const void* paramBlock);
 void texgen_getParams(TexGenerationContext* ctx, void* outParamBlock);
 bool_t texgen_execute(TexGenerationContext* ctx);
 TextureId texgen_getTextureId(TexGenerationContext* ctx);
+const Texture* texgen_getTexture(TexGenerationContext* ctx);
 
 #define TexGenerator_XOR (TexGeneratorID('X', 'O', 'R', '\0'))
 #define TexGenParam_XOR_UseColor (TexGenParamID('C', 'O', 'L', '\0'))
