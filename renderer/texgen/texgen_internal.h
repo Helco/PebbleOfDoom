@@ -17,7 +17,7 @@
         .type = _typeenum \
     }, \
     .offset = TEXGENERATOR_OFFSETOF(_texgen_type, _member) \
-    }
+    },
 #define TEXGENPARAM_INT(id,description,member) \
     TEXGENPARAM(id, description, TexGenParamType_Int, member)
 #define TEXGENPARAM_FLOAT(id,description,member) \

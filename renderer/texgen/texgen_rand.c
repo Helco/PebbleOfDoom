@@ -37,6 +37,14 @@ BEGIN_TEXGENERATOR(Rand, TexGen_Rand_Params)
         TexGenParam_Rand_UseColor,
         "color or black/white",
         useColor)
+    TEXGENPARAM_BOOL(
+        TexGenParam_Rand_UseSeed,
+        "use the seed parameter (or current)",
+        useSeed)
+    TEXGENPARAM_INT(
+        TexGenParam_Rand_Seed,
+        "seed to initialize randomness",
+        seed)
 END_TEXGENERATOR(Rand,
     TexGenerator_Rand,
     "random filled texure",
