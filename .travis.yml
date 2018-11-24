@@ -9,12 +9,6 @@ jobs:
     - stage: Build&Test
       name: Linux PCMockup
       script: bash ./travis/cmake_script.sh
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - gcc-8
     - stage: Build&Test
       name: Pebble
       before_script: bash ./travis/pebble_before_script.sh
@@ -27,6 +21,8 @@ jobs:
 
 addons:
   apt:
+    sources:
+    - ubuntu-toolchain-r-test
     packages:
     - python2.7-dev
     - python-pip
@@ -34,3 +30,4 @@ addons:
     - libegl1-mesa-dev
     - libgles2-mesa-dev
     - libsdl2-dev
+    - gcc-8
