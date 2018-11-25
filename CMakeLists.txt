@@ -51,6 +51,8 @@ include(CTest)
 include(GoogleTest)
 include("${CMAKE_SOURCE_DIR}/cmake/GTest.cmake")
 include("${CMAKE_SOURCE_DIR}/cmake/stb.cmake")
+include("${CMAKE_SOURCE_DIR}/cmake/glad.cmake")
+include("${CMAKE_SOURCE_DIR}/cmake/cimgui.cmake")
 
 if (MSVC AND CMAKE_C_COMPILER_ID STREQUAL "MSVC")
     message(FATAL_ERROR " Microsoft C Compiler is not supported, please use GCC or Clang")
