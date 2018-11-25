@@ -5,15 +5,27 @@
 
 struct DebugWindow
 {
-    SDL_Window* window;
+    ImageWindow* window;
     SDL_Renderer* renderer;
-    SDL_Texture* texture;
-    SDL_Rect texturePos;
+    SDL_Surface* surface;
     Renderer* podRenderer;
     const DebugView* view;
     xz_t position, offset;
     real_t zoom;
 };
+
+SDL_Surface* createSDLSurface(int w, int h, Uint32 format)
+{
+    SDL_PixelFormat* formatInfo = SDL_AllocFormat(format);
+    if (formatInfo == NULL)
+        return NULL;
+    SDL_Surface* surface = SDL_CreateRGBSurface(
+        SDL_SWSURFACE, w, h, formatInfo->BitsPerPixel,
+        formatInfo->Rmask, formatInfo->Gmask, formatInfo->Bmask, formatInfo->Amask
+    );
+    SDL_FreeFormat(formatInfo);
+    return surface;
+}
 
 DebugWindow* debugWindow_init(SDL_Rect bounds, const DebugView* view, Renderer* podRenderer)
 {
@@ -22,21 +34,25 @@ DebugWindow* debugWindow_init(SDL_Rect bounds, const DebugView* view, Renderer* 
         return NULL;
     memset(me, 0, sizeof(DebugWindow));
 
-    me->window = SDL_CreateWindow(view->name,
-        bounds.x, bounds.y,
-        bounds.w, bounds.h,
-        SDL_WINDOW_RESIZABLE);
+    me->window = imageWindow_init(view->name, (GSize) { bounds.w, bounds.h }, false);
     if (me->window == NULL)
     {
-        fprintf(stderr, "SDL_CreateWindow: %s\n", SDL_GetError());
+        debugWindow_free(me);
+        return NULL;
+    }
+    imageWindow_setInitialPosition(me->window, (GPoint) { bounds.x, bounds.y });
+
+    me->surface = createSDLSurface(bounds.w, bounds.h, SDL_PIXELFORMAT_ABGR8888);
+    if (me->surface == NULL)
+    {
+        fprintf(stderr, "createSDLSurface: %s\n", SDL_GetError());
         debugWindow_free(me);
         return NULL;
     }
 
-    me->renderer = SDL_CreateRenderer(me->window, -1, SDL_RENDERER_TARGETTEXTURE);
+    me->renderer = SDL_CreateSoftwareRenderer(me->surface);
     if (me->renderer == NULL)
     {
-        fprintf(stderr, "SDL_CreateRenderer: %s\n", SDL_GetError());
         debugWindow_free(me);
         return NULL;
     }
@@ -53,56 +69,27 @@ void debugWindow_free(DebugWindow* me)
 {
     if (me == NULL)
         return;
-    if (me->texture != NULL)
-        SDL_DestroyTexture(me->texture);
+    if (me->window != NULL)
+        imageWindow_free(me->window);
+    if (me->surface != NULL)
+        SDL_FreeSurface(me->surface);
     if (me->renderer != NULL)
         SDL_DestroyRenderer(me->renderer);
-    if (me->window != NULL)
-        SDL_DestroyWindow(me->window);
     free(me);
 }
 
 void debugWindow_startUpdate(DebugWindow* me)
 {
-    SDL_Rect src;
-    int textureW = -1, textureH = -1;
-    SDL_GetWindowSize(me->window, &src.w, &src.h);
-    if (me->texture != NULL)
-        SDL_QueryTexture(me->texture, NULL, NULL, &textureW, &textureH);
-    me->texturePos = findBestFit(src, 1.0f);
-
-    if (me->texturePos.w != textureW || me->texturePos.h != textureH)
-    {
-        if (me->texture != NULL)
-            SDL_DestroyTexture(me->texture);
-        me->texture = SDL_CreateTexture(me->renderer,
-            SDL_PIXELFORMAT_ARGB8888,
-            SDL_TEXTUREACCESS_TARGET,
-            me->texturePos.w, me->texturePos.h);
-        if (me->texture == NULL)
-        {
-            fprintf(stderr, "SDL_CreateTexture: %s\n", SDL_GetError());
-            exit(-1);
-        }
-    }
-
-    SDL_SetRenderTarget(me->renderer, me->texture);
+    float scale = real_to_float(me->zoom);
     SDL_SetRenderDrawColor(me->renderer, 0, 0, 0, 255);
     SDL_RenderClear(me->renderer);
-
-    float scale = real_to_float(me->zoom);
     SDL_RenderSetScale(me->renderer, scale, scale);
 }
 
 void debugWindow_endUpdate(DebugWindow* me)
 {
-    SDL_RenderSetScale(me->renderer, 1.0f, 1.0f);
-    SDL_SetRenderTarget(me->renderer, NULL);
-    SDL_SetRenderDrawColor(me->renderer, 255, 0, 255, 255);
-    SDL_RenderClear(me->renderer);
-    SDL_SetRenderDrawColor(me->renderer, 255, 255, 255, 255);
-    SDL_RenderCopy(me->renderer, me->texture, NULL, &me->texturePos);
-    SDL_RenderPresent(me->renderer);
+    imageWindow_setImageData(me->window, GSize(me->surface->w, me->surface->h), (SDL_Color*)me->surface->pixels);
+    imageWindow_update(me->window);
 }
 
 void debugWindow_update(DebugWindow* me)
@@ -114,7 +101,7 @@ void debugWindow_update(DebugWindow* me)
 
 void debugWindow_handleEvent(DebugWindow* me, const SDL_Event* ev)
 {
-    Uint32 windowID = SDL_GetWindowID(me->window);
+    Uint32 windowID = 1234;
     if (ev->type == SDL_MOUSEMOTION && ev->motion.windowID == windowID && (ev->motion.state & SDL_BUTTON_LMASK) > 0)
     {
         xz_t move = xz(real_from_int(ev->motion.xrel), real_from_int(ev->motion.yrel));
@@ -133,11 +120,19 @@ void debugWindow_handleEvent(DebugWindow* me, const SDL_Event* ev)
     }
 
     // update render offset
-    int textureW, textureH;
-    SDL_QueryTexture(me->texture, NULL, NULL, &textureW, &textureH);
-    xz_t halfSize = xz(real_from_int(textureW / 2), real_from_int(textureH / 2));
+    xz_t halfSize = xz(real_from_int(me->surface->w / 2), real_from_int(me->surface->h / 2));
     me->offset = xz_sub(
         xz_invScale(halfSize, me->zoom),
         me->position
     );
+}
+
+const DebugView* debugWindow_getDebugView(const DebugWindow* me)
+{
+    return me->view;
+}
+
+ImageWindow* debugWindow_asImageWindow(DebugWindow* me)
+{
+    return me->window;
 }

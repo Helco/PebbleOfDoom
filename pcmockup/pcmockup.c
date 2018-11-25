@@ -3,6 +3,7 @@
 #include "renderer.h"
 #include "platform.h"
 
+static const GSize WINDOW_START_SIZE = { 1024, 768 };
 static const int MAX_FRAMERATE = 60;
 
 struct PCMockup
@@ -54,18 +55,16 @@ PCMockup *pcmockup_init()
         return NULL;
     }
 
-    me->windowContainer = windowContainer_init(GSize(1024, 768));
+    me->windowContainer = windowContainer_init(WINDOW_START_SIZE);
     if (me->windowContainer == NULL)
     {
         pcmockup_free(me);
         return NULL;
     }
 
-    SDL_DisplayMode displayMode;
-    SDL_GetCurrentDisplayMode(0, &displayMode);
     WindowGrid windowGrid;
     windowGrid.windowCount = 1 + renderer_getDebugCount(me->renderer);
-    windowGrid.totalSize = GSize(displayMode.w, displayMode.h);
+    windowGrid.totalSize = WINDOW_START_SIZE;
 
     me->pebbleWindow = pebbleWindow_init(
         windowGrid_getSingleBounds(&windowGrid, 0),

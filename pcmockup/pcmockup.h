@@ -55,6 +55,8 @@ DebugWindow* debugWindow_init(SDL_Rect bounds, const DebugView* debugView, Rende
 void debugWindow_free(DebugWindow* window);
 void debugWindow_update(DebugWindow* window);
 void debugWindow_handleEvent(DebugWindow* window, const SDL_Event* ev);
+const DebugView* debugWindow_getDebugView(const DebugWindow* window);
+ImageWindow* debugWindow_asImageWindow(DebugWindow* window);
 
 typedef struct DebugWindowSet DebugWindowSet;
 DebugWindowSet* debugWindowSet_init(const WindowGrid* grid, Renderer* renderer);
