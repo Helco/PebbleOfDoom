@@ -54,6 +54,13 @@ PCMockup *pcmockup_init()
         return NULL;
     }
 
+    me->windowContainer = windowContainer_init(GSize(1024, 768));
+    if (me->windowContainer == NULL)
+    {
+        pcmockup_free(me);
+        return NULL;
+    }
+
     SDL_DisplayMode displayMode;
     SDL_GetCurrentDisplayMode(0, &displayMode);
     WindowGrid windowGrid;
@@ -75,13 +82,6 @@ PCMockup *pcmockup_init()
         me->renderer
     );
     if (me->debugWindowSet == NULL)
-    {
-        pcmockup_free(me);
-        return NULL;
-    }
-
-    me->windowContainer = windowContainer_init(GSize(1024, 768));
-    if (me->windowContainer == NULL)
     {
         pcmockup_free(me);
         return NULL;

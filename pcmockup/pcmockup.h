@@ -15,6 +15,16 @@ void windowContainer_startUpdate(WindowContainer* me);
 void windowContainer_endUpdate(WindowContainer* me);
 void windowContainer_handleEvent(WindowContainer* me, const SDL_Event* ev);
 
+typedef struct ImageWindow ImageWindow;
+ImageWindow* imageWindow_init(const char* title, GSize initialSize, bool_t isEssential);
+void imageWindow_free(ImageWindow* me);
+void imageWindow_setImageData(ImageWindow* me, GSize size, const SDL_Color* data);
+SDL_Rect imageWindow_getContentPos(ImageWindow* me); // in screen coordinates
+void imageWindow_update(ImageWindow* me);
+void imageWindow_setInitialPosition(ImageWindow* me, GPoint initialPosition);
+void imageWindow_toggle(ImageWindow* me, bool_t isOpen);
+bool_t imageWindow_isOpen(ImageWindow* me);
+
 typedef struct WindowGrid
 {
     int windowCount;
