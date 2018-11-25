@@ -12,6 +12,7 @@ struct PCMockup
     TextureManager* textureManager;
     PebbleWindow *pebbleWindow;
     DebugWindowSet *debugWindowSet;
+    WindowContainer* windowContainer;
     bool_t isRunning;
 };
 
@@ -79,6 +80,13 @@ PCMockup *pcmockup_init()
         return NULL;
     }
 
+    me->windowContainer = windowContainer_init(GSize(1024, 768));
+    if (me->windowContainer == NULL)
+    {
+        pcmockup_free(me);
+        return NULL;
+    }
+
     me->isRunning = true;
     return me;
 }
@@ -87,6 +95,8 @@ void pcmockup_free(PCMockup *me)
 {
     if (me == NULL)
         return;
+    if (me->windowContainer != NULL)
+        windowContainer_free(me->windowContainer);
     if (me->debugWindowSet != NULL)
         debugWindowSet_free(me->debugWindowSet);
     if (me->pebbleWindow != NULL)
@@ -102,11 +112,13 @@ void pcmockup_free(PCMockup *me)
 
 void pcmockup_update(PCMockup *me)
 {
+    windowContainer_startUpdate(me->windowContainer);
     GColor *framebuffer = pebbleWindow_getPebbleFramebuffer(me->pebbleWindow);
     pebbleWindow_startUpdate(me->pebbleWindow);
     renderer_render(me->renderer, framebuffer);
     pebbleWindow_endUpdate(me->pebbleWindow);
     debugWindowSet_update(me->debugWindowSet);
+    windowContainer_endUpdate(me->windowContainer);
 
     SDL_Event event;
     while (SDL_PollEvent(&event))
@@ -175,6 +187,7 @@ void pcmockup_update(PCMockup *me)
             }
         }
         debugWindowSet_handleEvent(me->debugWindowSet, &event);
+        windowContainer_handleEvent(me->windowContainer, &event);
     }
 }
 
@@ -200,6 +213,11 @@ int main(int argc, char *argv[])
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());
+        return -1;
+    }
+    if (SDL_GL_LoadLibrary(NULL) < 0)
+    {
+        fprintf(stderr, "SDL_GL_LoadLibrary: %s\n", SDL_GetError());
         return -1;
     }
     PCMockup* pcmockup = pcmockup_init();
@@ -242,4 +260,26 @@ SDL_Rect padRect(SDL_Rect rect, GSize amount)
         rect.w - amount.w,
         rect.h - amount.h
     };
+}
+
+Uint32 getWindowIDByEvent(const SDL_Event* ev)
+{
+    switch (ev->type)
+    {
+        case (SDL_KEYDOWN):
+        case (SDL_KEYUP):
+            return ev->key.windowID;
+        case (SDL_MOUSEBUTTONDOWN):
+        case (SDL_MOUSEBUTTONUP):
+            return ev->button.windowID;
+        case (SDL_MOUSEMOTION):
+            return ev->motion.windowID;
+        case (SDL_MOUSEWHEEL):
+            return ev->wheel.windowID;
+        case (SDL_WINDOWEVENT):
+            return ev->window.windowID;
+        case (SDL_TEXTINPUT):
+            return ev->text.windowID;
+    }
+    return UINT32_MAX;
 }

@@ -15,13 +15,14 @@ set(sources_pcmockup
     safeframebuffer.c
     rendererinterface.c
     texturemanager.c
+    windowcontainer.c
 )
 assign_source_group(${sources_pcmockup})
 
 add_executable(pcmockup ${sources_pcmockup})
 target_link_libraries(pcmockup
     ${SDL2_LIBRARY}
-    ${STB_LIBRARY}
+    stb
     podrenderer
 )
 target_include_directories(pcmockup
