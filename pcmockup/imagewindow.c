@@ -2,6 +2,7 @@
 #include "pcmockup.h"
 #include <glad/glad.h>
 #include <cimgui.h>
+#include <float.h>
 
 struct ImageWindow
 {
