@@ -14,6 +14,8 @@ struct ImageWindow
     ImVec2 initialPosition;
 };
 
+const Uint32 imageWindow_SDLPixelFormat = SDL_PIXELFORMAT_ABGR8888;
+
 ImageWindow* imageWindow_init(const char* title, GSize initialSize, bool_t isEssential)
 {
     ImageWindow* me = (ImageWindow*)malloc(sizeof(ImageWindow));

@@ -16,6 +16,7 @@ set(sources_pcmockup
     rendererinterface.c
     texturemanager.c
     windowcontainer.c
+    imagewindow.c
 )
 assign_source_group(${sources_pcmockup})
 

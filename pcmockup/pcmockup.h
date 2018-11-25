@@ -15,6 +15,7 @@ void windowContainer_startUpdate(WindowContainer* me);
 void windowContainer_endUpdate(WindowContainer* me);
 void windowContainer_handleEvent(WindowContainer* me, const SDL_Event* ev);
 
+extern const Uint32 imageWindow_SDLPixelFormat;
 typedef struct ImageWindow ImageWindow;
 ImageWindow* imageWindow_init(const char* title, GSize initialSize, bool_t isEssential);
 void imageWindow_free(ImageWindow* me);
@@ -47,6 +48,7 @@ void pebbleWindow_startUpdate(PebbleWindow* window);
 void pebbleWindow_endUpdate(PebbleWindow* window);
 SDL_Rect pebbleWindow_getBounds(PebbleWindow* window);
 GColor* pebbleWindow_getPebbleFramebuffer(PebbleWindow* window);
+ImageWindow* pebbleWindow_asImageWindow(PebbleWindow* window);
 
 typedef struct DebugWindow DebugWindow;
 DebugWindow* debugWindow_init(SDL_Rect bounds, const DebugView* debugView, Renderer* renderer);
