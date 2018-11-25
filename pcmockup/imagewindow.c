@@ -7,11 +7,12 @@ struct ImageWindow
 {
     char* title;
     GLuint textureID;
-    GSize windowSize;
+    GSize windowSize, imageSize;
     float aspect;
     SDL_Rect lastContentPos;
     bool isOpen, isEssential;
     ImVec2 initialPosition;
+    float toolbarHeight;
 };
 
 const Uint32 imageWindow_SDLPixelFormat = SDL_PIXELFORMAT_ABGR8888;
@@ -71,6 +72,8 @@ void imageWindow_setImageData(ImageWindow* me, GSize size, const SDL_Color* data
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, me->textureID);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, size.w, size.h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    me->imageSize = size;
+    me->aspect = (float)size.w / (float)size.h;
     me->windowSize.w = max(me->windowSize.w, size.w);
     me->windowSize.h = max(me->windowSize.h, size.h);
 }
@@ -80,17 +83,35 @@ SDL_Rect imageWindow_getContentPos(ImageWindow* me)
     return me->lastContentPos;
 }
 
+void imageWindow_constrainWindowSize(ImGuiSizeCallbackData* data)
+{
+    ImageWindow* me = (ImageWindow*)data->UserData;
+    data->DesiredSize.y -= me->toolbarHeight;
+
+    ImVec2 byWidth = {
+        floorf(data->DesiredSize.x),
+        floorf(data->DesiredSize.x / me->aspect + me->toolbarHeight)
+    };
+    float byWidthArea = byWidth.x * byWidth.y;
+    ImVec2 byHeight = {
+        floorf(data->DesiredSize.y * me->aspect),
+        floorf(data->DesiredSize.y + me->toolbarHeight)
+    };
+    float byHeightArea = byHeight.x * byHeight.y;
+
+    data->DesiredSize = byWidthArea > byHeightArea ? byWidth : byHeight;
+}
+
 void imageWindow_update(ImageWindow* me)
 {
     if (!me->isOpen)
         return;
-    const SDL_Rect windowRect = { 0, 0, me->windowSize.w, me->windowSize.h };
-    const SDL_Rect imageRect = findBestFit(windowRect, me->aspect);
     const ImVec2
-        offset = { (float)imageRect.x, (float)imageRect.y },
-        size = { (float)imageRect.w, (float)imageRect.h },
+        size = { (float)me->windowSize.w, (float)me->windowSize.h },
+        minSize = { (float)me->imageSize.w, (float)me->imageSize.h },
+        maxSize = { FLT_MAX, FLT_MAX },
         zero = { 0, 0 },
-        uv1 = { 1, 1 };
+        one = { 1 + FLT_EPSILON, 1 + FLT_EPSILON };
     ImVec2 toolbarSize, windowPos;
     const ImVec4
         tintColor = { 1, 1, 1, 1 },
@@ -101,30 +122,27 @@ void imageWindow_update(ImageWindow* me)
 
     if (me->initialPosition.x >= 0 && me->initialPosition.y >= 0)
         igSetNextWindowPos(me->initialPosition, ImGuiCond_Once, zero);
-    igSetNextWindowContentSize(size);
+    igSetNextWindowSizeConstraints(minSize, maxSize, imageWindow_constrainWindowSize, me);
     igPushStyleVarVec2(ImGuiStyleVar_WindowPadding, zero);  // space between image and window border
-    igPushStyleVarVec2(ImGuiStyleVar_ItemSpacing, zero);    // space between vertical centering dummy and image
-    igPushStyleVarFloat(ImGuiStyleVar_IndentSpacing, 0.0f); // space between horizontal centering indent and image
     igBegin(me->title, isOpenPtr,
         ImGuiWindowFlags_NoScrollbar |
         ImGuiWindowFlags_NoScrollWithMouse |
         ImGuiWindowFlags_NoCollapse);
     igGetItemRectSize_nonUDT(&toolbarSize);
     igGetWindowPos_nonUDT(&windowPos);
-    igDummy(offset);    // center vertically
-    igIndent(offset.x); // center horizontally
-    igImage((ImTextureID)(intptr_t)me->textureID, size, zero, uv1, tintColor, borderColor);
-    igPopStyleVar(3);
+    igImageButton((ImTextureID)(intptr_t)me->textureID, size, zero, one, 0, borderColor, tintColor);
+    igPopStyleVar(1);
 
     me->windowSize.w = (int16_t)igGetWindowWidth();
     me->windowSize.h = (int16_t)(igGetWindowHeight() - toolbarSize.y);
+    me->toolbarHeight = toolbarSize.y;
     igEnd();
 
     me->lastContentPos = (SDL_Rect) {
-        (int)(windowPos.x + imageRect.x),
-        (int)(windowPos.y + toolbarSize.y + imageRect.y),
-        (int)imageRect.w,
-        (int)imageRect.h
+        (int)(windowPos.x),
+        (int)(windowPos.y),
+        (int)me->windowSize.w,
+        (int)me->windowSize.h
     };
 }
 
