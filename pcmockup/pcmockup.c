@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <cimgui.h>
 #include "pcmockup.h"
 #include "renderer.h"
 #include "platform.h"
@@ -109,6 +110,22 @@ void pcmockup_free(PCMockup *me)
     free(me);
 }
 
+void pcmockup_updateMainMenubar(PCMockup* me)
+{
+    if (!igBeginMainMenuBar())
+        return;
+
+    if (igBeginMenu("PCMockup", true))
+    {
+        if (igMenuItemBool("Exit", NULL, false, true))
+            me->isRunning = false;
+        igEndMenu();
+    }
+    debugWindowSet_updateMenubar(me->debugWindowSet);
+
+    igEndMainMenuBar();
+}
+
 void pcmockup_update(PCMockup *me)
 {
     windowContainer_startUpdate(me->windowContainer);
@@ -117,6 +134,7 @@ void pcmockup_update(PCMockup *me)
     renderer_render(me->renderer, framebuffer);
     pebbleWindow_endUpdate(me->pebbleWindow);
     debugWindowSet_update(me->debugWindowSet);
+    pcmockup_updateMainMenubar(me);
     windowContainer_endUpdate(me->windowContainer);
 
     SDL_Event event;

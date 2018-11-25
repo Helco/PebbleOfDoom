@@ -1,4 +1,5 @@
 #include "pcmockup.h"
+#include <cimgui.h>
 
 #define WINDOW_GAP 64
 
@@ -70,6 +71,23 @@ void debugWindowSet_update(DebugWindowSet* me)
     {
         debugWindow_update(me->windows[i]);
     }
+#endif
+}
+
+void debugWindowSet_updateMenubar(DebugWindowSet* me)
+{
+#ifdef DEBUG_WINDOWS
+    if (!igBeginMenu("Debug windows", true))
+        return;
+    for (int i = 0; i < me->count; i++)
+    {
+        ImageWindow* window = debugWindow_asImageWindow(me->windows[i]);
+        const DebugView* view = debugWindow_getDebugView(me->windows[i]);
+        bool isOpen = imageWindow_isOpen(window);
+        igMenuItemBoolPtr(view->name, NULL, &isOpen, true);
+        imageWindow_toggle(window, isOpen);
+    }
+    igEndMenu();
 #endif
 }
 
