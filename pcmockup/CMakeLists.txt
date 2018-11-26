@@ -6,6 +6,11 @@ set(sources_pcmockup
     pebble.h
     sdl.include.h
     stb.include.h
+    cimgui.include.h
+
+    window.h
+    windowcontainer.c
+
     pcmockup.h
     pcmockup.c
     pebblewindow.c

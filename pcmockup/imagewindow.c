@@ -1,7 +1,7 @@
 #define _CRT_NONSTDC_NO_DEPRECATE
 #include "pcmockup.h"
 #include <glad/glad.h>
-#include <cimgui.h>
+#include "cimgui.include.h"
 #include <float.h>
 
 struct ImageWindow
