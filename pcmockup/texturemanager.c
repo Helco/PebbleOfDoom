@@ -3,7 +3,7 @@
 #include <assert.h>
 
 #define TEXTURE_MANAGER_CHUNK 256
-#define TEXTURE_PATH "data/textures/"
+#define TEXTURE_PATH "resources/textures/"
 #define TEXTURE_PATH_SIZE 512
 
 typedef struct LoadedTexture
