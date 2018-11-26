@@ -9,34 +9,7 @@ Renderer* renderer_init()
         APP_LOG(APP_LOG_LEVEL_ERROR, "Could not allocate renderer");
         return NULL;
     }
-
-    me->wall.end = xz(real_from_int(0), real_from_int(50));
-    me->wall.start = xz(real_from_int(70), real_from_int(50));
-    me->wall.height = real_from_int(25);
-    me->wall.heightOffset = real_zero;
-    me->wall.floorColor = GColorFromRGB(0, 0, 255);
-    me->wall.wallColor = GColorFromRGB(0, 255, 0);
-    me->wall.ceilColor = GColorFromRGB(255, 0, 0);
-
-    me->wall2.start = xz(real_from_int(0), real_from_int(50));
-    me->wall2.end = xz(real_from_int(0), real_from_int(-30));
-    me->wall2.height = real_from_int(25);
-    me->wall2.heightOffset = real_zero;
-    me->wall2.floorColor = GColorFromRGB(0, 0, 255);
-    me->wall2.wallColor = GColorFromRGB(255, 0, 255);
-    me->wall2.ceilColor = GColorFromRGB(255, 0, 0);
-
-    me->wall3.start = xz(real_from_int(0), real_from_int(-30));
-    me->wall3.end = xz(real_from_int(70), real_from_int(50));
-    me->wall3.height = real_from_int(25);
-    me->wall3.heightOffset = real_zero;
-    me->wall3.floorColor = GColorFromRGB(0, 0, 255);
-    me->wall3.wallColor = GColorFromRGB(0, 255, 255);
-    me->wall3.ceilColor = GColorFromRGB(255, 0, 0);
-
-    me->location.position = xz(real_from_int(20), real_from_int(20));
-    me->location.angle = real_degToRad(real_from_int(0));
-    me->location.height = real_zero;
+    memset(me, 0, sizeof(Renderer));
 
     me->halfFov = real_degToRad(real_from_int(30));
 
@@ -62,6 +35,12 @@ void renderer_free(Renderer* me)
     if (me == NULL)
         return;
     free(me);
+}
+
+void renderer_setLevel(Renderer* renderer, const Level* level)
+{
+    renderer->level = level;
+    renderer->location = level->playerStart;
 }
 
 static xz_t myxz_rotate(xz_t a, real_t angleInRad)
@@ -90,11 +69,11 @@ void renderer_transformLine(const Renderer* me, const lineSeg_t* line, lineSeg_t
     result->end.xz = renderer_transformPoint(me, line->end.xz);
 }
 
-void renderer_transformWall(const Renderer* me, const Wall* wall, lineSeg_t* result)
+void renderer_transformWall(const Renderer* me, const Sector* sector, int wallIndex, lineSeg_t* result)
 {
     lineSeg_t lineSeg;
-    lineSeg.start.xz = wall->start;
-    lineSeg.end.xz = wall->end;
+    lineSeg.start.xz = sector->walls[wallIndex].startCorner;
+    lineSeg.end.xz = sector->walls[(wallIndex + 1) % sector->wallCount].startCorner;
     renderer_transformLine(me, &lineSeg, result);
 }
 
@@ -131,10 +110,10 @@ void renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
     }
 }
 
-void renderer_project(const Renderer* me, const Wall* wall, const lineSeg_t* transformedSeg, WallSection* projected)
+void renderer_project(const Renderer* me, const Sector* sector, const lineSeg_t* transformedSeg, WallSection* projected)
 {
-    const real_t halfHeight = real_div(wall->height, real_from_int(2));
-    const real_t relHeightOffset = real_sub(me->location.height, wall->heightOffset);
+    const real_t halfHeight = real_div(real_from_int(sector->height), real_from_int(2));
+    const real_t relHeightOffset = real_sub(me->location.height, real_from_int(sector->heightOffset));
 #define scale_height(value) (real_mul(real_from_int(HALF_RENDERER_HEIGHT), (value)))
     const real_t scaledWallHeight =    scale_height(real_add(halfHeight, relHeightOffset));
     const real_t negScaledWallHeight = scale_height(real_add(real_neg(halfHeight), relHeightOffset));
@@ -154,17 +133,18 @@ void renderer_project(const Renderer* me, const Wall* wall, const lineSeg_t* tra
 #undef div_and_int
 }
 
-void renderer_renderWall(Renderer* me, GColor* framebuffer, const Wall* wall)
+void renderer_renderWall(Renderer* me, GColor* framebuffer, const Sector* sector, int wallIndex)
 {
+    const Wall* wall = &sector->walls[wallIndex];
     lineSeg_t wallSeg;
-    renderer_transformWall(me, wall, &wallSeg);
+    renderer_transformWall(me, sector, wallIndex, &wallSeg);
     if (real_compare(wallSeg.start.xz.z, real_zero) < 0 && real_compare(wallSeg.end.xz.z, real_zero) < 0)
         return;
 
     renderer_clipByFov(me, &wallSeg);
 
     WallSection p;
-    renderer_project(me, wall, &wallSeg, &p);
+    renderer_project(me, sector, &wallSeg, &p);
     if (p.left.x >= p.right.x || p.right.x < 0 || p.left.x >= RENDERER_WIDTH)
         return;
 
@@ -178,12 +158,18 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const Wall* wall)
 
         int y;
         for (y = 0; y < max(0, yCurStart); y++)
-            *(curPixel++) = wall->floorColor;
+            *(curPixel++) = sector->floorColor;
         for (; y <= min(RENDERER_HEIGHT - 1, yCurEnd); y++)
-            *(curPixel++) = wall->wallColor;
+            *(curPixel++) = wall->color;
         for (; y < RENDERER_HEIGHT; y++)
-            *(curPixel++) = wall->ceilColor;
+            *(curPixel++) = sector->ceilColor;
     }
+}
+
+void renderer_renderSector(Renderer* renderer, GColor* framebuffer, const Sector* sector)
+{
+    for (int i = 0; i < sector->wallCount; i++)
+        renderer_renderWall(renderer, framebuffer, sector, i);
 }
 
 void renderer_moveLocation(Renderer* renderer, xz_t xz)
@@ -194,11 +180,12 @@ void renderer_moveLocation(Renderer* renderer, xz_t xz)
 
 void renderer_render(Renderer* renderer, GColor* framebuffer)
 {
+    if (renderer->level == NULL)
+        return;
     memset(framebuffer, 0, RENDERER_WIDTH * RENDERER_HEIGHT);
-    renderer_renderWall(renderer, framebuffer, &renderer->wall);
-    renderer_renderWall(renderer, framebuffer, &renderer->wall2);
-    renderer_renderWall(renderer, framebuffer, &renderer->wall3);
-}
+    const Sector* startSector = &renderer->level->sectors[renderer->location.sector];
+    renderer_renderSector(renderer, framebuffer, startSector);
+};
 
 void renderer_rotateRight(Renderer* renderer)
 {

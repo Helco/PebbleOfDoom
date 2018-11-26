@@ -2,21 +2,17 @@
 #define RENDERER_H
 #include <pebble.h>
 #include "algebra.h"
+#include "level.h"
 
 #define RENDERER_WIDTH 168
 #define HALF_RENDERER_WIDTH (RENDERER_WIDTH / 2)
 #define RENDERER_HEIGHT 144
 #define HALF_RENDERER_HEIGHT (RENDERER_HEIGHT / 2)
 
-typedef struct {
-    xz_t position;
-    real_t height;
-    real_t angle;
-} Location;
-
 typedef struct Renderer Renderer;
 Renderer* renderer_init();
 void renderer_free(Renderer* renderer);
+void renderer_setLevel(Renderer* renderer, const Level* level);
 /*
  * framebuffer - *column-stored* framebuffer pointer
  */
