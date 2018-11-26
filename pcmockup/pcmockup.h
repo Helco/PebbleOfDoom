@@ -15,10 +15,18 @@ typedef struct WindowGrid
 GSize windowGrid_getGridSize(const WindowGrid* grid);
 SDL_Rect windowGrid_getSingleBounds(const WindowGrid* grid, int windowI); // negative to select from end
 
+typedef struct SafeFramebuffer SafeFramebuffer;
+SafeFramebuffer* safeFramebuffer_init(GSize size, int canarySize); // canarySize in framebuffer sizes
+void safeFramebuffer_free(SafeFramebuffer* me);
+GColor* safeFramebuffer_getScreenBuffer(SafeFramebuffer* me);
+void safeFramebuffer_prepare(SafeFramebuffer* me);
+void safeFramebuffer_check(SafeFramebuffer* me);
+
 typedef struct PebbleWindow PebbleWindow;
 PebbleWindow* pebbleWindow_init(SDL_Rect initialBounds, GSize pebbleSize);
 void pebbleWindow_free(PebbleWindow* window);
-void pebbleWindow_update(PebbleWindow* window);
+void pebbleWindow_startUpdate(PebbleWindow* window);
+void pebbleWindow_endUpdate(PebbleWindow* window);
 SDL_Rect pebbleWindow_getBounds(PebbleWindow* window);
 GColor* pebbleWindow_getPebbleFramebuffer(PebbleWindow* window);
 
