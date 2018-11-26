@@ -47,7 +47,11 @@ PCMockup *pcmockup_init()
     }
     renderer_setLevel(me->renderer, me->level);
     renderer_setTextureManager(me->renderer, me->textureManager);
-    textureManager_registerFile(me->textureManager, "xor64.png");
+    if (textureManager_registerFile(me->textureManager, "xor64.png") == INVALID_TEXTURE_ID)
+    {
+        pcmockup_free(me);
+        return NULL;
+    }
 
     SDL_DisplayMode displayMode;
     SDL_GetCurrentDisplayMode(0, &displayMode);

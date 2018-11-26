@@ -27,4 +27,7 @@ target_link_libraries(pcmockup
 target_include_directories(pcmockup
     PRIVATE ${SDL2_INCLUDE_DIR}
 )
+set_target_properties(pcmockup PROPERTIES
+    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+)
 enable_warnings(pcmockup)
