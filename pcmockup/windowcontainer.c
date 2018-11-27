@@ -1,6 +1,8 @@
-#include "pcmockup.h"
+#include "window_internal.h"
+#include <assert.h>
 #include <glad/glad.h>
 #include "cimgui.include.h"
+#include "sdl.include.h"
 
 #define IMGUI_IMPL_API
 #include <imgui_impl_sdl.h>
@@ -12,11 +14,16 @@ extern void ImGui_ImplOpenGL3_Shutdown();
 extern void ImGui_ImplOpenGL3_NewFrame();
 extern void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data);
 
+#define WINDOW_CONTAINER_CHUNK 16
+
 struct WindowContainer
 {
     SDL_Window* window;
     SDL_GLContext glContext;
     ImGuiContext* imGuiContext;
+    Window** windows;
+    Window* focusedWindow;
+    int windowCount, windowCapacity;
 };
 
 WindowContainer* windowContainer_init(GSize windowSize)
@@ -103,6 +110,12 @@ void windowContainer_free(WindowContainer* me)
         SDL_GL_DeleteContext(me->glContext);
     if (me->window)
         SDL_DestroyWindow(me->window);
+    if (me->windows != NULL)
+    {
+        for (int i = 0; i < me->windowCount; i++)
+            window_free(me->windows[i]);
+        free(me->windows);
+    }
     free(me);
 }
 
@@ -115,6 +128,14 @@ void windowContainer_startUpdate(WindowContainer* me)
     ImGui_ImplSDL2_NewFrame(me->window);
     igNewFrame();
     igShowDemoWindow(&open);
+
+    me->focusedWindow = NULL;
+    for (int i = 0; i < me->windowCount; i++)
+    {
+        window_update(me->windows[i]);
+        if (window_isFocused(me->windows[i]))
+            me->focusedWindow = me->windows[i];
+    }
 }
 
 void windowContainer_endUpdate(WindowContainer* me)
@@ -127,11 +148,38 @@ void windowContainer_endUpdate(WindowContainer* me)
     SDL_GL_SwapWindow(me->window);
 }
 
+Window* windowContainer_newWindow(WindowContainer* me, const char* title)
+{
+    if (me->windowCount == me->windowCapacity)
+    {
+        me->windowCapacity += WINDOW_CONTAINER_CHUNK;
+        me->windows = (Window**)realloc(me->windows, sizeof(Window*) * me->windowCapacity);
+        assert(me->windows != NULL);
+    }
+    Window* newWindow = window_init();
+    window_setTitle(newWindow, title);
+    me->windows[me->windowCount++] = newWindow;
+    return newWindow;
+}
+
+Window* windowContainer_getFocusedWindow(WindowContainer* me)
+{
+    return me->focusedWindow;
+}
+
 void windowContainer_handleEvent(WindowContainer* me, const SDL_Event* ev)
 {
     // the ImGui SDL2 implementation does not filter the events by window ID
     Uint32 windowID = SDL_GetWindowID(me->window);
-    if (getWindowIDByEvent(ev) == windowID)
-        ImGui_ImplSDL2_ProcessEvent((SDL_Event*)ev);
+    if (getWindowIDByEvent(ev) != windowID)
+        return;
+    ImGui_ImplSDL2_ProcessEvent((SDL_Event*)ev);
     // TODO: Remove const-removing-cast as soon as (https://github.com/ocornut/imgui/issues/2187) is resolved!
+
+    if (me->focusedWindow == NULL)
+        return;
+    const ImGuiIO* io = igGetIO();
+    if ((ev->type == SDL_KEYDOWN || ev->type == SDL_KEYUP) && !io->WantCaptureKeyboard)
+        window_handleKeyEvent(me->focusedWindow, ev->key.keysym, (ev->type == SDL_KEYDOWN));
+    window_handleDragEvent(me->focusedWindow);
 }

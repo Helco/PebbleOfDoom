@@ -9,6 +9,8 @@ set(sources_pcmockup
     cimgui.include.h
 
     window.h
+    window_internal.h
+    window.c
     windowcontainer.c
 
     pcmockup.h

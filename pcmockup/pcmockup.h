@@ -3,17 +3,10 @@
 #include "sdl.include.h"
 #include "pebble.h"
 #include "renderer.h"
+#include "window.h"
 
 SDL_Rect findBestFit(SDL_Rect target, float aspect);
 SDL_Rect padRect(SDL_Rect rect, GSize amount);
-Uint32 getWindowIDByEvent(const SDL_Event* ev);
-
-typedef struct WindowContainer WindowContainer;
-WindowContainer* windowContainer_init(GSize windowSize);
-void windowContainer_free(WindowContainer* me);
-void windowContainer_startUpdate(WindowContainer* me);
-void windowContainer_endUpdate(WindowContainer* me);
-void windowContainer_handleEvent(WindowContainer* me, const SDL_Event* ev);
 
 extern const Uint32 imageWindow_SDLPixelFormat;
 typedef struct ImageWindow ImageWindow;
