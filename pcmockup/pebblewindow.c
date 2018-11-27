@@ -84,9 +84,7 @@ static inline SDL_Color prv_convertGColorTo32Bit(GColor pebbleColor)
 static void prv_pebbleWindow_convertPebbleToTexture(PebbleWindow* me)
 {
     const GColor* pebblePixels = pebbleWindow_getPebbleFramebuffer(me);
-    char* texPixels;
-    int texPitch;
-    SDL_LockTexture(me->pebbleTexture, NULL, (void**)&texPixels, &texPitch);
+    SDL_Color* texPixels = me->textureData;
 
     uint32_t* itTexPixel;
     const GColor* itPebblePixel;
