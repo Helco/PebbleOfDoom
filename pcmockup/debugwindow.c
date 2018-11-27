@@ -29,6 +29,7 @@ SDL_Surface* createSDLSurface(int w, int h, Uint32 format)
 }
 
 void debugWindow_onDrag(Window* window, int button, ImVec2 delta, void* userdata);
+void debugWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata);
 
 DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* podRenderer)
 {
@@ -45,6 +46,10 @@ DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const De
         return NULL;
     }
     window_setDragCallback(imageWindow_asWindow(me->window), debugWindow_onDrag, me);
+    window_setKeyCallbacks(imageWindow_asWindow(me->window), (WindowKeyCallbacks) {
+        .down = debugWindow_onKeyDown,
+        .userdata = me
+    });
 
     me->surface = createSDLSurface(bounds.w, bounds.h, SDL_PIXELFORMAT_ABGR8888);
     if (me->surface == NULL)
@@ -102,6 +107,15 @@ void debugWindow_update(DebugWindow* me)
     debugWindow_endUpdate(me);
 }
 
+void debugWindow_updateOffset(DebugWindow* me)
+{
+    xz_t halfSize = xz(real_from_int(me->surface->w / 2), real_from_int(me->surface->h / 2));
+    me->offset = xz_sub(
+        xz_invScale(halfSize, me->zoom),
+        me->position
+    );
+}
+
 void debugWindow_onDrag(Window* window, int button, ImVec2 delta, void* userdata)
 {
     UNUSED(window);
@@ -110,12 +124,24 @@ void debugWindow_onDrag(Window* window, int button, ImVec2 delta, void* userdata
     DebugWindow* me = (DebugWindow*)userdata;
     xz_t move = xz_invScale((xz_t) { real_from_int(delta.x), real_from_int(delta.y) }, me->zoom);
     me->position = xz_sub(me->position, move);
+    debugWindow_updateOffset(me);
+}
 
-    xz_t halfSize = xz(real_from_int(me->surface->w / 2), real_from_int(me->surface->h / 2));
-    me->offset = xz_sub(
-        xz_invScale(halfSize, me->zoom),
-        me->position
-    );
+void debugWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata)
+{
+    UNUSED(window);
+    real_t delta = real_zero;
+    switch (sym.sym)
+    {
+        case (SDLK_PLUS):
+        case (SDLK_KP_PLUS): delta = real_from_float(0.1f); break;
+        case (SDLK_MINUS):
+        case (SDLK_KP_MINUS): delta = real_from_float(-0.1f); break;
+        default: return;
+    }
+    DebugWindow* me = (DebugWindow*)userdata;
+    me->zoom = real_add(me->zoom, real_mul(me->zoom, delta));
+    debugWindow_updateOffset(me);
 }
 
 const DebugView* debugWindow_getDebugView(const DebugWindow* me)
