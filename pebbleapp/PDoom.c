@@ -1,4 +1,5 @@
 #include <pebble.h>
+#include "textureresources.h"
 #include "../renderer/renderer.h"
 
 Window* s_main_window;
@@ -21,7 +22,24 @@ void update_animation(Animation *animation, const AnimationProgress progress)
   layer_mark_dirty(root_layer);
 }
 
+bool loadTextures()
+{
+  static const uint32_t resourceIds[] = {
+    RESOURCE_ID_TEXTURE_XOR64
+  };
+  static const int countIds = sizeof(resourceIds) / sizeof(uint32_t);
+  for (int i = 0; i < countIds; i++)
+  {
+    if (loadTextureFromResource(resourceIds[i]))
+      return false;
+  }
+  return true;
+}
+
 int main(void) {
+  if (!loadTextures())
+    return -1;
+
   renderer = renderer_init();
   s_main_window = window_create();
 
@@ -41,4 +59,6 @@ int main(void) {
 
   window_stack_push(s_main_window, true);
   app_event_loop();
+
+  freeTextures();
 }

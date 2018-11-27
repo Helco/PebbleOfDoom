@@ -43,6 +43,11 @@ void renderer_setLevel(Renderer* renderer, const Level* level)
     renderer->location = level->playerStart;
 }
 
+void renderer_setTextureManager(Renderer* me, TextureManagerHandle handle)
+{
+    me->textureManager = handle;
+}
+
 static xz_t myxz_rotate(xz_t a, real_t angleInRad)
 {
     real_t s = real_sin(angleInRad);
