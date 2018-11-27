@@ -18,8 +18,9 @@ typedef struct Location {
 
 typedef struct Wall {
     xz_t startCorner;
-    GColor color;
     int portalTo;
+    TextureId texture;
+    TexCoord texCoord;
 } Wall;
 
 typedef struct Sector {

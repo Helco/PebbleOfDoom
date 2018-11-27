@@ -117,31 +117,6 @@ bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg, TexCoord* texC
     return result;
 }
 
-typedef struct {
-    GColor* colors;
-    int width, height;
-} Bild;
-
-static const Bild* genBild()
-{
-    static GColor pixels[64*64];
-    static Bild bild;
-    bild.width = 64;
-    bild.height = 64;
-    bild.colors = pixels;
-    for (int i = 0; i <64*64; i++)
-    {
-        int x = i % 64;
-        int y = i / 64;
-        int c = x ^ y;
-        pixels[i].r = (c >> 0) & 2;
-        pixels[i].g = (c >> 2) & 2;
-        pixels[i].b = (c >> 4) & 2;
-        pixels[i].a = 3;
-    }
-    return &bild;
-}
-
 void renderer_project(const Renderer* me, const Sector* sector, const lineSeg_t* transformedSeg, WallSection* projected)
 {
     //const real_t halfHeight = real_div(real_from_int(sector->height), real_from_int(2));
@@ -170,14 +145,14 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
     const Sector* const sector = request->sector;
     const Wall* const wall = &sector->walls[wallIndex];
     const real_t nearPlane = me->leftFovSeg.start.xz.z;
-    const Bild* bild = genBild();
+    const Texture* texture = texture_load(me->textureManager, wall->texture);
 
     lineSeg_t wallSeg;
     renderer_transformWall(me, sector, wallIndex, &wallSeg);
     if (real_compare(wallSeg.start.xz.z, nearPlane) < 0 && real_compare(wallSeg.end.xz.z, nearPlane) < 0)
         return;
 
-    TexCoord texCoord = (TexCoord) { xy_zero, xy_one };
+    TexCoord texCoord = wall->texCoord;
     if (!renderer_clipByFov(me, &wallSeg, &texCoord))
         return;
 
@@ -216,13 +191,13 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
 
         real_t xNormalized = real_div(real_from_int(x - renderLeft), renderAmpl);
         int texCol = real_to_int(
-            real_mul(real_lerp(xNormalized, texCoord.start.x, texCoord.end.x), real_from_int(bild->width))
+            real_mul(real_lerp(xNormalized, texCoord.start.x, texCoord.end.x), real_from_int(texture->size.w))
         );
         real_t yNormalized = yCurStart >= 0 ? real_zero
             : real_div(real_from_int(-yCurStart), real_from_int(yCurEnd - yCurStart));
-        real_t texRow = real_mul(real_lerp(yNormalized, texCoord.start.y, texCoord.end.y), real_from_int(bild->height));
+        real_t texRow = real_mul(real_lerp(yNormalized, texCoord.start.y, texCoord.end.y), real_from_int(texture->size.h));
         real_t texRowIncr = real_div(
-            real_mul(real_sub(texCoord.end.y, texCoord.start.y), real_from_int(bild->height)),
+            real_mul(real_sub(texCoord.end.y, texCoord.start.y), real_from_int(texture->size.h)),
             real_from_int(yCurEnd - yCurStart + 1));
 
         int y;
@@ -231,9 +206,9 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
         for (; y <= min(yTop, yPortalStart - 1); y++)
         {
             int texRowI = real_to_int(texRow);
-            *(curPixel++) = bild->colors[
-                (texRowI % bild->height) * bild->width +
-                (texCol % bild->width)
+            *(curPixel++) = texture->pixels[
+                (texRowI % texture->size.h) * texture->size.w +
+                (texCol % texture->size.w)
             ];
             texRow = real_add(texRow, texRowIncr);
         }
@@ -245,9 +220,9 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
             for (y = yPortalEnd; y <= min(yTop, yCurEnd); y++)
             {
                 int texRowI = real_to_int(texRow);
-                *(curPixel++) = bild->colors[
-                    (texRowI % bild->height) * bild->width +
-                    (texCol % bild->width)
+                *(curPixel++) = texture->pixels[
+                    (texRowI % texture->size.h) * texture->size.w +
+                    (texCol % texture->size.w)
                 ];
                 texRow = real_add(texRow, texRowIncr);
             }
@@ -255,6 +230,8 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
         for (; y <= yTop; y++)
             *(curPixel++) = sector->ceilColor;
     }
+
+    texture_free(me->textureManager, texture);
 }
 
 void renderer_renderSector(Renderer* renderer, GColor* framebuffer, const DrawRequest* request)
