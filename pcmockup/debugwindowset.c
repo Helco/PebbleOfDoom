@@ -91,9 +91,3 @@ void debugWindowSet_updateMenubar(DebugWindowSet* me)
     igEndMenu();
 #endif
 }
-
-void debugWindowSet_handleEvent(DebugWindowSet* me, const SDL_Event* ev)
-{
-    for (int i = 0; i < me->count; i++)
-        debugWindow_handleEvent(me->windows[i], ev);
-}

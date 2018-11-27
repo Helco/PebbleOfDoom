@@ -43,7 +43,6 @@ typedef struct DebugWindow DebugWindow;
 DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* debugView, Renderer* renderer);
 void debugWindow_free(DebugWindow* window);
 void debugWindow_update(DebugWindow* window);
-void debugWindow_handleEvent(DebugWindow* window, const SDL_Event* ev);
 const DebugView* debugWindow_getDebugView(const DebugWindow* window);
 ImageWindow* debugWindow_asImageWindow(DebugWindow* window);
 
@@ -52,7 +51,6 @@ DebugWindowSet* debugWindowSet_init(WindowContainer* parent, const WindowGrid* g
 void debugWindowSet_free(DebugWindowSet* set);
 void debugWindowSet_update(DebugWindowSet* set);
 void debugWindowSet_updateMenubar(DebugWindowSet* me);
-void debugWindowSet_handleEvent(DebugWindowSet* set, const SDL_Event* ev);
 
 typedef struct PCMockup PCMockup;
 PCMockup* pcmockup_init();

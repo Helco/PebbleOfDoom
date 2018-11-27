@@ -2,6 +2,7 @@
 #include <glad/glad.h>
 #include "cimgui.include.h"
 #include <float.h>
+#include "platform.h"
 
 struct ImageWindow
 {
@@ -15,8 +16,8 @@ struct ImageWindow
 
 const Uint32 imageWindow_SDLPixelFormat = SDL_PIXELFORMAT_ABGR8888;
 
-void imageWindow_beforeUpdate(Window* me);
-void imageWindow_contentUpdate(Window* me);
+void imageWindow_beforeUpdate(Window* me, void* userdata);
+void imageWindow_contentUpdate(Window* me, void* userdata);
 
 ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect initialBounds, bool_t isEssential)
 {
@@ -32,7 +33,6 @@ ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect 
         imageWindow_free(me);
         return NULL;
     }
-    window_setUserdata(me->window, me);
     window_setInitialBounds(me->window, initialBounds);
     window_setOpenState(me->window, isEssential ? WindowOpenState_Unclosable : WindowOpenState_Open);
     window_setFlags(me->window,
@@ -41,7 +41,8 @@ ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect 
         ImGuiWindowFlags_NoCollapse);
     window_setUpdateCallbacks(me->window, (WindowUpdateCallbacks) {
         .before = imageWindow_beforeUpdate,
-        .content = imageWindow_contentUpdate
+        .content = imageWindow_contentUpdate,
+        .userdata = me
     });
 
     glGenTextures(1, &me->textureID);
@@ -102,9 +103,10 @@ void imageWindow_constrainWindowSize(ImGuiSizeCallbackData* data)
     data->DesiredSize = byWidthArea > byHeightArea ? byWidth : byHeight;
 }
 
-void imageWindow_beforeUpdate(Window* window)
+void imageWindow_beforeUpdate(Window* window, void* userdata)
 {
-    ImageWindow* me = (ImageWindow*)window_getUserdata(window);
+    UNUSED(window);
+    ImageWindow* me = (ImageWindow*)userdata;
     const ImVec2
         zero = { 0, 0 },
         minSize = { (float)me->imageSize.w, (float)me->imageSize.h },
@@ -113,9 +115,9 @@ void imageWindow_beforeUpdate(Window* window)
     igPushStyleVarVec2(ImGuiStyleVar_WindowPadding, zero);  // space between image and window border
 }
 
-void imageWindow_contentUpdate(Window* window)
+void imageWindow_contentUpdate(Window* window, void* userdata)
 {
-    const ImageWindow* me = (const ImageWindow*)window_getUserdata(window);
+    const ImageWindow* me = (const ImageWindow*)userdata;
     const GSize windowSize = window_getBounds(window).size;
     const ImVec2
         zero = { 0, 0 },

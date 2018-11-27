@@ -205,7 +205,6 @@ void pcmockup_update(PCMockup *me)
             break;
             }
         }
-        debugWindowSet_handleEvent(me->debugWindowSet, &event);
         windowContainer_handleEvent(me->windowContainer, &event);
     }
 }

@@ -1,5 +1,6 @@
 #include "pcmockup.h"
 #include "renderer.h"
+#include "platform.h"
 
 #include <string.h>
 
@@ -27,6 +28,8 @@ SDL_Surface* createSDLSurface(int w, int h, Uint32 format)
     return surface;
 }
 
+void debugWindow_onDrag(Window* window, int button, ImVec2 delta, void* userdata);
+
 DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* podRenderer)
 {
     DebugWindow* me = (DebugWindow*)malloc(sizeof(DebugWindow));
@@ -41,6 +44,7 @@ DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const De
         debugWindow_free(me);
         return NULL;
     }
+    window_setDragCallback(imageWindow_asWindow(me->window), debugWindow_onDrag, me);
 
     me->surface = createSDLSurface(bounds.w, bounds.h, SDL_PIXELFORMAT_ABGR8888);
     if (me->surface == NULL)
@@ -98,27 +102,15 @@ void debugWindow_update(DebugWindow* me)
     debugWindow_endUpdate(me);
 }
 
-void debugWindow_handleEvent(DebugWindow* me, const SDL_Event* ev)
+void debugWindow_onDrag(Window* window, int button, ImVec2 delta, void* userdata)
 {
-    Uint32 windowID = 1234;
-    if (ev->type == SDL_MOUSEMOTION && ev->motion.windowID == windowID && (ev->motion.state & SDL_BUTTON_LMASK) > 0)
-    {
-        xz_t move = xz(real_from_int(ev->motion.xrel), real_from_int(ev->motion.yrel));
-        move = xz_invScale(move, me->zoom);
-        me->position = xz_sub(me->position, move);
-    }
-    if (ev->type == SDL_MOUSEWHEEL && ev->wheel.windowID == windowID)
-    {
-        real_t zoom = real_from_int(ev->wheel.y);
-        zoom = real_mul(real_div(zoom, real_from_int(10)), me->zoom);
-        me->zoom = real_add(me->zoom, zoom);
-    }
-    if (ev->type == SDL_KEYDOWN && ev->key.windowID == windowID && ev->key.keysym.sym == SDLK_r)
-    {
-        me->position = xz(real_zero, real_zero);
-    }
+    UNUSED(window);
+    if (button != 0)
+        return;
+    DebugWindow* me = (DebugWindow*)userdata;
+    xz_t move = xz_invScale((xz_t) { real_from_int(delta.x), real_from_int(delta.y) }, me->zoom);
+    me->position = xz_sub(me->position, move);
 
-    // update render offset
     xz_t halfSize = xz(real_from_int(me->surface->w / 2), real_from_int(me->surface->h / 2));
     me->offset = xz_sub(
         xz_invScale(halfSize, me->zoom),
