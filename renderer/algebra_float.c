@@ -132,6 +132,12 @@ real_t real_lerp(real_t value, real_t start, real_t end)
     return real_add(real_mul(value, ampl), start);
 }
 
+real_t real_norm_lerp(real_t value, real_t inputStart, real_t inputEnd, real_t outputStart, real_t outputEnd)
+{
+    real_t normalized = real_div(real_sub(value, inputStart), real_sub(inputEnd, inputStart));
+    return real_lerp(normalized, outputStart, outputEnd);
+}
+
 real_t real_clamp(real_t minimum, real_t value, real_t maximum)
 {
     return real_max(minimum, real_min(value, maximum));

@@ -118,6 +118,19 @@ TEST_F(TestAlgebraReal, real_lerp) {
     expectApproxEq(real_from_int(-20), real_lerp(real_neg(two), real_zero, ten));
 }
 
+TEST_F(TestAlgebraReal, real_norm_lerp) {
+    EXPECT_EQ(real_zero,          real_norm_lerp(real_zero,       real_zero, four,      real_zero, ten));
+    EXPECT_EQ(ten,                real_norm_lerp(four,            real_zero, four,      real_zero, ten));
+    EXPECT_EQ(five,               real_norm_lerp(two,             real_zero, four,      real_zero, ten));
+    EXPECT_EQ(real_zero,          real_norm_lerp(two,             two, four,            real_zero, ten));
+    EXPECT_EQ(five,               real_norm_lerp(two,             two, four,            five, ten));
+    EXPECT_EQ(five,               real_norm_lerp(real_zero,       real_neg(four),       four, real_zero, ten));
+    EXPECT_EQ(real_neg(ten),      real_norm_lerp(two,             two, four,            real_neg(ten), ten));
+    EXPECT_EQ(five,               real_norm_lerp(two,             real_neg(four), four, real_neg(ten), ten));
+    EXPECT_EQ(real_from_int(20),  real_norm_lerp(eight,           real_zero, four,      real_zero, ten));
+    EXPECT_EQ(real_from_int(-20), real_norm_lerp(real_neg(eight), real_zero, four,      real_zero, ten));
+}
+
 TEST_F(TestAlgebraReal, real_clamp) {
     const real_t eleven = real_from_int(11);
     expectApproxEq(five,           real_clamp(real_zero, five, ten));
