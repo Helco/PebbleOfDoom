@@ -27,20 +27,20 @@ SDL_Surface* createSDLSurface(int w, int h, Uint32 format)
     return surface;
 }
 
-DebugWindow* debugWindow_init(SDL_Rect bounds, const DebugView* view, Renderer* podRenderer)
+DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* podRenderer)
 {
     DebugWindow* me = (DebugWindow*)malloc(sizeof(DebugWindow));
     if (me == NULL)
         return NULL;
     memset(me, 0, sizeof(DebugWindow));
 
-    me->window = imageWindow_init(view->name, (GSize) { bounds.w, bounds.h }, false);
+    GRect b = { { bounds.x, bounds.y }, { bounds.w, bounds.h} };
+    me->window = imageWindow_init(parent, view->name, b, false);
     if (me->window == NULL)
     {
         debugWindow_free(me);
         return NULL;
     }
-    imageWindow_setInitialPosition(me->window, (GPoint) { bounds.x, bounds.y });
 
     me->surface = createSDLSurface(bounds.w, bounds.h, SDL_PIXELFORMAT_ABGR8888);
     if (me->surface == NULL)
@@ -89,7 +89,6 @@ void debugWindow_startUpdate(DebugWindow* me)
 void debugWindow_endUpdate(DebugWindow* me)
 {
     imageWindow_setImageData(me->window, GSize(me->surface->w, me->surface->h), (SDL_Color*)me->surface->pixels);
-    imageWindow_update(me->window);
 }
 
 void debugWindow_update(DebugWindow* me)

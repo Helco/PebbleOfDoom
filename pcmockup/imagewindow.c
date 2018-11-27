@@ -1,4 +1,3 @@
-#define _CRT_NONSTDC_NO_DEPRECATE
 #include "pcmockup.h"
 #include <glad/glad.h>
 #include "cimgui.include.h"
@@ -6,32 +5,44 @@
 
 struct ImageWindow
 {
-    char* title;
+    Window* window;
     GLuint textureID;
-    GSize windowSize, imageSize;
+    GSize imageSize;
     float aspect;
-    SDL_Rect lastContentPos;
-    bool isOpen, isEssential;
-    ImVec2 initialPosition;
+    bool isEssential;
     float toolbarHeight;
 };
 
 const Uint32 imageWindow_SDLPixelFormat = SDL_PIXELFORMAT_ABGR8888;
 
-ImageWindow* imageWindow_init(const char* title, GSize initialSize, bool_t isEssential)
+void imageWindow_beforeUpdate(Window* me);
+void imageWindow_contentUpdate(Window* me);
+
+ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect initialBounds, bool_t isEssential)
 {
     ImageWindow* me = (ImageWindow*)malloc(sizeof(ImageWindow));
     if (me == NULL)
         return NULL;
     memset(me, 0, sizeof(ImageWindow));
 
-    me->title = strdup(title);
-    if (me->title == NULL)
+    me->window = windowContainer_newWindow(parent, title);
+    if (me->window == NULL)
     {
-        fprintf(stderr, "strdup: failure\n");
+        fprintf(stderr, "Could not allocate new window\n");
         imageWindow_free(me);
         return NULL;
     }
+    window_setUserdata(me->window, me);
+    window_setInitialBounds(me->window, initialBounds);
+    window_setOpenState(me->window, isEssential ? WindowOpenState_Unclosable : WindowOpenState_Open);
+    window_setFlags(me->window,
+        ImGuiWindowFlags_NoScrollbar |
+        ImGuiWindowFlags_NoScrollWithMouse |
+        ImGuiWindowFlags_NoCollapse);
+    window_setUpdateCallbacks(me->window, (WindowUpdateCallbacks) {
+        .before = imageWindow_beforeUpdate,
+        .content = imageWindow_contentUpdate
+    });
 
     glGenTextures(1, &me->textureID);
     if (me->textureID == 0)
@@ -49,11 +60,8 @@ ImageWindow* imageWindow_init(const char* title, GSize initialSize, bool_t isEss
     const SDL_Color black = { 255, 255, 255, 255 };
     imageWindow_setImageData(me, GSize(1, 1), &black);
 
-    me->isOpen = true;
     me->isEssential = isEssential;
-    me->windowSize = initialSize;
-    me->aspect = (float)initialSize.w / initialSize.h;
-    me->initialPosition.x = -1; // undefined initial position
+    me->aspect = (float)initialBounds.size.w / initialBounds.size.h;
     return me;
 }
 
@@ -63,8 +71,6 @@ void imageWindow_free(ImageWindow* me)
         return;
     if (me->textureID != 0)
         glDeleteTextures(1, &me->textureID);
-    if (me->title != NULL)
-        free(me->title);
     free(me);
 }
 
@@ -75,13 +81,6 @@ void imageWindow_setImageData(ImageWindow* me, GSize size, const SDL_Color* data
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, size.w, size.h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     me->imageSize = size;
     me->aspect = (float)size.w / (float)size.h;
-    me->windowSize.w = max(me->windowSize.w, size.w);
-    me->windowSize.h = max(me->windowSize.h, size.h);
-}
-
-SDL_Rect imageWindow_getContentPos(ImageWindow* me)
-{
-    return me->lastContentPos;
 }
 
 void imageWindow_constrainWindowSize(ImGuiSizeCallbackData* data)
@@ -103,64 +102,46 @@ void imageWindow_constrainWindowSize(ImGuiSizeCallbackData* data)
     data->DesiredSize = byWidthArea > byHeightArea ? byWidth : byHeight;
 }
 
-void imageWindow_update(ImageWindow* me)
+void imageWindow_beforeUpdate(Window* window)
 {
-    if (!me->isOpen)
-        return;
+    ImageWindow* me = (ImageWindow*)window_getUserdata(window);
     const ImVec2
-        size = { (float)me->windowSize.w, (float)me->windowSize.h },
-        minSize = { (float)me->imageSize.w, (float)me->imageSize.h },
-        maxSize = { FLT_MAX, FLT_MAX },
         zero = { 0, 0 },
-        one = { 1 + FLT_EPSILON, 1 + FLT_EPSILON };
-    ImVec2 toolbarSize, windowPos;
+        minSize = { (float)me->imageSize.w, (float)me->imageSize.h },
+        maxSize = { FLT_MAX, FLT_MAX };
+    igSetNextWindowSizeConstraints(minSize, maxSize, imageWindow_constrainWindowSize, me);
+    igPushStyleVarVec2(ImGuiStyleVar_WindowPadding, zero);  // space between image and window border
+}
+
+void imageWindow_contentUpdate(Window* window)
+{
+    const ImageWindow* me = (const ImageWindow*)window_getUserdata(window);
+    const GSize windowSize = window_getBounds(window).size;
+    const ImVec2
+        zero = { 0, 0 },
+        one = { 1 + FLT_EPSILON, 1 + FLT_EPSILON },
+        size = { (float)windowSize.w, (float)windowSize.h };
     const ImVec4
         tintColor = { 1, 1, 1, 1 },
         borderColor = { 0, 0, 0, 0 };
-    bool* isOpenPtr = me->isEssential
-        ? NULL // essential windows don't get a close button
-        : &me->isOpen;
+    ImVec2 toolbarSize;
 
-    if (me->initialPosition.x >= 0 && me->initialPosition.y >= 0)
-        igSetNextWindowPos(me->initialPosition, ImGuiCond_Once, zero);
-    igSetNextWindowSizeConstraints(minSize, maxSize, imageWindow_constrainWindowSize, me);
-    igPushStyleVarVec2(ImGuiStyleVar_WindowPadding, zero);  // space between image and window border
-    igBegin(me->title, isOpenPtr,
-        ImGuiWindowFlags_NoScrollbar |
-        ImGuiWindowFlags_NoScrollWithMouse |
-        ImGuiWindowFlags_NoCollapse);
     igGetItemRectSize_nonUDT(&toolbarSize);
-    igGetWindowPos_nonUDT(&windowPos);
     igImageButton((ImTextureID)(intptr_t)me->textureID, size, zero, one, 0, borderColor, tintColor);
     igPopStyleVar(1);
-
-    me->windowSize.w = (int16_t)igGetWindowWidth();
-    me->windowSize.h = (int16_t)(igGetWindowHeight() - toolbarSize.y);
-    me->toolbarHeight = toolbarSize.y;
-    igEnd();
-
-    me->lastContentPos = (SDL_Rect) {
-        (int)(windowPos.x),
-        (int)(windowPos.y),
-        (int)me->windowSize.w,
-        (int)me->windowSize.h
-    };
-}
-
-void imageWindow_setInitialPosition(ImageWindow* me, GPoint initialPosition)
-{
-    me->initialPosition = (ImVec2) {
-        (float)initialPosition.x,
-        (float)initialPosition.y
-    };
 }
 
 void imageWindow_toggle(ImageWindow* me, bool_t isOpen)
 {
-    me->isOpen = isOpen;
+    window_setOpenState(me->window, isOpen ? WindowOpenState_Open : WindowOpenState_Closed);
 }
 
 bool_t imageWindow_isOpen(ImageWindow* me)
 {
-    return me->isOpen;
+    return window_getOpenState(me->window) == WindowOpenState_Open;
+}
+
+Window* imageWindow_asWindow(ImageWindow* me)
+{
+    return me->window;
 }

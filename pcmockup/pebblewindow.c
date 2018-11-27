@@ -13,20 +13,20 @@ struct PebbleWindow
     GSize pebbleSize;
 };
 
-PebbleWindow* pebbleWindow_init(SDL_Rect initialBounds, GSize pebbleSize)
+PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds, GSize pebbleSize)
 {
     PebbleWindow* me = (PebbleWindow*)malloc(sizeof(PebbleWindow));
     if (me == NULL)
         return NULL;
     memset(me, 0, sizeof(PebbleWindow));
 
-    me->window = imageWindow_init("Pebble screen", (GSize) { initialBounds.w, initialBounds.h }, true);
+    GRect b = { { initialBounds.x, initialBounds.y }, { initialBounds.w, initialBounds.h } };
+    me->window = imageWindow_init(parent, "Pebble screen", b, true);
     if (me->window == NULL)
     {
         pebbleWindow_free(me);
         return NULL;
     }
-    imageWindow_setInitialPosition(me->window, (GPoint) { initialBounds.x, initialBounds.y });
 
     me->textureData = (SDL_Color*)malloc(sizeof(SDL_Color) * pebbleSize.w * pebbleSize.h);
     if (me->textureData == NULL)
@@ -118,7 +118,6 @@ void pebbleWindow_endUpdate(PebbleWindow* me)
     safeFramebuffer_check(me->framebuffer);
     prv_pebbleWindow_convertPebbleToTexture(me);
     imageWindow_setImageData(me->window, me->pebbleSize, me->textureData);
-    imageWindow_update(me->window);
 }
 
 GColor* pebbleWindow_getPebbleFramebuffer(PebbleWindow* window)

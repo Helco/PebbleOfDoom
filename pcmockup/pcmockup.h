@@ -10,14 +10,12 @@ SDL_Rect padRect(SDL_Rect rect, GSize amount);
 
 extern const Uint32 imageWindow_SDLPixelFormat;
 typedef struct ImageWindow ImageWindow;
-ImageWindow* imageWindow_init(const char* title, GSize initialSize, bool_t isEssential);
+ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect initialBounds, bool_t isEssential);
 void imageWindow_free(ImageWindow* me);
 void imageWindow_setImageData(ImageWindow* me, GSize size, const SDL_Color* data);
-SDL_Rect imageWindow_getContentPos(ImageWindow* me); // in screen coordinates
-void imageWindow_update(ImageWindow* me);
-void imageWindow_setInitialPosition(ImageWindow* me, GPoint initialPosition);
 void imageWindow_toggle(ImageWindow* me, bool_t isOpen);
 bool_t imageWindow_isOpen(ImageWindow* me);
+Window* imageWindow_asWindow(ImageWindow* me);
 
 typedef struct WindowGrid
 {
@@ -35,16 +33,14 @@ void safeFramebuffer_prepare(SafeFramebuffer* me);
 void safeFramebuffer_check(SafeFramebuffer* me);
 
 typedef struct PebbleWindow PebbleWindow;
-PebbleWindow* pebbleWindow_init(SDL_Rect initialBounds, GSize pebbleSize);
+PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds, GSize pebbleSize);
 void pebbleWindow_free(PebbleWindow* window);
-void pebbleWindow_startUpdate(PebbleWindow* window);
-void pebbleWindow_endUpdate(PebbleWindow* window);
-SDL_Rect pebbleWindow_getBounds(PebbleWindow* window);
+void pebbleWindow_update(PebbleWindow* me);
 GColor* pebbleWindow_getPebbleFramebuffer(PebbleWindow* window);
 ImageWindow* pebbleWindow_asImageWindow(PebbleWindow* window);
 
 typedef struct DebugWindow DebugWindow;
-DebugWindow* debugWindow_init(SDL_Rect bounds, const DebugView* debugView, Renderer* renderer);
+DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* debugView, Renderer* renderer);
 void debugWindow_free(DebugWindow* window);
 void debugWindow_update(DebugWindow* window);
 void debugWindow_handleEvent(DebugWindow* window, const SDL_Event* ev);
@@ -52,7 +48,7 @@ const DebugView* debugWindow_getDebugView(const DebugWindow* window);
 ImageWindow* debugWindow_asImageWindow(DebugWindow* window);
 
 typedef struct DebugWindowSet DebugWindowSet;
-DebugWindowSet* debugWindowSet_init(const WindowGrid* grid, Renderer* renderer);
+DebugWindowSet* debugWindowSet_init(WindowContainer* parent, const WindowGrid* grid, Renderer* renderer);
 void debugWindowSet_free(DebugWindowSet* set);
 void debugWindowSet_update(DebugWindowSet* set);
 void debugWindowSet_updateMenubar(DebugWindowSet* me);

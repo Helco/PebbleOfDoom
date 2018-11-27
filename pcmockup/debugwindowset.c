@@ -10,7 +10,7 @@ struct DebugWindowSet
     Renderer* renderer;
 };
 
-DebugWindowSet* debugWindowSet_init(const WindowGrid* grid, Renderer* renderer)
+DebugWindowSet* debugWindowSet_init(WindowContainer* parent, const WindowGrid* grid, Renderer* renderer)
 {
     DebugWindowSet* me = (DebugWindowSet*)malloc(sizeof(DebugWindowSet));
     if (me == NULL)
@@ -32,6 +32,7 @@ DebugWindowSet* debugWindowSet_init(const WindowGrid* grid, Renderer* renderer)
     for (int i = 0; i < me->count; i++)
     {
         me->windows[i] = debugWindow_init(
+            parent,
             windowGrid_getSingleBounds(grid, -1 - i),
             &renderer_getDebugViews(renderer)[i],
             renderer

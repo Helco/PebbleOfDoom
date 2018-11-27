@@ -68,6 +68,7 @@ PCMockup *pcmockup_init()
     windowGrid.totalSize = WINDOW_START_SIZE;
 
     me->pebbleWindow = pebbleWindow_init(
+        me->windowContainer,
         windowGrid_getSingleBounds(&windowGrid, 0),
         GSize(RENDERER_WIDTH, RENDERER_HEIGHT)
     );
@@ -78,6 +79,7 @@ PCMockup *pcmockup_init()
     }
 
     me->debugWindowSet = debugWindowSet_init(
+        me->windowContainer,
         &windowGrid,
         me->renderer
     );
