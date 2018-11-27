@@ -173,7 +173,6 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
     // render wall
     const int renderLeft = max(0, p.left.x);
     const int renderRight = min(RENDERER_WIDTH - 1, p.right.x);
-    const real_t renderAmpl = real_from_int(renderRight - renderLeft + 1);
     for (int x = renderLeft; x <= renderRight; x++) {
         const int yBottom = me->yBottom[x];
         const int yTop = me->yTop[x];
@@ -189,10 +188,11 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
             me->yTop[x] = yPortalEnd = clampi(yBottom, lerpi(portalNomEnd, 0, sector->height, yCurStart, yCurEnd), yTop);
         }
 
-        real_t xNormalized = real_div(real_from_int(x - renderLeft), renderAmpl);
-        int texCol = real_to_int(
-            real_mul(real_lerp(xNormalized, texCoord.start.x, texCoord.end.x), real_from_int(texture->size.w))
-        );
+        real_t xLerped = real_norm_lerp(real_from_int(x),
+            real_from_int(renderLeft), real_from_int(renderRight),
+            texCoord.start.x, texCoord.end.x);
+        int texCol = real_to_int(real_mul(xLerped, real_from_int(texture->size.w)));
+
         real_t yNormalized = yCurStart >= 0 ? real_zero
             : real_div(real_from_int(-yCurStart), real_from_int(yCurEnd - yCurStart));
         real_t texRow = real_mul(real_lerp(yNormalized, texCoord.start.y, texCoord.end.y), real_from_int(texture->size.h));
