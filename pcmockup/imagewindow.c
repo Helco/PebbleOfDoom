@@ -117,18 +117,19 @@ void imageWindow_beforeUpdate(Window* window, void* userdata)
 
 void imageWindow_contentUpdate(Window* window, void* userdata)
 {
-    const ImageWindow* me = (const ImageWindow*)userdata;
+    ImageWindow* me = (ImageWindow*)userdata;
     const GSize windowSize = window_getBounds(window).size;
     const ImVec2
         zero = { 0, 0 },
-        one = { 1 + FLT_EPSILON, 1 + FLT_EPSILON },
-        size = { (float)windowSize.w, (float)windowSize.h };
+        one = { 1, 1 },
+        size = { (float)windowSize.w, (float)windowSize.h - me->toolbarHeight };
     const ImVec4
         tintColor = { 1, 1, 1, 1 },
         borderColor = { 0, 0, 0, 0 };
     ImVec2 toolbarSize;
 
     igGetItemRectSize_nonUDT(&toolbarSize);
+    me->toolbarHeight = toolbarSize.y;
     igImageButton((ImTextureID)(intptr_t)me->textureID, size, zero, one, 0, borderColor, tintColor);
     igPopStyleVar(1);
 }
