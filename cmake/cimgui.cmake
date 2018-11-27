@@ -41,3 +41,9 @@ target_compile_definitions(cimgui
     PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD
     INTERFACE CIMGUI_DEFINE_ENUMS_AND_STRUCTS
 )
+target_compile_options(cimgui PRIVATE
+    "-Wno-pragma-pack"
+    "-Wno-return-type-c-linkage"
+    "-Wno-unused-const-variable"
+    "-Wno-macro-redefined"
+)
