@@ -171,6 +171,7 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
     }
 
     // render wall
+    const Texture* texture = texture_load(me->textureManager, wall->texture);
     const int renderLeft = max(0, p.left.x);
     const int renderRight = min(RENDERER_WIDTH - 1, p.right.x);
     for (int x = renderLeft; x <= renderRight; x++) {
