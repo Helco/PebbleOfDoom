@@ -164,6 +164,7 @@ TEST_F(TestAlgebraReal, real_mul) {
     EXPECT_EQ(real_one, real_mul(three, one_third));
 }
 
+// #lifesafer
 TEST_F(TestAlgebraReal, real_div) {
     EXPECT_EQ(real_from_int(4), real_div(real_from_int(12), three));
     EXPECT_EQ(real_zero, real_div(real_zero, real_one));
