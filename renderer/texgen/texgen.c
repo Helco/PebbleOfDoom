@@ -11,7 +11,7 @@ int texgen_getGeneratorCount()
     return sizeof(rawtexgen_registry) / sizeof(TexGeneratorInitializer);
 }
 
-bool_t texgen_getGeneratorByIndex(TexGeneratorInfo* info, int index)
+bool_t texgen_getGeneratorInfoByIndex(TexGeneratorInfo* info, int index)
 {
     if (index < 0 || index >= texgen_getGeneratorCount())
         return false;
@@ -32,7 +32,7 @@ const TexGenerator* rawtexgen_getGeneratorByID(TexGeneratorID id)
     return NULL;
 }
 
-bool_t texgen_getGeneratorByID(TexGeneratorInfo* info, TexGeneratorID id)
+bool_t texgen_getGeneratorInfoByID(TexGeneratorInfo* info, TexGeneratorID id)
 {
     const TexGenerator* generator = rawtexgen_getGeneratorByID(id);
     if (generator != NULL)
@@ -40,7 +40,7 @@ bool_t texgen_getGeneratorByID(TexGeneratorInfo* info, TexGeneratorID id)
     return (generator != NULL);
 }
 
-bool_t texgen_getParameterByIndex(TexGeneratorParameterInfo* info, TexGeneratorID id, int index)
+bool_t texgen_getParameterInfoByIndex(TexGeneratorParameterInfo* info, TexGeneratorID id, int index)
 {
     const TexGenerator* generator = rawtexgen_getGeneratorByID(id);
     if (generator == NULL)
@@ -62,7 +62,7 @@ const TexGeneratorParam* rawtexgen_getParameterByID(const TexGenerator* generato
     return NULL;
 }
 
-bool_t texgen_getParameterByID(TexGeneratorParameterInfo* info, TexGeneratorID genId, TexGenParamID paramId)
+bool_t texgen_getParameterInfoByID(TexGeneratorParameterInfo* info, TexGeneratorID genId, TexGenParamID paramId)
 {
     const TexGenerator* generator = rawtexgen_getGeneratorByID(genId);
     if (generator == NULL)

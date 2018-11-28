@@ -107,13 +107,13 @@ bool texgencli_find_generator(TexGeneratorInfo* info, const char* param)
 {
     TexGeneratorID id;
     if (texgencli_parse_fourcc(param, &id) &&
-        texgen_getGeneratorByID(info, id))
+        texgen_getGeneratorInfoByID(info, id))
         return true;
 
     int count = texgen_getGeneratorCount();
     for (int i = 0; i < count; i++)
     {
-        if (texgen_getGeneratorByIndex(info, i) &&
+        if (texgen_getGeneratorInfoByIndex(info, i) &&
             strcmp(info->name, param) == 0)
             return true;
     }
@@ -127,12 +127,12 @@ bool texgencli_find_parameter(TexGenCLI* cli, TexGeneratorParameterInfo* info, c
     const TexGeneratorID genId = cli->generator.id;
     TexGenParamID id;
     if (texgencli_parse_fourcc(param, &id) &&
-        texgen_getParameterByID(info, genId, id))
+        texgen_getParameterInfoByID(info, genId, id))
         return true;
 
     for (int i = 0; i < cli->generator.paramCount; i++)
     {
-        if (texgen_getParameterByIndex(info, genId, i) &&
+        if (texgen_getParameterInfoByIndex(info, genId, i) &&
             strcmp(info->name, param) == 0)
             return true;
     }
@@ -196,7 +196,7 @@ bool texgencli_opt_list_generators(const char* const * params, void* userdata)
     for (int i = 0; i < count; i++)
     {
         TexGeneratorInfo generator;
-        if (texgen_getGeneratorByIndex(&generator, i))
+        if (texgen_getGeneratorInfoByIndex(&generator, i))
             texgencli_print_generator_header(&generator);
     }
     return true;
@@ -213,7 +213,7 @@ bool texgencli_opt_generator_info(const char* const * params, void* userdata)
     for (int i = 0; i < info.paramCount; i++)
     {
         TexGeneratorParameterInfo paramInfo;
-        if (texgen_getParameterByIndex(&paramInfo, info.id, i))
+        if (texgen_getParameterInfoByIndex(&paramInfo, info.id, i))
             texgencli_print_generator_param(&paramInfo);
     }
     return true;

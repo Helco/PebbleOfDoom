@@ -40,10 +40,10 @@ typedef struct TexGeneratorParameterInfo {
 typedef struct TexGenerationContext TexGenerationContext;
 
 int texgen_getGeneratorCount();
-bool_t texgen_getGeneratorByIndex(TexGeneratorInfo* info, int index);
-bool_t texgen_getGeneratorByID(TexGeneratorInfo* info, TexGeneratorID id);
-bool_t texgen_getParameterByIndex(TexGeneratorParameterInfo* info, TexGeneratorID id, int index);
-bool_t texgen_getParameterByID(TexGeneratorParameterInfo* info, TexGeneratorID genId, TexGenParamID paramId);
+bool_t texgen_getGeneratorInfoByIndex(TexGeneratorInfo* info, int index);
+bool_t texgen_getGeneratorInfoByID(TexGeneratorInfo* info, TexGeneratorID id);
+bool_t texgen_getParameterInfoByIndex(TexGeneratorParameterInfo* info, TexGeneratorID id, int index);
+bool_t texgen_getParameterInfoByID(TexGeneratorParameterInfo* info, TexGeneratorID genId, TexGenParamID paramId);
 
 TexGenerationContext* texgen_init(TextureManagerHandle textureManager, TexGeneratorID id, int size);
 void texgen_free(TexGenerationContext* ctx);
