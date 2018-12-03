@@ -1,4 +1,5 @@
 #include "fixtures.h"
+#include "../renderer/platform.h"
 
 class TestAlgebraVector : public MathFixture { };
 
@@ -12,6 +13,8 @@ TEST_F(TestAlgebraVector, constants) {
     xz_t xzzero = xz_zero;
     xz_t xzright = xz_right;
     xz_t xzforward = xz_forward;
+    UNUSED(xyone, xyzero, xyright, xyup);
+    UNUSED(xzone, xzzero, xzright, xzforward);
 }
 
 TEST_F(TestAlgebraVector, constructor) {
