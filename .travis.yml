@@ -21,6 +21,8 @@ jobs:
 
 addons:
   apt:
+    sources:
+    - ubuntu-toolchain-r-test
     packages:
     - python2.7-dev
     - python-pip
@@ -28,3 +30,4 @@ addons:
     - libegl1-mesa-dev
     - libgles2-mesa-dev
     - libsdl2-dev
+    - gcc-8

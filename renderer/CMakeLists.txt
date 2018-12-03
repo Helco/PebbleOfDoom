@@ -12,6 +12,13 @@ set(sources_podrenderer
     level.h
     level.c
 
+    texgen/texgen.h
+    texgen/texgen_internal.h
+    texgen/texgen_registry.h
+    texgen/texgen.c
+    texgen/texgen_xor.c
+    texgen/texgen_rand.c
+
     ../pcmockup/pebble.c
 )
 assign_source_group(${sources_podrenderer})

@@ -15,6 +15,7 @@ typedef struct Texture {
 } Texture;
 
 extern const Texture* texture_load(TextureManagerHandle manager, TextureId id);
+extern const Texture* texture_createEmpty(TextureManagerHandle manager, GSize size, GColor** contentPtr);
 extern void texture_free(TextureManagerHandle manager, const Texture* texture);
 
 #endif

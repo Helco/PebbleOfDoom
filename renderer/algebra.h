@@ -10,9 +10,6 @@
 #ifndef max
 #define max(a,b) ((a)>(b)?(a):(b))
 #endif
-#if !defined abs && !defined _MSC_VER
-#define abs(a) ((a)<0?-(a):(a))
-#endif
 
 int lerpi(int value, int inputStart, int inputEnd, int outputStart, int outputEnd);
 int clampi(int start, int value, int end);
