@@ -28,6 +28,7 @@ SDL_Surface* createSDLSurface(int w, int h, Uint32 format)
     return surface;
 }
 
+void debugWindow_onDrag(Window* window, int button, ImVec2 delta, void* userdata);
 void debugWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata);
 
 DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* podRenderer)
@@ -44,6 +45,7 @@ DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const De
         debugWindow_free(me);
         return NULL;
     }
+    window_setDragCallback(imageWindow_asWindow(me->window), debugWindow_onDrag, me);
     window_setKeyCallbacks(imageWindow_asWindow(me->window), (WindowKeyCallbacks) {
         .down = debugWindow_onKeyDown,
         .userdata = me
@@ -117,7 +119,7 @@ void debugWindow_updateOffset(DebugWindow* me)
 void debugWindow_onDrag(Window* window, int button, ImVec2 delta, void* userdata)
 {
     UNUSED(window);
-    if (button != 0)
+    if (button != 2) // middle mouse button
         return;
     DebugWindow* me = (DebugWindow*)userdata;
     xz_t move = xz_invScale((xz_t) { real_from_int(delta.x), real_from_int(delta.y) }, me->zoom);

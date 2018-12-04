@@ -70,11 +70,21 @@ void window_update(Window* me)
         me->onUpdate.after(me, me->onUpdate.userdata);
 }
 
+static bool window_shouldHandleDrag(const Window* me, int button)
+{
+    if (!igIsMouseDragging(button, -1.0f) || me->onDrag == NULL)
+        return false;
+    const ImVec2 dragSource = igGetIO()->MouseClickedPos[button];
+    return
+        dragSource.x >= me->currentPos.x && dragSource.x < me->currentPos.x + me->currentSize.x &&
+        dragSource.y >= me->currentPos.y && dragSource.y < me->currentPos.y + me->currentSize.y;
+}
+
 void window_handleDragEvent(Window* me)
 {
     for (int button = 0; button < 4; button++)
     {
-        if (!igIsMouseDragging(button, -1.0f) || me->onDrag == NULL)
+        if (!window_shouldHandleDrag(me, button))
         {
             me->lastDragDelta[button] = (ImVec2) { 0, 0 };
             continue;
