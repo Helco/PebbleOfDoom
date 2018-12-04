@@ -30,7 +30,7 @@ bool loadTextures()
   static const int countIds = sizeof(resourceIds) / sizeof(uint32_t);
   for (int i = 0; i < countIds; i++)
   {
-    if (loadTextureFromResource(resourceIds[i]))
+    if (loadTextureFromResource(resourceIds[i]) == INVALID_TEXTURE_ID)
       return false;
   }
   return true;
