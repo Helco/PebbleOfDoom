@@ -70,7 +70,8 @@ PCMockup *pcmockup_init()
     me->pebbleWindow = pebbleWindow_init(
         me->windowContainer,
         windowGrid_getSingleBounds(&windowGrid, 0),
-        GSize(RENDERER_WIDTH, RENDERER_HEIGHT)
+        GSize(RENDERER_WIDTH, RENDERER_HEIGHT),
+        me->renderer
     );
     if (me->pebbleWindow == NULL)
     {
@@ -151,58 +152,7 @@ void pcmockup_update(PCMockup *me)
             case (SDLK_ESCAPE):
             {
                 me->isRunning = 0;
-            }
-            break;
-            case (SDLK_w):
-            {
-                renderer_moveForward(me->renderer);
-            }
-            break;
-            case (SDLK_s):
-            {
-                renderer_moveBackwards(me->renderer);
-            }
-            break;
-            case (SDLK_a):
-            {
-                renderer_moveLeft(me->renderer);
-            }
-            break;
-            case (SDLK_d):
-            {
-                renderer_moveRight(me->renderer);
-            }
-            break;
-            case (SDLK_RIGHT):
-            {
-                renderer_rotateRight(me->renderer);
-            }
-            break;
-            case (SDLK_LEFT):
-            {
-                renderer_rotateLeft(me->renderer);
-            }
-            break;
-            case (SDLK_UP):
-            {
-                renderer_moveUp(me->renderer);
-            }
-            break;
-            case (SDLK_DOWN):
-            {
-                renderer_moveDown(me->renderer);
-            }
-            break;
-            case (SDLK_SPACE):
-            {
-                Location playerLocation;
-                playerLocation.angle = real_degToRad(real_from_int(0));
-                playerLocation.height = real_zero;
-                playerLocation.position = xz(real_from_int(20), real_from_int(20));
-
-                renderer_moveTo(me->renderer, playerLocation);
-            }
-            break;
+            }break;
             }
         }
         windowContainer_handleEvent(me->windowContainer, &event);

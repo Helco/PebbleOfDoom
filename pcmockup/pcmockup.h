@@ -33,7 +33,7 @@ void safeFramebuffer_prepare(SafeFramebuffer* me);
 void safeFramebuffer_check(SafeFramebuffer* me);
 
 typedef struct PebbleWindow PebbleWindow;
-PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds, GSize pebbleSize);
+PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds, GSize pebbleSize, Renderer* renderer);
 void pebbleWindow_free(PebbleWindow* window);
 void pebbleWindow_startUpdate(PebbleWindow* me);
 void pebbleWindow_endUpdate(PebbleWindow* me);

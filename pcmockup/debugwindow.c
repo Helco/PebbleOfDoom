@@ -28,7 +28,6 @@ SDL_Surface* createSDLSurface(int w, int h, Uint32 format)
     return surface;
 }
 
-void debugWindow_onDrag(Window* window, int button, ImVec2 delta, void* userdata);
 void debugWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata);
 
 DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* podRenderer)
@@ -45,7 +44,6 @@ DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const De
         debugWindow_free(me);
         return NULL;
     }
-    window_setDragCallback(imageWindow_asWindow(me->window), debugWindow_onDrag, me);
     window_setKeyCallbacks(imageWindow_asWindow(me->window), (WindowKeyCallbacks) {
         .down = debugWindow_onKeyDown,
         .userdata = me
@@ -130,17 +128,29 @@ void debugWindow_onDrag(Window* window, int button, ImVec2 delta, void* userdata
 void debugWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata)
 {
     UNUSED(window);
-    real_t delta = real_zero;
+    static const float zoomSpeed = 0.1f;
+    static const float moveSpeed = 8.0f;
+    real_t zoomDelta = real_zero;
+    xz_t moveDelta = xz_zero;
     switch (sym.sym)
     {
         case (SDLK_PLUS):
-        case (SDLK_KP_PLUS): delta = real_from_float(0.1f); break;
+        case (SDLK_KP_PLUS): zoomDelta = real_from_float(zoomSpeed); break;
         case (SDLK_MINUS):
-        case (SDLK_KP_MINUS): delta = real_from_float(-0.1f); break;
+        case (SDLK_KP_MINUS): zoomDelta = real_from_float(-zoomSpeed); break;
+        case (SDLK_w):
+        case (SDLK_UP): moveDelta = xz(real_zero, real_from_float(-moveSpeed)); break;
+        case (SDLK_s):
+        case (SDLK_DOWN): moveDelta = xz(real_zero, real_from_float(moveSpeed)); break;
+        case (SDLK_a):
+        case (SDLK_LEFT): moveDelta = xz(real_from_float(-moveSpeed), real_zero); break;
+        case (SDLK_d):
+        case (SDLK_RIGHT): moveDelta = xz(real_from_float(moveSpeed), real_zero); break;
         default: return;
     }
     DebugWindow* me = (DebugWindow*)userdata;
-    me->zoom = real_add(me->zoom, real_mul(me->zoom, delta));
+    me->position = xz_sub(me->position, xz_invScale(moveDelta, me->zoom));
+    me->zoom = real_add(me->zoom, real_mul(me->zoom, zoomDelta));
     debugWindow_updateOffset(me);
 }
 
