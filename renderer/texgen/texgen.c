@@ -110,6 +110,7 @@ TexGenerationContext* texgen_init(TextureManagerHandle textureManager, TexGenera
         texgen_free(me);
         return NULL;
     }
+    memcpy(me->paramBlock, generator->defaultParamBlock, generator->info.paramBlockSize);
 
     me->generator = generator;
     me->textureManager = textureManager;
