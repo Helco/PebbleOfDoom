@@ -45,6 +45,18 @@ void texgencli_print_generator_header(const TexGeneratorInfo* info)
     printf(" \"%s\" - %s\n", info->name, info->description);
 }
 
+void texgencli_print_generator_param_range(const TexGeneratorParameterInfo* info)
+{
+    if (info->type == TexGenParamType_Int &&
+        (info->range.min.integer != -1 || info->range.max.integer != -1)) {
+        printf("    Range: %d -> %d\n", info->range.min.integer, info->range.max.integer);
+    }
+    if (info->type == TexGenParamType_Float &&
+        (info->range.min.floating != -1.0f || info->range.max.floating != -1.0f)) {
+        printf("    Range: %.3f -> %.3f\n", info->range.min.floating, info->range.max.floating);
+    }
+}
+
 void texgencli_print_generator_param(const TexGeneratorParameterInfo* info)
 {
     static const char* TYPE_NAMES[] = {
@@ -55,6 +67,7 @@ void texgencli_print_generator_param(const TexGeneratorParameterInfo* info)
     printf("  - %s ", TYPE_NAMES[info->type]);
     texgencli_print_fourcc(info->id);
     printf(" \"%s\" - %s\n", info->name, info->description);
+    texgencli_print_generator_param_range(info);
 }
 
 bool texgencli_parse_int(const char* param, int* value)

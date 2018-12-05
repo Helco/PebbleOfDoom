@@ -35,6 +35,12 @@ typedef struct TexGeneratorParameterInfo {
     const char* name;
     const char* description;
     TexGeneratorParamType type;
+    struct {
+        union {
+            int integer;
+            float floating;
+        } min, max;
+    } range;
 } TexGeneratorParameterInfo;
 
 typedef struct TexGenerationContext TexGenerationContext;
