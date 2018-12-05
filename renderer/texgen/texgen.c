@@ -159,6 +159,16 @@ void texgen_setParamBool(TexGenerationContext* me, TexGenParamID id, bool_t valu
     }
 }
 
+void texgen_setParamColor(TexGenerationContext* me, TexGenParamID id, GColor value)
+{
+    const TexGeneratorParam* param = rawtexgen_getParameterByID(me->generator, id);
+    if (param != NULL && param->info.type == TexGenParamType_Color)
+    {
+        GColor* targetPtr = (GColor*)rawtexgen_getParamPointer(param, me->paramBlock);
+        *targetPtr = value;
+    }
+}
+
 void texgen_setParams(TexGenerationContext* me, const void* paramBlock)
 {
     memcpy(me->paramBlock, paramBlock, me->generator->info.paramBlockSize);

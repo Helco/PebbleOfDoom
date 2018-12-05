@@ -29,6 +29,8 @@
         { .floating = _max })
 #define TEXGENPARAM_BOOL(id,description,member) \
     TEXGENPARAM(id, description, TexGenParamType_Bool, member, { .integer = 0 }, { .integer = 1 })
+#define TEXGENPARAM_COLOR(id,description,member) \
+    TEXGENPARAM(id, description, TexGenParamType_Color, member, { .integer = 0 }, { .integer = 255 })
 
 #define END_TEXGENERATOR(_name,_id,_description,_defaultParams,_callback) \
     }; \

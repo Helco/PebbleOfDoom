@@ -20,6 +20,7 @@ typedef enum TexGeneratorParamType {
     TexGenParamType_Int = 0,
     TexGenParamType_Float,
     TexGenParamType_Bool,
+    TexGenParamType_Color
 } TexGeneratorParamType;
 
 typedef struct TexGeneratorInfo {
@@ -56,6 +57,7 @@ void texgen_free(TexGenerationContext* ctx);
 void texgen_setParamInt(TexGenerationContext* ctx, TexGenParamID id, int value);
 void texgen_setParamFloat(TexGenerationContext* ctx, TexGenParamID id, float value);
 void texgen_setParamBool(TexGenerationContext* ctx, TexGenParamID id, bool_t value);
+void texgen_setParamColor(TexGenerationContext* ctx, TexGenParamID id, GColor value);
 void texgen_setParams(TexGenerationContext* ctx, const void* paramBlock);
 void texgen_getParams(TexGenerationContext* ctx, void* outParamBlock);
 bool_t texgen_execute(TexGenerationContext* ctx);
