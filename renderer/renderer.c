@@ -48,19 +48,12 @@ void renderer_setTextureManager(Renderer* me, TextureManagerHandle handle)
     me->textureManager = handle;
 }
 
-static xz_t myxz_rotate(xz_t a, real_t angleInRad)
-{
-    real_t s = real_sin(angleInRad);
-    real_t c = real_cos(angleInRad);
-    return xz(
-        real_sub(real_mul(a.x, s), real_mul(a.z, c)),
-        real_add(real_mul(a.x, c), real_mul(a.z, s))
-    );
-}
-
 xz_t renderer_transformVector(const Renderer* me, xz_t vector)
 {
-    return myxz_rotate(vector, me->location.angle);
+    vector = xz(real_neg(vector.z), real_neg(vector.x));
+    xz_t xz = xz_rotate(vector, me->location.angle);
+    xz.z = real_neg(xz.z);
+    return xz;
 }
 
 xz_t renderer_transformPoint(const Renderer* me, xz_t point)
@@ -202,24 +195,9 @@ void renderer_rotateLeft(Renderer* renderer)
     renderer->location.angle = real_sub(renderer->location.angle, real_degToRad(real_from_int(1)));
 }
 
-void renderer_moveForward(Renderer* renderer)
+void renderer_move(Renderer* renderer, xz_t directions)
 {
-    renderer_moveLocation(renderer, xz(real_one, real_zero));
-}
-
-void renderer_moveBackwards(Renderer* renderer)
-{
-    renderer_moveLocation(renderer, xz(real_neg(real_one), real_zero));
-}
-
-void renderer_moveRight(Renderer* renderer)
-{
-    renderer_moveLocation(renderer, xz(real_zero, real_one));
-}
-
-void renderer_moveLeft(Renderer* renderer)
-{
-    renderer_moveLocation(renderer, xz(real_zero, real_neg(real_one)));
+    renderer_moveLocation(renderer, directions);
 }
 
 void renderer_moveUp(Renderer* renderer)

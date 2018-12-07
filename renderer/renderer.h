@@ -23,10 +23,7 @@ void renderer_render(Renderer* renderer, GColor* framebuffer);
 void renderer_moveTo(Renderer* renderer, Location playerLocation);
 void renderer_rotateRight(Renderer* renderer);
 void renderer_rotateLeft(Renderer* renderer);
-void renderer_moveRight(Renderer* renderer);
-void renderer_moveLeft(Renderer* renderer);
-void renderer_moveUp(Renderer* renderer);
-void renderer_moveDown(Renderer* renderer);
+void renderer_move(Renderer* renderer, xz_t directions);
 void renderer_moveForward(Renderer* renderer);
 void renderer_moveBackwards(Renderer* renderer);
 

@@ -108,66 +108,54 @@ void pcmockup_update(PCMockup *me)
     pebbleWindow_endUpdate(me->pebbleWindow);
     debugWindowSet_update(me->debugWindowSet);
 
-    SDL_Event event;
-    while (SDL_PollEvent(&event))
-    {
-        if (event.type == SDL_QUIT)
-            me->isRunning = 0;
-        else if (event.type == SDL_KEYDOWN)
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
         {
-            switch (event.key.keysym.sym)
+            if (event.type == SDL_QUIT)
+                isRunning = 0;
+            else if (event.type == SDL_KEYDOWN)
             {
-            case (SDLK_ESCAPE):
-            {
-                me->isRunning = 0;
-            }
-            break;
-            case (SDLK_w):
-            {
-                renderer_moveForward(me->renderer);
-            }
-            break;
-            case (SDLK_s):
-            {
-                renderer_moveBackwards(me->renderer);
-            }
-            break;
-            case (SDLK_a):
-            {
-                renderer_moveLeft(me->renderer);
-            }
-            break;
-            case (SDLK_d):
-            {
-                renderer_moveRight(me->renderer);
-            }
-            break;
-            case (SDLK_RIGHT):
-            {
-                renderer_rotateRight(me->renderer);
-            }
-            break;
-            case (SDLK_LEFT):
-            {
-                renderer_rotateLeft(me->renderer);
-            }
-            break;
-            case (SDLK_UP):
-            {
-                renderer_moveUp(me->renderer);
-            }
-            break;
-            case (SDLK_DOWN):
-            {
-                renderer_moveDown(me->renderer);
-            }
-            break;
-            case (SDLK_SPACE):
-            {
-                Location playerLocation;
-                playerLocation.angle = real_degToRad(real_from_int(0));
-                playerLocation.height = real_zero;
-                playerLocation.position = xz(real_from_int(20), real_from_int(20));
+                switch(event.key.keysym.sym)
+                {
+                    case (SDLK_ESCAPE): { isRunning = 0; }break;
+                    case (SDLK_w):
+                    {
+                        renderer_move(renderer, xz_forward);
+                    }break;
+                    case (SDLK_s):
+                    {
+                        renderer_move(renderer, xz_backwards);
+                    }break;
+                    case (SDLK_a):
+                    {
+                        renderer_move(renderer, xz_left);
+                    }break;
+                    case (SDLK_d):
+                    {
+                        renderer_move(renderer, xz_right);
+                    }break;
+                    case (SDLK_RIGHT):
+                    {
+                        renderer_rotateRight(renderer);
+                    }break;
+                    case (SDLK_LEFT):
+                    {
+                        renderer_rotateLeft(renderer);
+                    }break;
+                    case (SDLK_UP):
+                    {
+                        renderer_moveUp(renderer);
+                    }break;
+                    case (SDLK_DOWN):
+                    {
+                        renderer_moveDown(renderer);
+                    }break;
+                    case (SDLK_SPACE):
+                    { 
+                        Location playerLocation;
+                        playerLocation.angle = real_degToRad(real_from_int(0));
+                        playerLocation.height = real_zero;
+                        playerLocation.position = xz(real_from_int(20), real_from_int(20));
 
                 renderer_moveTo(me->renderer, playerLocation);
             }
