@@ -50,9 +50,7 @@ void renderer_setTextureManager(Renderer* me, TextureManagerHandle handle)
 
 xz_t renderer_transformVector(const Renderer* me, xz_t vector)
 {
-    xz_t xz = xz_rotate(xz_neg(vector), me->location.angle);
-    xz.z = real_neg(xz.z);
-    return xz;
+    return xz_rotate(vector, me->location.angle);
 }
 
 xz_t renderer_transformPoint(const Renderer* me, xz_t point)
@@ -171,7 +169,7 @@ void renderer_renderSector(Renderer* renderer, GColor* framebuffer, const Sector
 
 void renderer_moveLocation(Renderer* renderer, xz_t xz)
 {
-    xz = xz_rotate(xz, renderer->location.angle);
+    xz = xz_rotate(xz, real_neg(renderer->location.angle)); // angle needs the be negated because xz_rotate is considering a righthand rotation to be in the positiv and left negativ (world space)
     renderer->location.position = xz_add(renderer->location.position, xz);
 }
 

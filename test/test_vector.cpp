@@ -7,7 +7,7 @@ TEST_F(TestAlgebraVector, constants) {
     // To test macro evaluation
     xy_t xyone = xy_one;
     xy_t xyzero = xy_zero;
-    xy_t xyright = xy_forward;
+    xy_t xyright = xy_right;
     xy_t xyup = xy_up;
     xz_t xzone = xz_one;
     xz_t xzzero = xz_zero;

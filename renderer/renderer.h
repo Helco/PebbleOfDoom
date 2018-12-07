@@ -16,7 +16,7 @@ typedef struct {
     real_t angle;
 } Location;
 
-enum angle {rotateLeft = -1, rotateRight = 1};
+enum angle {rotateLeft = 1, rotateRight = -1};
 
 typedef struct Renderer Renderer;
 Renderer* renderer_init();
