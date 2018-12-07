@@ -124,7 +124,7 @@ void pcmockup_update(PCMockup *me)
                     }break;
                     case (SDLK_s):
                     {
-                        renderer_move(renderer, xz_backwards);
+                        renderer_move(renderer, xz_backward);
                     }break;
                     case (SDLK_a):
                     {
@@ -144,11 +144,11 @@ void pcmockup_update(PCMockup *me)
                     }break;
                     case (SDLK_UP):
                     {
-                        renderer_moveHorizontal(renderer, xy_up);
+                        renderer_moveVertical(renderer, xy_up);
                     }break;
                     case (SDLK_DOWN):
                     {
-                        renderer_moveHorizontal(renderer, xy_down);
+                        renderer_moveVertical(renderer, xy_down);
                     }break;
                     case (SDLK_SPACE):
                     { 

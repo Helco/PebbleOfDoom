@@ -195,7 +195,7 @@ void renderer_move(Renderer* renderer, xz_t directions)
     renderer_moveLocation(renderer, directions);
 }
 
-void renderer_moveHorizontal(Renderer* renderer, xy_t directions)
+void renderer_moveVertical(Renderer* renderer, xy_t directions)
 {
     renderer->location.height = real_add(renderer->location.height, directions.y);
 }
