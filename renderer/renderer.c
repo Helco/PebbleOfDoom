@@ -50,8 +50,7 @@ void renderer_setTextureManager(Renderer* me, TextureManagerHandle handle)
 
 xz_t renderer_transformVector(const Renderer* me, xz_t vector)
 {
-    vector = xz(real_neg(vector.z), real_neg(vector.x));
-    xz_t xz = xz_rotate(vector, me->location.angle);
+    xz_t xz = xz_rotate(xz_neg(vector), me->location.angle);
     xz.z = real_neg(xz.z);
     return xz;
 }
