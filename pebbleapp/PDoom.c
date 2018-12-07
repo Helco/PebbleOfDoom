@@ -6,6 +6,7 @@ Window* s_main_window;
 Layer* root_layer;
 Animation* animation;
 Renderer* renderer;
+Level* level;
 
 void update_layer(Layer* layer, GContext* ctx)
 {
@@ -13,6 +14,7 @@ void update_layer(Layer* layer, GContext* ctx)
   GColor* framebuffer = (GColor*)gbitmap_get_data(framebuffer_bitmap);
 
   renderer_render(renderer, framebuffer);
+  renderer_rotateRight(renderer);
 
   graphics_release_frame_buffer(ctx, framebuffer_bitmap);
 }
@@ -30,7 +32,7 @@ bool loadTextures()
   static const int countIds = sizeof(resourceIds) / sizeof(uint32_t);
   for (int i = 0; i < countIds; i++)
   {
-    if (loadTextureFromResource(resourceIds[i]))
+    if (loadTextureFromResource(resourceIds[i]) == INVALID_TEXTURE_ID)
       return false;
   }
   return true;
@@ -39,8 +41,13 @@ bool loadTextures()
 int main(void) {
   if (!loadTextures())
     return -1;
+  level = level_load(0);
+  if (!level)
+    return -1;
 
   renderer = renderer_init();
+  renderer_setLevel(renderer, level);
+  renderer_setTextureManager(renderer, NULL);
   s_main_window = window_create();
 
   root_layer = window_get_root_layer(s_main_window);
@@ -60,5 +67,7 @@ int main(void) {
   window_stack_push(s_main_window, true);
   app_event_loop();
 
+  renderer_free(renderer);
+  level_free(level);
   freeTextures();
 }
