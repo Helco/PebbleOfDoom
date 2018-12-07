@@ -112,43 +112,43 @@ void pcmockup_update(PCMockup *me)
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_QUIT)
-                isRunning = 0;
+                me->isRunning = 0;
             else if (event.type == SDL_KEYDOWN)
             {
                 switch(event.key.keysym.sym)
                 {
-                    case (SDLK_ESCAPE): { isRunning = 0; }break;
+                    case (SDLK_ESCAPE): { me->isRunning = 0; }break;
                     case (SDLK_w):
                     {
-                        renderer_move(renderer, xz_forward);
+                        renderer_move(me->renderer, xz_forward);
                     }break;
                     case (SDLK_s):
                     {
-                        renderer_move(renderer, xz_backward);
+                        renderer_move(me->renderer, xz_backward);
                     }break;
                     case (SDLK_a):
                     {
-                        renderer_move(renderer, xz_left);
+                        renderer_move(me->renderer, xz_left);
                     }break;
                     case (SDLK_d):
                     {
-                        renderer_move(renderer, xz_right);
+                        renderer_move(me->renderer, xz_right);
                     }break;
                     case (SDLK_RIGHT):
                     {
-                        renderer_rotate(renderer, rotateRight);
+                        renderer_rotate(me->renderer, rotateRight);
                     }break;
                     case (SDLK_LEFT):
                     {
-                        renderer_rotate(renderer, rotateLeft);
+                        renderer_rotate(me->renderer, rotateLeft);
                     }break;
                     case (SDLK_UP):
                     {
-                        renderer_moveVertical(renderer, xy_up);
+                        renderer_moveVertical(me->renderer, xy_up);
                     }break;
                     case (SDLK_DOWN):
                     {
-                        renderer_moveVertical(renderer, xy_down);
+                        renderer_moveVertical(me->renderer, xy_down);
                     }break;
                     case (SDLK_SPACE):
                     { 

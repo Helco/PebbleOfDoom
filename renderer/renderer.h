@@ -10,12 +10,6 @@
 #define RENDERER_HEIGHT 144
 #define HALF_RENDERER_HEIGHT (RENDERER_HEIGHT / 2)
 
-typedef struct {
-    xz_t position;
-    real_t height;
-    real_t angle;
-} Location;
-
 enum angle {rotateLeft = 1, rotateRight = -1};
 
 typedef struct Renderer Renderer;
