@@ -8,6 +8,7 @@
 #pragma clang diagnostic ignored "-Wunused-function"
 #endif
 
+#define STB_DEFINE
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #define STBI_ONLY_PNG
