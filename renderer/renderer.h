@@ -30,8 +30,8 @@ void renderer_render(Renderer* renderer, GColor* framebuffer);
 
 void renderer_moveTo(Renderer* renderer, Location playerLocation);
 void renderer_rotate(Renderer* renderer, int angle); //angle should be in degrees
-void renderer_move(Renderer* renderer, xz_t directions);
-void renderer_moveHorizontal(Renderer* renderer, xy_t directions);
+void renderer_move(Renderer* renderer, xz_t direction);
+void renderer_moveHorizontal(Renderer* renderer, xy_t direction);
 
 #ifdef DEBUG_WINDOWS
 struct SDL_Renderer; // no need to include SDL here
