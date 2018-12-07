@@ -1,6 +1,6 @@
 #include "renderer_internal.h"
 #include "algebra.h"
-#include <assert.h>
+#include "platform.h"
 
 Renderer* renderer_init()
 {
@@ -162,11 +162,10 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
         return;
 
     const Sector* targetSector = &me->level->sectors[wall->portalTo];
-    int portalNomStart, portalNomEnd;
+    int portalNomStart = -1, portalNomEnd = -1;
     if (wall->portalTo >= 0 && targetSector != request->sourceSector) {
         portalNomStart = clampi(0, targetSector->heightOffset - sector->heightOffset, sector->height);
         portalNomEnd = clampi(0, portalNomStart + targetSector->height, sector->height);
-        //if (sector->wallCount == 3)
         drawRequestStack_push(&me->drawRequests, targetSector,
             max(request->left, p.left.x), min(request->right, p.right.x), sector);
     }
@@ -291,7 +290,7 @@ void drawRequestStack_push(DrawRequestStack* stack, const Sector* sector, int le
 {
     const int insertAt = stack->end;
     stack->end = (stack->end + 1) % MAX_DRAW_DEPTH;
-    assert(stack->end != stack->start);
+    assert(stack->end == stack->start);
     stack->requests[insertAt] = (DrawRequest) {
         .sector = sector,
         .left = left,
