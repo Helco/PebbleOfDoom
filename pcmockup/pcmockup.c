@@ -136,19 +136,19 @@ void pcmockup_update(PCMockup *me)
                     }break;
                     case (SDLK_RIGHT):
                     {
-                        renderer_rotateRight(renderer);
+                        renderer_rotate(renderer, rotateRight);
                     }break;
                     case (SDLK_LEFT):
                     {
-                        renderer_rotateLeft(renderer);
+                        renderer_rotate(renderer, rotateLeft);
                     }break;
                     case (SDLK_UP):
                     {
-                        renderer_moveUp(renderer);
+                        renderer_moveHorizontal(renderer, xy_up);
                     }break;
                     case (SDLK_DOWN):
                     {
-                        renderer_moveDown(renderer);
+                        renderer_moveHorizontal(renderer, xy_down);
                     }break;
                     case (SDLK_SPACE):
                     { 

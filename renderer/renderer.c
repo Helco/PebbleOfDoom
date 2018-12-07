@@ -185,14 +185,9 @@ void renderer_render(Renderer* renderer, GColor* framebuffer)
     renderer_renderSector(renderer, framebuffer, startSector);
 };
 
-void renderer_rotateRight(Renderer* renderer)
+void renderer_rotate(Renderer* renderer, int angle)
 {
-    renderer->location.angle = real_add(renderer->location.angle, real_degToRad(real_from_int(1)));
-}
-
-void renderer_rotateLeft(Renderer* renderer)
-{
-    renderer->location.angle = real_sub(renderer->location.angle, real_degToRad(real_from_int(1)));
+    renderer->location.angle = real_add(renderer->location.angle, real_degToRad(angle));
 }
 
 void renderer_move(Renderer* renderer, xz_t directions)
@@ -200,14 +195,9 @@ void renderer_move(Renderer* renderer, xz_t directions)
     renderer_moveLocation(renderer, directions);
 }
 
-void renderer_moveUp(Renderer* renderer)
+void renderer_moveHorizontal(Renderer* renderer, xy_t directions)
 {
-    renderer->location.height = real_add(renderer->location.height, real_one);
-}
-
-void renderer_moveDown(Renderer* renderer)
-{
-    renderer->location.height = real_sub(renderer->location.height, real_one);
+    renderer->location.height = real_add(renderer->location.height, directions.y);
 }
 
 void renderer_moveTo(Renderer* renderer, Location relativOrigin)
