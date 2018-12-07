@@ -72,4 +72,14 @@ const Texture* texgen_getTexture(TexGenerationContext* ctx);
 #define TexGenParam_Rand_UseSeed (TexGenParamID('U', 'S', 'E', 'E'))
 #define TexGenParam_Rand_Seed (TexGenParamID('S', 'E', 'E', 'D'))
 
+#define TexGenerator_Bricks (TexGeneratorID('B', 'R', 'I', 'K'))
+#define TexGenParam_Bricks_BrickWidth (TexGenParamID('B', 'R', 'W', '\0'))
+#define TexGenParam_Bricks_BrickHeight (TexGenParamID('B', 'R', 'H', '\0'))
+#define TexGenParam_Bricks_BrickColor (TexGenParamID('B', 'R', 'C', '\0'))
+#define TexGenParam_Bricks_BrickNoise (TexGenParamID('B', 'R', 'N', '\0'))
+#define TexGenParam_Bricks_BorderSize (TexGenParamID('B', 'O', 'R', 'S'))
+#define TexGenParam_Bricks_BorderWalls (TexGenParamID('B', 'O', 'R', 'W'))
+#define TexGenParam_Bricks_BorderColor (TexGenParamID('B', 'O', 'R', 'C'))
+#define TexGenParam_Bricks_BorderNoise (TexGenParamID('B', 'O', 'R', 'N'))
+
 #endif

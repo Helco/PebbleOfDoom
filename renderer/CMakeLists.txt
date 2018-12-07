@@ -18,6 +18,7 @@ set(sources_podrenderer
     texgen/texgen.c
     texgen/texgen_xor.c
     texgen/texgen_rand.c
+    texgen/texgen_bricks.c
 
     ../pcmockup/pebble.c
 )
