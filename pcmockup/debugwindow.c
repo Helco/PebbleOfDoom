@@ -1,42 +1,67 @@
 #include "pcmockup.h"
 #include "renderer.h"
+#include "platform.h"
 
 #include <string.h>
 
 struct DebugWindow
 {
-    SDL_Window* window;
+    ImageWindow* window;
     SDL_Renderer* renderer;
-    SDL_Texture* texture;
-    SDL_Rect texturePos;
+    SDL_Surface* surface;
     Renderer* podRenderer;
     const DebugView* view;
     xz_t position, offset;
     real_t zoom;
 };
 
-DebugWindow* debugWindow_init(SDL_Rect bounds, const DebugView* view, Renderer* podRenderer)
+SDL_Surface* createSDLSurface(int w, int h, Uint32 format)
+{
+    SDL_PixelFormat* formatInfo = SDL_AllocFormat(format);
+    if (formatInfo == NULL)
+        return NULL;
+    SDL_Surface* surface = SDL_CreateRGBSurface(
+        SDL_SWSURFACE, w, h, formatInfo->BitsPerPixel,
+        formatInfo->Rmask, formatInfo->Gmask, formatInfo->Bmask, formatInfo->Amask
+    );
+    SDL_FreeFormat(formatInfo);
+    return surface;
+}
+
+void debugWindow_onDrag(Window* window, int button, ImVec2 delta, void* userdata);
+void debugWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata);
+
+DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* podRenderer)
 {
     DebugWindow* me = (DebugWindow*)malloc(sizeof(DebugWindow));
     if (me == NULL)
         return NULL;
     memset(me, 0, sizeof(DebugWindow));
 
-    me->window = SDL_CreateWindow(view->name,
-        bounds.x, bounds.y,
-        bounds.w, bounds.h,
-        SDL_WINDOW_RESIZABLE);
+    GRect b = { { bounds.x, bounds.y }, { bounds.w, bounds.h} };
+    me->window = imageWindow_init(parent, view->name, b, false);
     if (me->window == NULL)
     {
-        fprintf(stderr, "SDL_CreateWindow: %s\n", SDL_GetError());
+        debugWindow_free(me);
+        return NULL;
+    }
+    window_setDragCallback(imageWindow_asWindow(me->window), debugWindow_onDrag, me);
+    window_setKeyCallbacks(imageWindow_asWindow(me->window), (WindowKeyCallbacks) {
+        .down = debugWindow_onKeyDown,
+        .userdata = me
+    });
+
+    me->surface = createSDLSurface(bounds.w, bounds.h, SDL_PIXELFORMAT_ABGR8888);
+    if (me->surface == NULL)
+    {
+        fprintf(stderr, "createSDLSurface: %s\n", SDL_GetError());
         debugWindow_free(me);
         return NULL;
     }
 
-    me->renderer = SDL_CreateRenderer(me->window, -1, SDL_RENDERER_TARGETTEXTURE);
+    me->renderer = SDL_CreateSoftwareRenderer(me->surface);
     if (me->renderer == NULL)
     {
-        fprintf(stderr, "SDL_CreateRenderer: %s\n", SDL_GetError());
         debugWindow_free(me);
         return NULL;
     }
@@ -53,56 +78,26 @@ void debugWindow_free(DebugWindow* me)
 {
     if (me == NULL)
         return;
-    if (me->texture != NULL)
-        SDL_DestroyTexture(me->texture);
+    if (me->window != NULL)
+        imageWindow_free(me->window);
+    if (me->surface != NULL)
+        SDL_FreeSurface(me->surface);
     if (me->renderer != NULL)
         SDL_DestroyRenderer(me->renderer);
-    if (me->window != NULL)
-        SDL_DestroyWindow(me->window);
     free(me);
 }
 
 void debugWindow_startUpdate(DebugWindow* me)
 {
-    SDL_Rect src;
-    int textureW = -1, textureH = -1;
-    SDL_GetWindowSize(me->window, &src.w, &src.h);
-    if (me->texture != NULL)
-        SDL_QueryTexture(me->texture, NULL, NULL, &textureW, &textureH);
-    me->texturePos = findBestFit(src, 1.0f);
-
-    if (me->texturePos.w != textureW || me->texturePos.h != textureH)
-    {
-        if (me->texture != NULL)
-            SDL_DestroyTexture(me->texture);
-        me->texture = SDL_CreateTexture(me->renderer,
-            SDL_PIXELFORMAT_ARGB8888,
-            SDL_TEXTUREACCESS_TARGET,
-            me->texturePos.w, me->texturePos.h);
-        if (me->texture == NULL)
-        {
-            fprintf(stderr, "SDL_CreateTexture: %s\n", SDL_GetError());
-            exit(-1);
-        }
-    }
-
-    SDL_SetRenderTarget(me->renderer, me->texture);
+    float scale = real_to_float(me->zoom);
     SDL_SetRenderDrawColor(me->renderer, 0, 0, 0, 255);
     SDL_RenderClear(me->renderer);
-
-    float scale = real_to_float(me->zoom);
     SDL_RenderSetScale(me->renderer, scale, scale);
 }
 
 void debugWindow_endUpdate(DebugWindow* me)
 {
-    SDL_RenderSetScale(me->renderer, 1.0f, 1.0f);
-    SDL_SetRenderTarget(me->renderer, NULL);
-    SDL_SetRenderDrawColor(me->renderer, 255, 0, 255, 255);
-    SDL_RenderClear(me->renderer);
-    SDL_SetRenderDrawColor(me->renderer, 255, 255, 255, 255);
-    SDL_RenderCopy(me->renderer, me->texture, NULL, &me->texturePos);
-    SDL_RenderPresent(me->renderer);
+    imageWindow_setImageData(me->window, GSize(me->surface->w, me->surface->h), (SDL_Color*)me->surface->pixels);
 }
 
 void debugWindow_update(DebugWindow* me)
@@ -112,32 +107,61 @@ void debugWindow_update(DebugWindow* me)
     debugWindow_endUpdate(me);
 }
 
-void debugWindow_handleEvent(DebugWindow* me, const SDL_Event* ev)
+void debugWindow_updateOffset(DebugWindow* me)
 {
-    Uint32 windowID = SDL_GetWindowID(me->window);
-    if (ev->type == SDL_MOUSEMOTION && ev->motion.windowID == windowID && (ev->motion.state & SDL_BUTTON_LMASK) > 0)
-    {
-        xz_t move = xz(real_from_int(ev->motion.xrel), real_from_int(ev->motion.yrel));
-        move = xz_invScale(move, me->zoom);
-        me->position = xz_sub(me->position, move);
-    }
-    if (ev->type == SDL_MOUSEWHEEL && ev->wheel.windowID == windowID)
-    {
-        real_t zoom = real_from_int(ev->wheel.y);
-        zoom = real_mul(real_div(zoom, real_from_int(10)), me->zoom);
-        me->zoom = real_add(me->zoom, zoom);
-    }
-    if (ev->type == SDL_KEYDOWN && ev->key.windowID == windowID && ev->key.keysym.sym == SDLK_r)
-    {
-        me->position = xz(real_zero, real_zero);
-    }
-
-    // update render offset
-    int textureW, textureH;
-    SDL_QueryTexture(me->texture, NULL, NULL, &textureW, &textureH);
-    xz_t halfSize = xz(real_from_int(textureW / 2), real_from_int(textureH / 2));
+    xz_t halfSize = xz(real_from_int(me->surface->w / 2), real_from_int(me->surface->h / 2));
     me->offset = xz_sub(
         xz_invScale(halfSize, me->zoom),
         me->position
     );
+}
+
+void debugWindow_onDrag(Window* window, int button, ImVec2 delta, void* userdata)
+{
+    UNUSED(window);
+    if (button != 2) // middle mouse button
+        return;
+    DebugWindow* me = (DebugWindow*)userdata;
+    xz_t move = xz_invScale((xz_t) { real_from_int(delta.x), real_from_int(delta.y) }, me->zoom);
+    me->position = xz_sub(me->position, move);
+    debugWindow_updateOffset(me);
+}
+
+void debugWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata)
+{
+    UNUSED(window);
+    static const float zoomSpeed = 0.1f;
+    static const float moveSpeed = 8.0f;
+    real_t zoomDelta = real_zero;
+    xz_t moveDelta = xz_zero;
+    switch (sym.sym)
+    {
+        case (SDLK_PLUS):
+        case (SDLK_KP_PLUS): zoomDelta = real_from_float(zoomSpeed); break;
+        case (SDLK_MINUS):
+        case (SDLK_KP_MINUS): zoomDelta = real_from_float(-zoomSpeed); break;
+        case (SDLK_w):
+        case (SDLK_UP): moveDelta = xz(real_zero, real_from_float(-moveSpeed)); break;
+        case (SDLK_s):
+        case (SDLK_DOWN): moveDelta = xz(real_zero, real_from_float(moveSpeed)); break;
+        case (SDLK_a):
+        case (SDLK_LEFT): moveDelta = xz(real_from_float(-moveSpeed), real_zero); break;
+        case (SDLK_d):
+        case (SDLK_RIGHT): moveDelta = xz(real_from_float(moveSpeed), real_zero); break;
+        default: return;
+    }
+    DebugWindow* me = (DebugWindow*)userdata;
+    me->position = xz_sub(me->position, xz_invScale(moveDelta, me->zoom));
+    me->zoom = real_add(me->zoom, real_mul(me->zoom, zoomDelta));
+    debugWindow_updateOffset(me);
+}
+
+const DebugView* debugWindow_getDebugView(const DebugWindow* me)
+{
+    return me->view;
+}
+
+ImageWindow* debugWindow_asImageWindow(DebugWindow* me)
+{
+    return me->window;
 }

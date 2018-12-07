@@ -1,3 +1,9 @@
 [submodule "external/stb"]
 	path = external/stb
 	url = https://github.com/nothings/stb.git
+[submodule "external/cimgui"]
+	path = external/cimgui
+	url = https://github.com/cimgui/cimgui.git
+[submodule "external/glad"]
+	path = external/glad
+	url = https://github.com/Dav1dde/glad.git

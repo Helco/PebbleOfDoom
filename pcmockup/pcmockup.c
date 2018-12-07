@@ -1,8 +1,10 @@
 #include <stdio.h>
+#include "cimgui.include.h"
 #include "pcmockup.h"
 #include "renderer.h"
 #include "platform.h"
 
+static const GSize WINDOW_START_SIZE = { 1024, 768 };
 static const int MAX_FRAMERATE = 60;
 
 struct PCMockup
@@ -12,6 +14,7 @@ struct PCMockup
     TextureManager* textureManager;
     PebbleWindow *pebbleWindow;
     DebugWindowSet *debugWindowSet;
+    WindowContainer* windowContainer;
     bool_t isRunning;
 };
 
@@ -53,15 +56,22 @@ PCMockup *pcmockup_init()
         return NULL;
     }
 
-    SDL_DisplayMode displayMode;
-    SDL_GetCurrentDisplayMode(0, &displayMode);
+    me->windowContainer = windowContainer_init(WINDOW_START_SIZE);
+    if (me->windowContainer == NULL)
+    {
+        pcmockup_free(me);
+        return NULL;
+    }
+
     WindowGrid windowGrid;
     windowGrid.windowCount = 1 + renderer_getDebugCount(me->renderer);
-    windowGrid.totalSize = GSize(displayMode.w, displayMode.h);
+    windowGrid.totalSize = WINDOW_START_SIZE;
 
     me->pebbleWindow = pebbleWindow_init(
+        me->windowContainer,
         windowGrid_getSingleBounds(&windowGrid, 0),
-        GSize(RENDERER_WIDTH, RENDERER_HEIGHT)
+        GSize(RENDERER_WIDTH, RENDERER_HEIGHT),
+        me->renderer
     );
     if (me->pebbleWindow == NULL)
     {
@@ -70,6 +80,7 @@ PCMockup *pcmockup_init()
     }
 
     me->debugWindowSet = debugWindowSet_init(
+        me->windowContainer,
         &windowGrid,
         me->renderer
     );
@@ -87,6 +98,8 @@ void pcmockup_free(PCMockup *me)
 {
     if (me == NULL)
         return;
+    if (me->windowContainer != NULL)
+        windowContainer_free(me->windowContainer);
     if (me->debugWindowSet != NULL)
         debugWindowSet_free(me->debugWindowSet);
     if (me->pebbleWindow != NULL)
@@ -100,13 +113,32 @@ void pcmockup_free(PCMockup *me)
     free(me);
 }
 
+void pcmockup_updateMainMenubar(PCMockup* me)
+{
+    if (!igBeginMainMenuBar())
+        return;
+
+    if (igBeginMenu("PCMockup", true))
+    {
+        if (igMenuItemBool("Exit", NULL, false, true))
+            me->isRunning = false;
+        igEndMenu();
+    }
+    debugWindowSet_updateMenubar(me->debugWindowSet);
+
+    igEndMainMenuBar();
+}
+
 void pcmockup_update(PCMockup *me)
 {
+    windowContainer_startUpdate(me->windowContainer);
     GColor *framebuffer = pebbleWindow_getPebbleFramebuffer(me->pebbleWindow);
     pebbleWindow_startUpdate(me->pebbleWindow);
     renderer_render(me->renderer, framebuffer);
     pebbleWindow_endUpdate(me->pebbleWindow);
     debugWindowSet_update(me->debugWindowSet);
+    pcmockup_updateMainMenubar(me);
+    windowContainer_endUpdate(me->windowContainer);
 
         SDL_Event event;
         while (SDL_PollEvent(&event))
@@ -162,7 +194,7 @@ void pcmockup_update(PCMockup *me)
             break;
             }
         }
-        debugWindowSet_handleEvent(me->debugWindowSet, &event);
+        windowContainer_handleEvent(me->windowContainer, &event);
     }
 }
 
@@ -188,6 +220,11 @@ int main(int argc, char *argv[])
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());
+        return -1;
+    }
+    if (SDL_GL_LoadLibrary(NULL) < 0)
+    {
+        fprintf(stderr, "SDL_GL_LoadLibrary: %s\n", SDL_GetError());
         return -1;
     }
     PCMockup* pcmockup = pcmockup_init();
@@ -230,4 +267,26 @@ SDL_Rect padRect(SDL_Rect rect, GSize amount)
         rect.w - amount.w,
         rect.h - amount.h
     };
+}
+
+Uint32 getWindowIDByEvent(const SDL_Event* ev)
+{
+    switch (ev->type)
+    {
+        case (SDL_KEYDOWN):
+        case (SDL_KEYUP):
+            return ev->key.windowID;
+        case (SDL_MOUSEBUTTONDOWN):
+        case (SDL_MOUSEBUTTONUP):
+            return ev->button.windowID;
+        case (SDL_MOUSEMOTION):
+            return ev->motion.windowID;
+        case (SDL_MOUSEWHEEL):
+            return ev->wheel.windowID;
+        case (SDL_WINDOWEVENT):
+            return ev->window.windowID;
+        case (SDL_TEXTINPUT):
+            return ev->text.windowID;
+    }
+    return UINT32_MAX;
 }

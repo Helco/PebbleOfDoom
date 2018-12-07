@@ -33,4 +33,7 @@ target_compile_definitions(podrenderer
     PUBLIC REAL_USE_FLOAT
     PUBLIC DEBUG_WINDOWS
 )
+target_link_libraries(podrenderer
+    PUBLIC cimgui
+)
 enable_warnings(podrenderer)
