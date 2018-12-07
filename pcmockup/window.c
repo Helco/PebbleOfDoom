@@ -2,6 +2,7 @@
 #include "window_internal.h"
 
 #define MOUSE_BUTTON_COUNT 5 // even imgui uses this "magic" number
+#define DEFAULT_MOUSE_THRESHOLD -1.0f
 
 struct Window
 {
@@ -72,7 +73,7 @@ void window_update(Window* me)
 
 static bool window_shouldHandleDrag(const Window* me, int button)
 {
-    if (!igIsMouseDragging(button, -1.0f) || me->onDrag == NULL)
+    if (!igIsMouseDragging(button, DEFAULT_MOUSE_THRESHOLD) || me->onDrag == NULL)
         return false;
     const ImVec2 dragSource = igGetIO()->MouseClickedPos[button];
     return
@@ -82,7 +83,7 @@ static bool window_shouldHandleDrag(const Window* me, int button)
 
 void window_handleDragEvent(Window* me)
 {
-    for (int button = 0; button < 4; button++)
+    for (int button = 0; button < MOUSE_BUTTON_COUNT; button++)
     {
         if (!window_shouldHandleDrag(me, button))
         {
@@ -90,7 +91,7 @@ void window_handleDragEvent(Window* me)
             continue;
         }
         ImVec2 lastDelta = me->lastDragDelta[button], delta;
-        igGetMouseDragDelta_nonUDT(&delta, button, -1.0f);
+        igGetMouseDragDelta_nonUDT(&delta, button, DEFAULT_MOUSE_THRESHOLD);
 
         ImVec2 deltaDelta = { delta.x - lastDelta.x, delta.y - lastDelta.y };
         me->onDrag(me, button, deltaDelta, me->onDragUserdata);
