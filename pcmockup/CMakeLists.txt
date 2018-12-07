@@ -6,6 +6,13 @@ set(sources_pcmockup
     pebble.h
     sdl.include.h
     stb.include.h
+    cimgui.include.h
+
+    window.h
+    window_internal.h
+    window.c
+    windowcontainer.c
+
     pcmockup.h
     pcmockup.c
     pebblewindow.c
@@ -15,13 +22,15 @@ set(sources_pcmockup
     safeframebuffer.c
     rendererinterface.c
     texturemanager.c
+    windowcontainer.c
+    imagewindow.c
 )
 assign_source_group(${sources_pcmockup})
 
 add_executable(pcmockup ${sources_pcmockup})
 target_link_libraries(pcmockup
     ${SDL2_LIBRARY}
-    ${STB_LIBRARY}
+    stb
     podrenderer
 )
 target_include_directories(pcmockup

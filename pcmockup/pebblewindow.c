@@ -1,4 +1,5 @@
 #include "pcmockup.h"
+#include "platform.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -6,52 +7,44 @@
 
 struct PebbleWindow
 {
-    SDL_Window* window;
-    SDL_Renderer* renderer;
-    SDL_Texture* pebbleTexture;
+    ImageWindow* window;
+    SDL_Color* textureData;
     SDL_PixelFormat* texturePixelFormat;
     SafeFramebuffer* framebuffer;
+    Renderer* renderer;
     GSize pebbleSize;
 };
 
-PebbleWindow* pebbleWindow_init(SDL_Rect initialBounds, GSize pebbleSize)
+void pebbleWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata);
+
+PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds, GSize pebbleSize, Renderer* renderer)
 {
     PebbleWindow* me = (PebbleWindow*)malloc(sizeof(PebbleWindow));
     if (me == NULL)
         return NULL;
     memset(me, 0, sizeof(PebbleWindow));
 
-    me->window = SDL_CreateWindow("PebbleOfDoom - PCMockup",
-        initialBounds.x, initialBounds.y,
-        initialBounds.w, initialBounds.h,
-        SDL_WINDOW_RESIZABLE);
+    GRect b = { { initialBounds.x, initialBounds.y }, { initialBounds.w, initialBounds.h } };
+    me->window = imageWindow_init(parent, "Pebble screen", b, true);
     if (me->window == NULL)
     {
-        fprintf(stderr, "SDL_CreateWindow: %s\n", SDL_GetError());
         pebbleWindow_free(me);
         return NULL;
     }
+    window_setKeyCallbacks(imageWindow_asWindow(me->window), (WindowKeyCallbacks) {
+        .down = pebbleWindow_onKeyDown,
+        .userdata = me
+    });
 
-    me->renderer = SDL_CreateRenderer(me->window, -1, 0);
-    if (me->renderer == NULL)
+    me->textureData = (SDL_Color*)malloc(sizeof(SDL_Color) * pebbleSize.w * pebbleSize.h);
+    if (me->textureData == NULL)
     {
-        fprintf(stderr, "SDL_CreateRenderer: %s\n", SDL_GetError());
+        fprintf(stderr, "Could not allocate pebble texture!\n");
         pebbleWindow_free(me);
         return NULL;
     }
 
-    me->pebbleTexture = SDL_CreateTexture(me->renderer,
-        SDL_PIXELFORMAT_ARGB8888,
-        SDL_TEXTUREACCESS_STREAMING,
-        pebbleSize.w, pebbleSize.h);
-    if (me->pebbleTexture == NULL)
-    {
-        fprintf(stderr, "SDL_CreateTexture: %s\n", SDL_GetError());
-        pebbleWindow_free(me);
-        return NULL;
-    }
-
-    me->texturePixelFormat = SDL_AllocFormat(SDL_PIXELFORMAT_ARGB8888);
+    me->texturePixelFormat = SDL_AllocFormat(imageWindow_SDLPixelFormat);
     if (me->texturePixelFormat == NULL)
     {
         fprintf(stderr, "SDL_AllocFormat: %s\n", SDL_GetError());
@@ -67,7 +60,7 @@ PebbleWindow* pebbleWindow_init(SDL_Rect initialBounds, GSize pebbleSize)
     }
 
     me->pebbleSize = pebbleSize;
-
+    me->renderer = renderer;
     return me;
 }
 
@@ -75,25 +68,15 @@ void pebbleWindow_free(PebbleWindow* me)
 {
     if (me == NULL)
         return;
+    if (me->window != NULL)
+        imageWindow_free(me->window);
+    if (me->textureData != NULL)
+        free(me->textureData);
     if (me->framebuffer != NULL)
         safeFramebuffer_free(me->framebuffer);
     if (me->texturePixelFormat != NULL)
         SDL_FreeFormat(me->texturePixelFormat);
-    if (me->pebbleTexture != NULL)
-        SDL_DestroyTexture(me->pebbleTexture);
-    if (me->renderer != NULL)
-        SDL_DestroyRenderer(me->renderer);
-    if (me->window != NULL)
-        SDL_DestroyWindow(me->window);
     free(me);
-}
-
-static SDL_Rect prv_pebbleWindow_fitPebbleScreen(const PebbleWindow* me)
-{
-    SDL_Rect src;
-    SDL_GetWindowSize(me->window, &src.w, &src.h);
-    const float pebbleAspect = (float)me->pebbleSize.w / me->pebbleSize.h;
-    return findBestFit(src, pebbleAspect);
 }
 
 static inline SDL_Color prv_convertGColorTo32Bit(GColor pebbleColor)
@@ -109,9 +92,7 @@ static inline SDL_Color prv_convertGColorTo32Bit(GColor pebbleColor)
 static void prv_pebbleWindow_convertPebbleToTexture(PebbleWindow* me)
 {
     const GColor* pebblePixels = pebbleWindow_getPebbleFramebuffer(me);
-    char* texPixels;
-    int texPitch;
-    SDL_LockTexture(me->pebbleTexture, NULL, (void**)&texPixels, &texPitch);
+    SDL_Color* texPixels = me->textureData;
 
     uint32_t* itTexPixel;
     const GColor* itPebblePixel;
@@ -129,10 +110,8 @@ static void prv_pebbleWindow_convertPebbleToTexture(PebbleWindow* me)
         }
 
         // Advance to next line
-        texPixels += texPitch;
+        texPixels += me->pebbleSize.w;
     }
-
-    SDL_UnlockTexture(me->pebbleTexture);
 }
 
 void pebbleWindow_startUpdate(PebbleWindow* me)
@@ -144,23 +123,41 @@ void pebbleWindow_endUpdate(PebbleWindow* me)
 {
     safeFramebuffer_check(me->framebuffer);
     prv_pebbleWindow_convertPebbleToTexture(me);
-
-    SDL_SetRenderDrawColor(me->renderer, 255, 0, 255, 255);
-    SDL_RenderClear(me->renderer);
-    const SDL_Rect dst = prv_pebbleWindow_fitPebbleScreen(me);
-    SDL_RenderCopy(me->renderer, me->pebbleTexture, NULL, &dst);
-    SDL_RenderPresent(me->renderer);
+    imageWindow_setImageData(me->window, me->pebbleSize, me->textureData);
 }
 
-SDL_Rect pebbleWindow_getBounds(PebbleWindow* me)
+void pebbleWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata)
 {
-    SDL_Rect bounds;
-    SDL_GetWindowPosition(me->window, &bounds.x, &bounds.y);
-    SDL_GetWindowSize(me->window, &bounds.w, &bounds.h);
-    return bounds;
+    UNUSED(window);
+    PebbleWindow* me = (PebbleWindow*)userdata;
+    switch(sym.sym)
+    {
+        case (SDLK_w): renderer_moveForward(me->renderer); break;
+        case (SDLK_s): renderer_moveBackwards(me->renderer); break;
+        case (SDLK_a): renderer_moveLeft(me->renderer); break;
+        case (SDLK_d): renderer_moveRight(me->renderer); break;
+        case (SDLK_UP): renderer_moveUp(me->renderer); break;
+        case (SDLK_DOWN): renderer_moveDown(me->renderer); break;
+        case (SDLK_LEFT): renderer_rotateLeft(me->renderer); break;
+        case (SDLK_RIGHT): renderer_rotateRight(me->renderer); break;
+        case(SDLK_SPACE):
+        {
+            Location playerLocation;
+            playerLocation.angle = real_degToRad(real_from_int(0));
+            playerLocation.height = real_zero;
+            playerLocation.position = xz(real_from_int(20), real_from_int(20));
+
+            renderer_moveTo(me->renderer, playerLocation);
+        }break;
+    }
 }
 
 GColor* pebbleWindow_getPebbleFramebuffer(PebbleWindow* window)
 {
     return safeFramebuffer_getScreenBuffer(window->framebuffer);
+}
+
+ImageWindow* pebbleWindow_asImageWindow(PebbleWindow* me)
+{
+    return me->window;
 }
