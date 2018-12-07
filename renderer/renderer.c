@@ -290,7 +290,7 @@ void drawRequestStack_push(DrawRequestStack* stack, const Sector* sector, int le
 {
     const int insertAt = stack->end;
     stack->end = (stack->end + 1) % MAX_DRAW_DEPTH;
-    assert(stack->end == stack->start);
+    assert(stack->end != stack->start);
     stack->requests[insertAt] = (DrawRequest) {
         .sector = sector,
         .left = left,
