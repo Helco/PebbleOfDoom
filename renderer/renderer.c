@@ -187,7 +187,7 @@ void renderer_render(Renderer* renderer, GColor* framebuffer)
 
 void renderer_rotate(Renderer* renderer, int angle)
 {
-    renderer->location.angle = real_add(renderer->location.angle, real_degToRad(angle));
+    renderer->location.angle = real_add(renderer->location.angle, real_degToRad(real_from_int(angle)));
 }
 
 void renderer_move(Renderer* renderer, xz_t directions)
