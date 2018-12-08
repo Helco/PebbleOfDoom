@@ -55,11 +55,18 @@ bool_t texgen_getParameterInfoByID(TexGeneratorParameterInfo* info, TexGenerator
 TexGenerationContext* texgen_init(TextureManagerHandle textureManager, TexGeneratorID id, int size);
 void texgen_free(TexGenerationContext* ctx);
 void texgen_setSize(TexGenerationContext* ctx, int newSize);
+void texgen_setGenerator(TexGenerationContext* ctx, TexGeneratorID id);
 void texgen_setParamInt(TexGenerationContext* ctx, TexGenParamID id, int value);
 void texgen_setParamFloat(TexGenerationContext* ctx, TexGenParamID id, float value);
 void texgen_setParamBool(TexGenerationContext* ctx, TexGenParamID id, bool_t value);
 void texgen_setParamColor(TexGenerationContext* ctx, TexGenParamID id, GColor value);
 void texgen_setParams(TexGenerationContext* ctx, const void* paramBlock);
+int texgen_getLogSize(TexGenerationContext* ctx);
+TexGeneratorID texgen_getGenerator(TexGenerationContext* ctx);
+int texgen_getParamInt(TexGenerationContext* ctx, TexGenParamID id);
+float texgen_getParamFloat(TexGenerationContext* ctx, TexGenParamID id);
+bool_t texgen_getParamBool(TexGenerationContext* ctx, TexGenParamID id);
+GColor texgen_getParamColor(TexGenerationContext* ctx, TexGenParamID id);
 void texgen_getParams(TexGenerationContext* ctx, void* outParamBlock);
 bool_t texgen_execute(TexGenerationContext* ctx);
 TextureId texgen_getTextureId(TexGenerationContext* ctx);
