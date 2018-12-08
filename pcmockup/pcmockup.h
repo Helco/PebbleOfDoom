@@ -65,6 +65,7 @@ void textureManager_free(TextureManager* me); // asserts that all textures are f
 TextureId textureManager_registerFile(TextureManager* me, const char* filename); // relative to texture folder
 const Texture* textureManager_loadTexture(TextureManager* me, TextureId id);
 const Texture* textureManager_createEmptyTexture(TextureManager* me, GSize size, GColor** outputPtr);
+void textureManager_resizeEmptyTexture(TextureManager* me, TextureId id, GSize newSize, GColor** outputPtr);
 void textureManager_freeTexture(TextureManager* me, const Texture* texture);
 
 #endif

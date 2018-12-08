@@ -129,6 +129,13 @@ void texgen_free(TexGenerationContext* me)
     free(me);
 }
 
+void texgen_setSize(TexGenerationContext* ctx, int newAbsSize)
+{
+    int logSize = prv_abs_to_logsize(newAbsSize);
+    assert(logSize == 0);
+    texture_resizeEmpty(ctx->textureManager, ctx->texture->id, GSize(newAbsSize, newAbsSize), &ctx->pixels);
+}
+
 void texgen_setParamInt(TexGenerationContext* me, TexGenParamID id, int value)
 {
     const TexGeneratorParam* param = rawtexgen_getParameterByID(me->generator, id);

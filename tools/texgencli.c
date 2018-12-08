@@ -473,6 +473,13 @@ const Texture* texture_createEmpty(TextureManagerHandle manager, GSize size, GCo
     return texture;
 }
 
+void texture_resizeEmpty(TextureManagerHandle manager, TextureId id, GSize newSize, GColor** contentPtr)
+{
+    // this is not needed for the cli
+    UNUSED(manager, id, newSize, contentPtr);
+    assert(false && "Unimplemented function: texture_resizeEmpty");
+}
+
 void texture_free(TextureManagerHandle manager, const Texture* texture)
 {
     UNUSED(manager);

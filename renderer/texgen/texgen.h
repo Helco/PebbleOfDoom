@@ -54,6 +54,7 @@ bool_t texgen_getParameterInfoByID(TexGeneratorParameterInfo* info, TexGenerator
 
 TexGenerationContext* texgen_init(TextureManagerHandle textureManager, TexGeneratorID id, int size);
 void texgen_free(TexGenerationContext* ctx);
+void texgen_setSize(TexGenerationContext* ctx, int newSize);
 void texgen_setParamInt(TexGenerationContext* ctx, TexGenParamID id, int value);
 void texgen_setParamFloat(TexGenerationContext* ctx, TexGenParamID id, float value);
 void texgen_setParamBool(TexGenerationContext* ctx, TexGenParamID id, bool_t value);
