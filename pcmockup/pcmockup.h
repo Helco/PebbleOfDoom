@@ -82,5 +82,6 @@ TexGenerationContext* textureManager_createGeneratedTexture(TextureManager* me, 
 TexGenerationContext* textureManager_getGenerationContext(TextureManager* me, TextureId id);
 int textureManager_getTextureCount(TextureManager* me);
 const Texture* textureManager_getTextureByIndex(TextureManager* me, int index);
+const char* textureManager_getTextureSource(TextureManager* me, const Texture* texture);
 
 #endif

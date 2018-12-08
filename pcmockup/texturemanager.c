@@ -1,4 +1,5 @@
 #include "pcmockup.h"
+#include <string.h>
 #include <stb_image.h>
 #include <assert.h>
 
@@ -10,6 +11,7 @@ typedef struct LoadedTexture
 {
     int referenceCount;
     Texture texture;
+    char* source;
     TexGenerationContext* generationContext;
 } LoadedTexture;
 
@@ -56,6 +58,8 @@ void textureManager_free(TextureManager* me)
             assert(itTexture->referenceCount == 0);
             if (itTexture->texture.pixels != NULL)
                 free(itTexture->texture.pixels);
+            if (itTexture->source != NULL)
+                free(itTexture->source);
         }
         free(me->textures);
     }
@@ -76,6 +80,7 @@ static LoadedTexture* prv_textureManager_nextEntry(TextureManager* me)
     texture->referenceCount = 0;
     texture->texture.id = me->count;
     texture->generationContext = NULL;
+    texture->source = NULL;
     me->count++;
     return texture;
 }
@@ -131,6 +136,7 @@ TextureId textureManager_registerFile(TextureManager* me, const char* filename)
     loadedTex->texture.size.w = width;
     loadedTex->texture.size.h = height;
     loadedTex->texture.pixels = pebblePixels;
+    loadedTex->source = strdup(filename);
     return loadedTex->texture.id;
 }
 
@@ -184,6 +190,7 @@ TexGenerationContext* textureManager_createGeneratedTexture(TextureManager* me, 
         return NULL;
     LoadedTexture* loadedTexture = &me->textures[texgen_getTextureId(generationContext)];
     loadedTexture->generationContext = generationContext;
+    loadedTexture->source = strdup("<generated>");
     return generationContext;
 }
 
@@ -195,22 +202,18 @@ TexGenerationContext* textureManager_getGenerationContext(TextureManager* me, Te
 
 int textureManager_getTextureCount(TextureManager* me)
 {
-    int count = 0;
-    for (int i = 0; i < me->count; i++)
-        count += (me->textures[i].referenceCount > 0);
-    return count;
+    return me->count;
 }
 
 const Texture* textureManager_getTextureByIndex(TextureManager* me, int publicIndex)
 {
-    if (publicIndex < 0)
-        return NULL;
-    for (int privateIndex = 0; privateIndex < me->count; privateIndex++) {
-        if (me->textures[privateIndex].referenceCount == 0)
-            continue;
-        if (publicIndex == 0)
-            return &me->textures[privateIndex].texture;
-        publicIndex--;
-    }
-    return NULL;
+    return publicIndex < 0 || publicIndex >= me->count ? NULL
+        : &me->textures[publicIndex].texture;
+}
+
+const char* textureManager_getTextureSource(TextureManager* me, const Texture* texture)
+{
+    static const char* const EMPTY = "";
+    LoadedTexture* loadedTexture = &me->textures[texture->id];
+    return loadedTexture->source == NULL ? EMPTY : loadedTexture->source;;
 }
