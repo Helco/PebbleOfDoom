@@ -167,3 +167,12 @@ void window_setKeyCallbacks(Window* me, WindowKeyCallbacks callbacks)
 {
     me->onKey = callbacks;
 }
+
+void window_updateMenubar(Window* me)
+{
+    bool isOpen = (me->openState == WindowOpenState_Open);
+    bool* isOpenPtr = me->openState == WindowOpenState_Unclosable ? NULL : &isOpen;
+    igMenuItemBoolPtr(me->title, NULL, isOpenPtr, true);
+    if (isOpenPtr)
+        window_setOpenState(me, isOpen ? WindowOpenState_Open : WindowOpenState_Closed);
+}

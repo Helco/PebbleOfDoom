@@ -45,6 +45,7 @@ void window_setInitialBounds(Window* window, GRect bounds);
 void window_setUpdateCallbacks(Window* window, WindowUpdateCallbacks callbacks);
 void window_setDragCallback(Window* window, WindowDragCallback callback, void* userdata);
 void window_setKeyCallbacks(Window* window, WindowKeyCallbacks callbacks);
+void window_updateMenubar(Window* window);
 
 typedef struct WindowContainer WindowContainer;
 WindowContainer* windowContainer_init(GSize windowSize);
