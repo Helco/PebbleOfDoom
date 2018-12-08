@@ -22,7 +22,7 @@ static const TexGen_Bricks_Params texGen_bricks_defaultParams = {
 };
 
 static GColor bricks_applyNoise(GColor base, int noise) {
-    if (noise == 0 || rand() % (MAX_NOISE - noise))
+    if (noise == 0 || rand() % (MAX_NOISE + 1 - noise))
         return base;
 
     const int delta = rand() % 2 ? 1 : -1;
