@@ -5,11 +5,21 @@
 #include "renderer.h"
 #include "texgen/texgen.h"
 #include "window.h"
+#include <glad/glad.h>
 
 SDL_Rect findBestFit(SDL_Rect target, float aspect);
 SDL_Rect padRect(SDL_Rect rect, GSize amount);
 
 extern const Uint32 imageWindow_SDLPixelFormat;
+typedef struct UploadedTexture UploadedTexture;
+UploadedTexture* uploadedTexture_init();
+void uploadedTexture_free(UploadedTexture* me);
+GLuint uploadedTexture_getGLTextureId(UploadedTexture* me);
+GSize uploadedTexture_getSize(UploadedTexture* me);
+void uploadedTexture_setFrom32Bit(UploadedTexture* me, GSize size, const SDL_Color* pixels);
+void uploadedTexture_setFrom8Bit(UploadedTexture* me, GSize size, const GColor* pixels);
+void uploadedTexture_setFromTexture(UploadedTexture* me, const Texture* texture);
+
 typedef struct ImageWindow ImageWindow;
 ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect initialBounds, bool_t isEssential);
 void imageWindow_free(ImageWindow* me);
