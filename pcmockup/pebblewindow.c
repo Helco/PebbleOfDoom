@@ -132,14 +132,14 @@ void pebbleWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata)
     PebbleWindow* me = (PebbleWindow*)userdata;
     switch(sym.sym)
     {
-        case (SDLK_w): renderer_moveForward(me->renderer); break;
-        case (SDLK_s): renderer_moveBackwards(me->renderer); break;
-        case (SDLK_a): renderer_moveLeft(me->renderer); break;
-        case (SDLK_d): renderer_moveRight(me->renderer); break;
-        case (SDLK_UP): renderer_moveUp(me->renderer); break;
-        case (SDLK_DOWN): renderer_moveDown(me->renderer); break;
-        case (SDLK_LEFT): renderer_rotateLeft(me->renderer); break;
-        case (SDLK_RIGHT): renderer_rotateRight(me->renderer); break;
+        case (SDLK_w): renderer_move(me->renderer, xz_forward); break;
+        case (SDLK_s): renderer_move(me->renderer, xz_backward); break;
+        case (SDLK_a): renderer_move(me->renderer, xz_left); break;
+        case (SDLK_d): renderer_move(me->renderer, xz_right); break;
+        case (SDLK_UP): renderer_moveVertical(me->renderer, xy_up); break;
+        case (SDLK_DOWN): renderer_moveVertical(me->renderer, xy_down); break;
+        case (SDLK_LEFT): renderer_rotate(me->renderer, rotateLeft); break;
+        case (SDLK_RIGHT): renderer_rotate(me->renderer, rotateRight); break;
         case(SDLK_SPACE):
         {
             Location playerLocation;
