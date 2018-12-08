@@ -102,7 +102,6 @@ TexGenerationContext* texgen_init(TextureManagerHandle textureManager, TexGenera
         texgen_free(me);
         return NULL;
     }
-    texture_load(textureManager, me->texture->id); // keep texture loaded
 
     me->paramBlock = malloc(generator->info.paramBlockSize);
     if (me->paramBlock == NULL)

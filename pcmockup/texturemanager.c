@@ -10,6 +10,7 @@ typedef struct LoadedTexture
 {
     int referenceCount;
     Texture texture;
+    TexGenerationContext* generationContext;
 } LoadedTexture;
 
 struct TextureManager
@@ -49,6 +50,9 @@ void textureManager_free(TextureManager* me)
         LoadedTexture* itTexture = me->textures;
         for (int i = 0; i < me->count; i++, itTexture++)
         {
+            if (itTexture->generationContext != NULL)
+                texgen_free(itTexture->generationContext);
+
             assert(itTexture->referenceCount == 0);
             if (itTexture->texture.pixels != NULL)
                 free(itTexture->texture.pixels);
@@ -71,6 +75,7 @@ static LoadedTexture* prv_textureManager_nextEntry(TextureManager* me)
     LoadedTexture *texture = &me->textures[me->count];
     texture->referenceCount = 0;
     texture->texture.id = me->count;
+    texture->generationContext = NULL;
     me->count++;
     return texture;
 }
@@ -170,4 +175,42 @@ void textureManager_freeTexture(TextureManager* me, const Texture* texture)
     LoadedTexture* loadedTexture = &me->textures[texture->id];
     assert(loadedTexture->referenceCount > 0);
     loadedTexture->referenceCount--;
+}
+
+TexGenerationContext* textureManager_createGeneratedTexture(TextureManager* me, TexGeneratorID id, int size)
+{
+    TexGenerationContext* generationContext = texgen_init(me, id, size);
+    if (generationContext == NULL)
+        return NULL;
+    LoadedTexture* loadedTexture = &me->textures[texgen_getTextureId(generationContext)];
+    loadedTexture->generationContext = generationContext;
+    return generationContext;
+}
+
+TexGenerationContext* textureManager_getGenerationContext(TextureManager* me, TextureId id)
+{
+    assert(id >= 0 && id < me->count);
+    return me->textures[id].generationContext;
+}
+
+int textureManager_getTextureCount(TextureManager* me)
+{
+    int count = 0;
+    for (int i = 0; i < me->count; i++)
+        count += (me->textures[i].referenceCount > 0);
+    return count;
+}
+
+const Texture* textureManager_getTextureByIndex(TextureManager* me, int publicIndex)
+{
+    if (publicIndex < 0)
+        return NULL;
+    for (int privateIndex = 0; privateIndex < me->count; privateIndex++) {
+        if (me->textures[privateIndex].referenceCount == 0)
+            continue;
+        if (publicIndex == 0)
+            return &me->textures[privateIndex].texture;
+        publicIndex--;
+    }
+    return NULL;
 }
