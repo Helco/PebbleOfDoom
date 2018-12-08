@@ -84,4 +84,9 @@ int textureManager_getTextureCount(TextureManager* me);
 const Texture* textureManager_getTextureByIndex(TextureManager* me, int index);
 const char* textureManager_getTextureSource(TextureManager* me, const Texture* texture);
 
+typedef struct TextureWindow TextureWindow;
+TextureWindow* textureWindow_init(WindowContainer* parent, TextureManager* manager);
+void textureWindow_free(TextureWindow* me);
+Window* textureWindow_asWindow(TextureWindow* me);
+
 #endif

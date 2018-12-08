@@ -2,6 +2,7 @@
 #include "cimgui.include.h"
 #include "pcmockup.h"
 #include "renderer.h"
+#include "texgen/texgen.h"
 #include "platform.h"
 
 static const GSize WINDOW_START_SIZE = { 1024, 768 };
@@ -14,6 +15,7 @@ struct PCMockup
     TextureManager* textureManager;
     PebbleWindow *pebbleWindow;
     DebugWindowSet *debugWindowSet;
+    TextureWindow* textureWindow;
     WindowContainer* windowContainer;
     bool_t isRunning;
 };
@@ -55,6 +57,11 @@ PCMockup *pcmockup_init()
         pcmockup_free(me);
         return NULL;
     }
+    TexGenerationContext* texgenctx = textureManager_createGeneratedTexture(me->textureManager, TexGenerator_Bricks, 256);
+    texgen_execute(texgenctx);
+    texgen_setGenerator(texgenctx, TexGenerator_Rand);
+    texgen_setSize(texgenctx, 64);
+    texgen_execute(texgenctx);
 
     me->windowContainer = windowContainer_init(WINDOW_START_SIZE);
     if (me->windowContainer == NULL)
@@ -90,6 +97,13 @@ PCMockup *pcmockup_init()
         return NULL;
     }
 
+    me->textureWindow = textureWindow_init(me->windowContainer, me->textureManager);
+    if (me->textureWindow == NULL)
+    {
+        pcmockup_free(me);
+        return NULL;
+    }
+
     me->isRunning = true;
     return me;
 }
@@ -100,6 +114,8 @@ void pcmockup_free(PCMockup *me)
         return;
     if (me->windowContainer != NULL)
         windowContainer_free(me->windowContainer);
+    if (me->textureWindow != NULL)
+        textureWindow_free(me->textureWindow);
     if (me->debugWindowSet != NULL)
         debugWindowSet_free(me->debugWindowSet);
     if (me->pebbleWindow != NULL)
@@ -125,6 +141,11 @@ void pcmockup_updateMainMenubar(PCMockup* me)
         igEndMenu();
     }
     debugWindowSet_updateMenubar(me->debugWindowSet);
+    if (igBeginMenu("Tools", true))
+    {
+        window_updateMenubar(textureWindow_asWindow(me->textureWindow));
+        igEndMenu();
+    }
 
     igEndMainMenuBar();
 }

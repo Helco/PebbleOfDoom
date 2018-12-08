@@ -24,6 +24,7 @@ set(sources_pcmockup
     texturemanager.c
     windowcontainer.c
     imagewindow.c
+    texturewindow.c
     uploadedtexture.c
 )
 assign_source_group(${sources_pcmockup})
