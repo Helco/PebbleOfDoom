@@ -14,7 +14,7 @@ static const TexGen_Bricks_Params texGen_bricks_defaultParams = {
     .brickWidth = 8,
     .brickHeight = 4,
     .brickNoise = 20,
-    .brickColor = { .r = 3, .a = 3},
+    .brickColor = { .r = 3, .g = 0, .b = 0, .a = 3 },
     .borderSize = 1,
     .borderWalls = 0b1010,
     .borderNoise = 0,
