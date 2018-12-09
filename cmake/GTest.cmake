@@ -1,5 +1,9 @@
 # Configures googletest for use in PebbleOfDoom
 
+if (EMSCRIPTEN)
+  return()
+endif()
+
 configure_file(external/GTest.CMakeLists.txt.in googletest-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
   RESULT_VARIABLE result

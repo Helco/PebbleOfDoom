@@ -1,0 +1,17 @@
+if (NOT EMSCRIPTEN)
+    return()
+endif()
+
+function(add_flag flag)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${flag}" PARENT_SCOPE)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}" PARENT_SCOPE)
+endfunction()
+
+set(CMAKE_EXECUTABLE_SUFFIX ".html")
+add_flag("-s USE_SDL=2")
+add_flag("-s USE_WEBGL2=1")
+math(EXPR MEMORY_SIZE "1024 * 1024 * 256")
+add_flag("-s TOTAL_MEMORY=${MEMORY_SIZE}")
+add_flag("-Wno-unknown-warning-option")
+add_flag("-D'glBindSampler(a,b)='")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file \"${CMAKE_CURRENT_SOURCE_DIR}/resources/@resources\"")

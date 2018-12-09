@@ -1,4 +1,5 @@
 **/build/
+**/embuild/
 .vscode
 .vs
 CMakeCache.txt

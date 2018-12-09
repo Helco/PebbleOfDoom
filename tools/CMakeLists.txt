@@ -2,6 +2,10 @@
 # Tools
 ###################################################################
 
+if (EMSCRIPTEN)
+  return()
+endif()
+
 add_executable(texgencli
     "texgencli.c"
 )
