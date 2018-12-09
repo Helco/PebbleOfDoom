@@ -105,8 +105,8 @@ xy_t xy_neg(xy_t a);
 
 #define xz_one (xz(real_one, real_one))
 #define xz_zero (xz(real_zero, real_zero))
-#define xz_right (xz(real_neg(real_one), real_zero))
-#define xz_left (xz(real_one, real_zero))
+#define xz_right (xz(real_one, real_zero))
+#define xz_left (xz(real_neg(real_one), real_zero))
 #define xz_forward (xz(real_zero, real_one))
 #define xz_backward (xz(real_zero, real_neg(real_one)))
 xz_t xz(real_t x, real_t z);
@@ -126,8 +126,8 @@ xz_t xz_neg(xz_t a);
 //
 // Rotations
 //
-#define rotationLeft (real_one)
-#define rotationRight (real_neg(real_one))
+#define rotationLeft (real_neg(real_one))
+#define rotationRight (real_one)
 
 //
 // line intersection

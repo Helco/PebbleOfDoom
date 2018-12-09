@@ -26,7 +26,7 @@ Renderer* renderer_init()
     me->leftFovSeg.end.xz = xz(real_mul(minus_one, farPlane.x), farPlane.z);
     me->rightFovSeg.start.xz = nearPlane;
     me->rightFovSeg.end.xz = farPlane;
-    me->fovStuff = real_div(real_from_int(-HALF_RENDERER_WIDTH), tanHalfFov);
+    me->fovStuff = real_div(real_from_int(HALF_RENDERER_WIDTH), tanHalfFov);
     me->eyeHeight = real_from_int(12);
 
     return me;
@@ -69,8 +69,8 @@ void renderer_transformLine(const Renderer* me, const lineSeg_t* line, lineSeg_t
 void renderer_transformWall(const Renderer* me, const Sector* sector, int wallIndex, lineSeg_t* result)
 {
     lineSeg_t lineSeg;
-    lineSeg.start.xz = sector->walls[wallIndex].startCorner;
-    lineSeg.end.xz = sector->walls[(wallIndex + 1) % sector->wallCount].startCorner;
+    lineSeg.end.xz = sector->walls[wallIndex].startCorner;
+    lineSeg.start.xz = sector->walls[(wallIndex + 1) % sector->wallCount].startCorner;
     renderer_transformLine(me, &lineSeg, result);
 }
 
@@ -95,16 +95,17 @@ bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
 
     if (real_compare(wallSeg->start.xz.z, me->leftFovSeg.start.xz.z) <= 0)
     {
-        wallSeg->start.xz = (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight)
-            ? rightIntersection
-            : inWallSegLeft ? leftIntersection : (result = false, xz_zero);
+
+        wallSeg->start.xz = (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft)
+            ? leftIntersection
+            : inWallSegRight ? rightIntersection : (result = false, xz_zero);
     }
 
     if (real_compare(wallSeg->end.xz.z, me->leftFovSeg.start.xz.z) <= 0)
     {
-        wallSeg->end.xz = (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft)
-            ? leftIntersection
-            : inWallSegRight ? rightIntersection : (result = false, xz_zero);
+        wallSeg->end.xz = (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight)
+            ? rightIntersection
+            : inWallSegLeft ? leftIntersection : (result = false, xz_zero);
     }
 
     return result;
