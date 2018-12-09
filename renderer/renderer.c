@@ -1,5 +1,6 @@
 #include "renderer_internal.h"
 #include "algebra.h"
+#include "platform.h"
 
 Renderer* renderer_init()
 {
@@ -26,6 +27,7 @@ Renderer* renderer_init()
     me->rightFovSeg.start.xz = nearPlane;
     me->rightFovSeg.end.xz = farPlane;
     me->fovStuff = real_div(real_from_int(-HALF_RENDERER_WIDTH), tanHalfFov);
+    me->eyeHeight = real_from_int(12);
 
     return me;
 }
@@ -80,7 +82,7 @@ typedef struct
     } left, right;
 } WallSection;
 
-void renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
+bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
 {
     xz_t leftIntersection, rightIntersection;
     bool_t intersectsLeft = xz_lineIntersect(*wallSeg, me->leftFovSeg, &leftIntersection);
@@ -89,29 +91,32 @@ void renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
     real_t wallPhaseRight = intersectsRight ? xz_linePhase(*wallSeg, rightIntersection) : real_zero;
     bool_t inWallSegLeft = real_inBetween(wallPhaseLeft, real_zero, real_one);
     bool_t inWallSegRight = real_inBetween(wallPhaseRight, real_zero, real_one);
+    bool_t result = true;
 
     if (real_compare(wallSeg->start.xz.z, me->leftFovSeg.start.xz.z) <= 0)
     {
         wallSeg->start.xz = (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight)
             ? rightIntersection
-            : leftIntersection;
+            : inWallSegLeft ? leftIntersection : (result = false, xz_zero);
     }
 
     if (real_compare(wallSeg->end.xz.z, me->leftFovSeg.start.xz.z) <= 0)
     {
         wallSeg->end.xz = (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft)
             ? leftIntersection
-            : rightIntersection;
+            : inWallSegRight ? rightIntersection : (result = false, xz_zero);
     }
+
+    return result;
 }
 
 void renderer_project(const Renderer* me, const Sector* sector, const lineSeg_t* transformedSeg, WallSection* projected)
 {
-    const real_t halfHeight = real_div(real_from_int(sector->height), real_from_int(2));
-    const real_t relHeightOffset = real_sub(me->location.height, real_from_int(sector->heightOffset));
+    //const real_t halfHeight = real_div(real_from_int(sector->height), real_from_int(2));
+    const real_t relHeightOffset = real_sub(real_from_int(sector->heightOffset), real_add(me->location.height, me->eyeHeight));
 #define scale_height(value) (real_mul(real_from_int(HALF_RENDERER_HEIGHT), (value)))
-    const real_t scaledWallHeight =    scale_height(real_add(halfHeight, relHeightOffset));
-    const real_t negScaledWallHeight = scale_height(real_add(real_neg(halfHeight), relHeightOffset));
+    const real_t scaledWallHeight =    scale_height(real_add(real_from_int(sector->height), relHeightOffset));
+    const real_t negScaledWallHeight = scale_height(relHeightOffset);
 #undef scale_height
     const xz_t startT = transformedSeg->start.xz;
     const xz_t endT = transformedSeg->end.xz;
@@ -128,43 +133,70 @@ void renderer_project(const Renderer* me, const Sector* sector, const lineSeg_t*
 #undef div_and_int
 }
 
-void renderer_renderWall(Renderer* me, GColor* framebuffer, const Sector* sector, int wallIndex)
+void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* request, int wallIndex)
 {
-    const Wall* wall = &sector->walls[wallIndex];
+    const Sector* const sector = request->sector;
+    const Wall* const wall = &sector->walls[wallIndex];
+    const real_t nearPlane = me->leftFovSeg.start.xz.z;
     lineSeg_t wallSeg;
     renderer_transformWall(me, sector, wallIndex, &wallSeg);
-    if (real_compare(wallSeg.start.xz.z, real_zero) < 0 && real_compare(wallSeg.end.xz.z, real_zero) < 0)
+    if (real_compare(wallSeg.start.xz.z, nearPlane) < 0 && real_compare(wallSeg.end.xz.z, nearPlane) < 0)
         return;
 
-    renderer_clipByFov(me, &wallSeg);
+    if (!renderer_clipByFov(me, &wallSeg))
+        return;
 
     WallSection p;
     renderer_project(me, sector, &wallSeg, &p);
-    if (p.left.x >= p.right.x || p.right.x < 0 || p.left.x >= RENDERER_WIDTH)
+    if (p.left.x >= p.right.x || p.right.x < request->left || p.left.x > request->right)
         return;
 
+    const Sector* targetSector = &me->level->sectors[wall->portalTo];
+    int portalNomStart = -1, portalNomEnd = -1;
+    if (wall->portalTo >= 0 && targetSector != request->sourceSector) {
+        portalNomStart = clampi(0, targetSector->heightOffset - sector->heightOffset, sector->height);
+        portalNomEnd = clampi(0, portalNomStart + targetSector->height, sector->height);
+        drawRequestStack_push(&me->drawRequests, targetSector,
+            max(request->left, p.left.x), min(request->right, p.right.x), sector);
+    }
+
     // render wall
-    for (int x = max(0, p.left.x); x <= min(RENDERER_WIDTH - 1, p.right.x); x++) {
-        GColor* curPixel = framebuffer + x * RENDERER_HEIGHT;
+    for (int x = max(request->left, p.left.x); x <= min(request->right, p.right.x); x++) {
+        const int yBottom = me->yBottom[x];
+        const int yTop = me->yTop[x];
+        GColor* curPixel = framebuffer + x * RENDERER_HEIGHT + yBottom;
         int yCurStart = lerpi(x, p.left.x, p.right.x, p.left.yStart, p.right.yStart);
         int yCurEnd = lerpi(x, p.left.x, p.right.x, p.left.yEnd, p.right.yEnd);
-        if (yCurEnd < 0 || yCurStart >= RENDERER_HEIGHT)
+        if (yCurEnd < yBottom || yCurStart > yTop || yCurStart >= yCurEnd)
             continue;
 
+        int yPortalStart = yCurEnd, yPortalEnd = yTop + 1;
+        if (wall->portalTo >= 0) {
+            me->yBottom[x] = yPortalStart = clampi(yBottom, lerpi(portalNomStart, 0, sector->height, yCurStart, yCurEnd), yTop);
+            me->yTop[x] = yPortalEnd = clampi(yBottom, lerpi(portalNomEnd, 0, sector->height, yCurStart, yCurEnd), yTop);
+        }
+
         int y;
-        for (y = 0; y < max(0, yCurStart); y++)
+        for (y = yBottom; y < max(yBottom, yCurStart); y++)
             *(curPixel++) = sector->floorColor;
-        for (; y <= min(RENDERER_HEIGHT - 1, yCurEnd); y++)
+        for (; y <= min(yTop, yPortalStart - 1); y++)
             *(curPixel++) = wall->color;
-        for (; y < RENDERER_HEIGHT; y++)
+        if (wall->portalTo >= 0) {
+            //for (; y <= min(yTop, yPortalEnd); y++)
+                //*(curPixel++) = ((y / 4) % 2) ? GColorFromRGB(255, 0, 255) : GColorFromRGB(0, 0, 0);
+            curPixel += yPortalEnd - y;
+            for (y = yPortalEnd; y <= min(yTop, yCurEnd); y++)
+                *(curPixel++) = wall->color;
+        }
+        for (; y <= yTop; y++)
             *(curPixel++) = sector->ceilColor;
     }
 }
 
-void renderer_renderSector(Renderer* renderer, GColor* framebuffer, const Sector* sector)
+void renderer_renderSector(Renderer* renderer, GColor* framebuffer, const DrawRequest* request)
 {
-    for (int i = 0; i < sector->wallCount; i++)
-        renderer_renderWall(renderer, framebuffer, sector, i);
+    for (int i = 0; i < request->sector->wallCount; i++)
+        renderer_renderWall(renderer, framebuffer, request, i);
 }
 
 void renderer_moveLocation(Renderer* renderer, xz_t xz)
@@ -178,8 +210,20 @@ void renderer_render(Renderer* renderer, GColor* framebuffer)
     if (renderer->level == NULL)
         return;
     memset(framebuffer, 0, RENDERER_WIDTH * RENDERER_HEIGHT);
-    const Sector* startSector = &renderer->level->sectors[renderer->location.sector];
-    renderer_renderSector(renderer, framebuffer, startSector);
+    memset(renderer->yBottom, 0, sizeof(renderer->yBottom));
+    for (int i = 0; i < RENDERER_WIDTH; i++)
+        renderer->yTop[i] = RENDERER_HEIGHT - 1;
+    drawRequestStack_reset(&renderer->drawRequests);
+    drawRequestStack_push(&renderer->drawRequests,
+        &renderer->level->sectors[renderer->location.sector],
+        0, RENDERER_WIDTH - 1, NULL);
+
+    const DrawRequest* curRequest = drawRequestStack_pop(&renderer->drawRequests);
+    while (curRequest != NULL)
+    {
+        renderer_renderSector(renderer, framebuffer, curRequest);
+        curRequest = drawRequestStack_pop(&renderer->drawRequests);
+    }
 };
 
 void renderer_rotate(Renderer* renderer, int angle)
@@ -200,4 +244,31 @@ void renderer_moveVertical(Renderer* renderer, xy_t directions)
 void renderer_moveTo(Renderer* renderer, Location relativOrigin)
 {
     renderer->location = relativOrigin;
+}
+
+void drawRequestStack_reset(DrawRequestStack* stack)
+{
+    stack->start = stack->end = 0;
+}
+
+void drawRequestStack_push(DrawRequestStack* stack, const Sector* sector, int left, int right, const Sector* sourceSector)
+{
+    const int insertAt = stack->end;
+    stack->end = (stack->end + 1) % MAX_DRAW_DEPTH;
+    assert(stack->end != stack->start);
+    stack->requests[insertAt] = (DrawRequest) {
+        .sector = sector,
+        .left = left,
+        .right = right,
+        .sourceSector = sourceSector
+    };
+}
+
+const DrawRequest* drawRequestStack_pop(DrawRequestStack* stack)
+{
+    if (stack->start == stack->end)
+        return NULL;
+    const DrawRequest* result = &stack->requests[stack->start];
+    stack->start = (stack->start + 1) % MAX_DRAW_DEPTH;
+    return result;
 }

@@ -32,6 +32,7 @@ def build(ctx):
     for platform in ctx.env.TARGET_PLATFORMS:
         ctx.env = ctx.all_envs[platform]
         ctx.env.append_value('DEFINES', 'REAL_USE_FLOAT')
+        ctx.env.append_value('DEFINES', 'POD_PEBBLE')
         ctx.set_group(ctx.env.PLATFORM_NAME)
         app_elf = '{}/pebble-app.elf'.format(ctx.env.BUILD_DIR)
         ctx.pbl_build(source=ctx.path.ant_glob([
