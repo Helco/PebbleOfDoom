@@ -53,8 +53,8 @@ void renderer_renderDebugVector(Renderer* me, SDL_Renderer* sdlRenderer, xz_t of
 xz_t angleToVector(real_t angle, real_t length)
 {
     return xz_scale(xz(
-        real_cos(angle),
-        real_sin(angle)
+        real_sin(angle),
+        real_cos(angle)
     ), length);
 }
 

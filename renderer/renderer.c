@@ -26,7 +26,7 @@ Renderer* renderer_init()
     me->leftFovSeg.end.xz = xz(real_mul(minus_one, farPlane.x), farPlane.z);
     me->rightFovSeg.start.xz = nearPlane;
     me->rightFovSeg.end.xz = farPlane;
-    me->fovStuff = real_div(real_from_int(-HALF_RENDERER_WIDTH), tanHalfFov);
+    me->fovStuff = real_div(real_from_int(HALF_RENDERER_WIDTH), tanHalfFov);
     me->eyeHeight = real_from_int(12);
 
     return me;
@@ -50,19 +50,9 @@ void renderer_setTextureManager(Renderer* me, TextureManagerHandle handle)
     me->textureManager = handle;
 }
 
-static xz_t myxz_rotate(xz_t a, real_t angleInRad)
-{
-    real_t s = real_sin(angleInRad);
-    real_t c = real_cos(angleInRad);
-    return xz(
-        real_sub(real_mul(a.x, s), real_mul(a.z, c)),
-        real_add(real_mul(a.x, c), real_mul(a.z, s))
-    );
-}
-
 xz_t renderer_transformVector(const Renderer* me, xz_t vector)
 {
-    return myxz_rotate(vector, me->location.angle);
+    return xz_rotate(vector, me->location.angle);
 }
 
 xz_t renderer_transformPoint(const Renderer* me, xz_t point)
@@ -79,8 +69,8 @@ void renderer_transformLine(const Renderer* me, const lineSeg_t* line, lineSeg_t
 void renderer_transformWall(const Renderer* me, const Sector* sector, int wallIndex, lineSeg_t* result)
 {
     lineSeg_t lineSeg;
-    lineSeg.start.xz = sector->walls[wallIndex].startCorner;
-    lineSeg.end.xz = sector->walls[(wallIndex + 1) % sector->wallCount].startCorner;
+    lineSeg.end.xz = sector->walls[wallIndex].startCorner;
+    lineSeg.start.xz = sector->walls[(wallIndex + 1) % sector->wallCount].startCorner;
     renderer_transformLine(me, &lineSeg, result);
 }
 
@@ -105,16 +95,17 @@ bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
 
     if (real_compare(wallSeg->start.xz.z, me->leftFovSeg.start.xz.z) <= 0)
     {
-        wallSeg->start.xz = (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight)
-            ? rightIntersection
-            : inWallSegLeft ? leftIntersection : (result = false, xz_zero);
+
+        wallSeg->start.xz = (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft)
+            ? leftIntersection
+            : inWallSegRight ? rightIntersection : (result = false, xz_zero);
     }
 
     if (real_compare(wallSeg->end.xz.z, me->leftFovSeg.start.xz.z) <= 0)
     {
-        wallSeg->end.xz = (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft)
-            ? leftIntersection
-            : inWallSegRight ? rightIntersection : (result = false, xz_zero);
+        wallSeg->end.xz = (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight)
+            ? rightIntersection
+            : inWallSegLeft ? leftIntersection : (result = false, xz_zero);
     }
 
     return result;
@@ -123,7 +114,7 @@ bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
 void renderer_project(const Renderer* me, const Sector* sector, const lineSeg_t* transformedSeg, WallSection* projected)
 {
     //const real_t halfHeight = real_div(real_from_int(sector->height), real_from_int(2));
-    const real_t relHeightOffset = real_sub(real_from_int(sector->heightOffset), real_add(me->location.height, me->eyeHeight));
+    const real_t relHeightOffset = real_add(real_from_int(sector->heightOffset), real_sub(me->location.height, me->eyeHeight));
 #define scale_height(value) (real_mul(real_from_int(HALF_RENDERER_HEIGHT), (value)))
     const real_t scaledWallHeight =    scale_height(real_add(real_from_int(sector->height), relHeightOffset));
     const real_t negScaledWallHeight = scale_height(relHeightOffset);
@@ -209,12 +200,6 @@ void renderer_renderSector(Renderer* renderer, GColor* framebuffer, const DrawRe
         renderer_renderWall(renderer, framebuffer, request, i);
 }
 
-void renderer_moveLocation(Renderer* renderer, xz_t xz)
-{
-    xz = xz_rotate(xz, renderer->location.angle);
-    renderer->location.position = xz_add(renderer->location.position, xz);
-}
-
 void renderer_render(Renderer* renderer, GColor* framebuffer)
 {
     if (renderer->level == NULL)
@@ -236,44 +221,20 @@ void renderer_render(Renderer* renderer, GColor* framebuffer)
     }
 };
 
-void renderer_rotateRight(Renderer* renderer)
+void renderer_rotate(Renderer* renderer, real_t angle)
 {
-    renderer->location.angle = real_add(renderer->location.angle, real_degToRad(real_from_int(1)));
+    renderer->location.angle = real_add(renderer->location.angle, real_degToRad(angle));
 }
 
-void renderer_rotateLeft(Renderer* renderer)
+void renderer_move(Renderer* renderer, xz_t directions)
 {
-    renderer->location.angle = real_sub(renderer->location.angle, real_degToRad(real_from_int(1)));
+    directions = xz_rotate(directions, real_neg(renderer->location.angle)); // angle needs the be negated because xz_rotate is considering a righthand rotation to be in the positiv and left negativ (world space)
+    renderer->location.position = xz_add(renderer->location.position, directions);
 }
 
-void renderer_moveForward(Renderer* renderer)
+void renderer_moveVertical(Renderer* renderer, xy_t directions)
 {
-    renderer_moveLocation(renderer, xz(real_one, real_zero));
-}
-
-void renderer_moveBackwards(Renderer* renderer)
-{
-    renderer_moveLocation(renderer, xz(real_neg(real_one), real_zero));
-}
-
-void renderer_moveRight(Renderer* renderer)
-{
-    renderer_moveLocation(renderer, xz(real_zero, real_one));
-}
-
-void renderer_moveLeft(Renderer* renderer)
-{
-    renderer_moveLocation(renderer, xz(real_zero, real_neg(real_one)));
-}
-
-void renderer_moveUp(Renderer* renderer)
-{
-    renderer->location.height = real_add(renderer->location.height, real_one);
-}
-
-void renderer_moveDown(Renderer* renderer)
-{
-    renderer->location.height = real_sub(renderer->location.height, real_one);
+    renderer->location.height = real_add(renderer->location.height, directions.y);
 }
 
 void renderer_moveTo(Renderer* renderer, Location relativOrigin)

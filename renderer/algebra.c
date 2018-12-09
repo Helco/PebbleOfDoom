@@ -99,6 +99,10 @@ xy_t xy_rotate(xy_t a, real_t angleInRad)
     );
 }
 
+xy_t xy_neg(xy_t a) {
+    return xy(real_neg(a.y), real_neg(a.x));
+}
+
 xz_t xz(real_t x, real_t z)
 {
     xz_t xz = { x, z };
@@ -161,6 +165,10 @@ xz_t xz_normalize(xz_t x)
 xz_t xz_rotate(xz_t a, real_t angleInRad)
 {
     return xy_to_xz(xy_rotate(xz_to_xy(a), angleInRad));
+}
+
+xz_t xz_neg(xz_t a) {
+    return xy_to_xz(xy_neg(xz_to_xy(a)));
 }
 
 //

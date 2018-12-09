@@ -86,7 +86,9 @@ typedef struct xy_t {
 #define xy_one (xy(real_one, real_one))
 #define xy_zero (xy(real_zero, real_zero))
 #define xy_right (xy(real_one, real_zero))
+#define xy_left (xy(real_neg(real_one), real_zero))
 #define xy_up (xy(real_zero, real_one))
+#define xy_down (xy(real_zero, real_neg(real_one)))
 xy_t xy(real_t x, real_t y);
 xy_t xy_add(xy_t a, xy_t b);
 xy_t xy_sub(xy_t a, xy_t b);
@@ -99,11 +101,14 @@ real_t xy_lengthSqr(xy_t x);
 real_t xy_length(xy_t x);
 xy_t xy_normalize(xy_t x);
 xy_t xy_rotate(xy_t a, real_t angleInRad);
+xy_t xy_neg(xy_t a);
 
 #define xz_one (xz(real_one, real_one))
 #define xz_zero (xz(real_zero, real_zero))
 #define xz_right (xz(real_one, real_zero))
+#define xz_left (xz(real_neg(real_one), real_zero))
 #define xz_forward (xz(real_zero, real_one))
+#define xz_backward (xz(real_zero, real_neg(real_one)))
 xz_t xz(real_t x, real_t z);
 xz_t xz_add(xz_t a, xz_t b);
 xz_t xz_sub(xz_t a, xz_t b);
@@ -116,6 +121,13 @@ real_t xz_lengthSqr(xz_t x);
 real_t xz_length(xz_t x);
 xz_t xz_normalize(xz_t x);
 xz_t xz_rotate(xz_t a, real_t angleInRad);
+xz_t xz_neg(xz_t a);
+
+//
+// Rotations
+//
+#define rotationLeft (real_neg(real_one))
+#define rotationRight (real_one)
 
 //
 // line intersection

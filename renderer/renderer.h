@@ -21,14 +21,9 @@ void renderer_setTextureManager(Renderer* renderer, TextureManagerHandle handle)
 void renderer_render(Renderer* renderer, GColor* framebuffer);
 
 void renderer_moveTo(Renderer* renderer, Location playerLocation);
-void renderer_rotateRight(Renderer* renderer);
-void renderer_rotateLeft(Renderer* renderer);
-void renderer_moveRight(Renderer* renderer);
-void renderer_moveLeft(Renderer* renderer);
-void renderer_moveUp(Renderer* renderer);
-void renderer_moveDown(Renderer* renderer);
-void renderer_moveForward(Renderer* renderer);
-void renderer_moveBackwards(Renderer* renderer);
+void renderer_rotate(Renderer* renderer, real_t angle); //angle should be in degrees
+void renderer_move(Renderer* renderer, xz_t direction);
+void renderer_moveVertical(Renderer* renderer, xy_t direction);
 
 #ifdef DEBUG_WINDOWS
 struct SDL_Renderer; // no need to include SDL here
