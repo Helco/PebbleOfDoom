@@ -143,6 +143,7 @@ void pebbleWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata)
         case(SDLK_SPACE):
         {
             Location playerLocation;
+            playerLocation.sector = 0;
             playerLocation.angle = real_degToRad(real_from_int(0));
             playerLocation.height = real_zero;
             playerLocation.position = xz(real_from_int(20), real_from_int(20));
