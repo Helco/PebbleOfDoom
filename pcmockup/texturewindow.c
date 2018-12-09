@@ -1,4 +1,5 @@
 #include "pcmockup.h"
+#include <stdarg.h>
 
 struct TextureWindow {
     Window* window;
@@ -56,8 +57,10 @@ void textureWindow_free(TextureWindow* me)
 void textureWindow_updateTexture(TextureWindow* me)
 {
     const Texture* const curTexture = textureManager_getTextureByIndex(me->manager, me->curTextureIndex);
-    if (me->uploadedTextureIndex != me->curTextureIndex)
+    if (me->uploadedTextureIndex != me->curTextureIndex) {
         uploadedTexture_setFromTexture(me->uploadedTexture, curTexture);
+        me->uploadedTextureIndex = me->curTextureIndex;
+    }
 }
 
 void textureWindow_updateContent(Window* window, void* userdata)
@@ -181,11 +184,76 @@ bool textureWindow_printBoolGenerationParameter(TexGenerationContext* generation
     return false;
 }
 
+ImVec4 pebbleColorToImGui(GColor color)
+{
+    return (ImVec4) {
+        color.r / 3.0f,
+        color.g / 3.0f,
+        color.b / 3.0f,
+        color.a / 3.0f
+    };
+}
+
+bool igcGColorPicker(const char* label, GColor* color)
+{
+    const ImGuiColorEditFlags pickerColorEditFlags =
+        ImGuiColorEditFlags_NoPicker |
+        ImGuiColorEditFlags_NoLabel |
+        ImGuiColorEditFlags_NoTooltip;
+    const ImGuiColorEditFlags btnColorEditFlags =
+        ImGuiColorEditFlags_NoPicker |
+        ImGuiColorEditFlags_Uint8;
+    const ImVec4 imColor = pebbleColorToImGui(*color);
+    bool didValueChange = false;
+
+    igPushIDStr(label);
+    if (igColorButton(label, imColor, btnColorEditFlags, (ImVec2) { 0, 0 }))
+        igOpenPopup("picker");
+    if (!igBeginPopup("picker", ImGuiWindowFlags_None)) {
+        igPopID();
+        return false;
+    }
+    for (int i = 0; i < 64; i++) {
+        const GColor curColor = (GColor) {
+            .r = (i >> 0) & 3,
+            .g = (i >> 2) & 3,
+            .b = (i >> 4) & 3,
+            .a = 3
+        };
+        const ImVec4 btnColor = pebbleColorToImGui(curColor);
+        igPushIDInt(i);
+        if (igColorButton("", btnColor, pickerColorEditFlags, (ImVec2) { 0, 0 })) {
+            didValueChange = true;
+            color->r = curColor.r;
+            color->g = curColor.g;
+            color->b = curColor.b;
+        }
+        if ((i % 8) < 7)
+            igSameLine(0.0f, -1.0f);
+        igPopID();
+    }
+    int alpha = color->a;
+    if (igSliderInt("", &alpha, 0, 3, "Alpha: %d")) {
+        didValueChange = true;
+        color->a = clampi(0, alpha, 3);
+    }
+    igEndPopup();
+    igPopID();
+    return didValueChange;
+}
+
 bool textureWindow_printColorGenerationParameter(TexGenerationContext* generationContext, const TexGeneratorParameterInfo* paramInfo)
 {
-    UNUSED(generationContext, paramInfo);
-    igText("eeehm please implement");
-    return false;
+    bool shouldRegenerate = false;
+    GColor value = texgen_getParamColor(generationContext, paramInfo->id);
+
+    if (igcGColorPicker(paramInfo->description, &value)) {
+        shouldRegenerate = true;
+        texgen_setParamColor(generationContext, paramInfo->id, value);
+    }
+    igSameLine(0.0f, -1.0f);
+    igTextUnformatted(paramInfo->name, NULL);
+    return shouldRegenerate;
 }
 
 bool textureWindow_printGenerationParameters(TexGenerationContext* generationContext)
@@ -224,8 +292,10 @@ void textureWindow_printGeneratedTexture(TextureWindow* me, const Texture* textu
     igSeparator();
     shouldRegenerate = shouldRegenerate || textureWindow_printGenerationParameters(generationContext);
 
-    if (shouldRegenerate)
+    if (shouldRegenerate) {
         texgen_execute(generationContext);
+        me->uploadedTextureIndex = -1;
+    }
 }
 
 Window* textureWindow_asWindow(TextureWindow* me)
