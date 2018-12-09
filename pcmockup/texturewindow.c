@@ -1,16 +1,20 @@
 #include "pcmockup.h"
 #include <stdarg.h>
+#include "stb.include.h"
 
 struct TextureWindow {
     Window* window;
     TextureManager* manager;
     UploadedTexture* uploadedTexture;
     int curTextureIndex, uploadedTextureIndex;
+    char** textureFiles; // allocated with stb_readdir_*
 };
 
 void textureWindow_updateContent(Window* window, void* userdata);
 void textureWindow_printImportedTexture(TextureWindow* me, const Texture* texture);
 void textureWindow_printGeneratedTexture(TextureWindow* me, const Texture* texture, TexGenerationContext* generationContext);
+void textureWindow_printImportFromFileMenu(TextureWindow* me);
+void textureWindow_printGenerateNewMenu(TextureWindow* me);
 
 TextureWindow* textureWindow_init(WindowContainer* parent, TextureManager* manager)
 {
@@ -26,7 +30,8 @@ TextureWindow* textureWindow_init(WindowContainer* parent, TextureManager* manag
     }
     window_setFlags(me->window,
         ImGuiWindowFlags_AlwaysAutoResize |
-        ImGuiWindowFlags_NoCollapse);
+        ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_MenuBar);
     window_setOpenState(me->window, WindowOpenState_Closed);
     window_setUpdateCallbacks(me->window, (WindowUpdateCallbacks) {
         .userdata = me,
@@ -51,6 +56,8 @@ void textureWindow_free(TextureWindow* me)
         return;
     if (me->uploadedTexture != NULL)
         uploadedTexture_free(me->uploadedTexture);
+    if (me->textureFiles != NULL)
+        stb_readdir_free(me->textureFiles);
     free(me);
 }
 
@@ -63,12 +70,10 @@ void textureWindow_updateTexture(TextureWindow* me)
     }
 }
 
-void textureWindow_updateContent(Window* window, void* userdata)
+void textureWindow_printTextureSelection(TextureWindow* me)
 {
 #define BUFFER_SIZE 64
     static char buffer[BUFFER_SIZE];
-    UNUSED(window);
-    TextureWindow* me = (TextureWindow*)userdata;
     const int textureCount = textureManager_getTextureCount(me->manager);
     const Texture* const curTexture = textureManager_getTextureByIndex(me->manager, me->curTextureIndex);
     const float contentWidth = igGetContentRegionAvailWidth();
@@ -90,14 +95,28 @@ void textureWindow_updateContent(Window* window, void* userdata)
     textureWindow_updateTexture(me);
     ImTextureID imTextureId = (ImTextureID)(intptr_t)uploadedTexture_getGLTextureId(me->uploadedTexture);
     igImageButton(imTextureId, imageSize, zero, one, 0, transparent, white);
-    igSeparator();
+#undef BUFFER_SIZE
+}
 
+void textureWindow_updateContent(Window* window, void* userdata)
+{
+    UNUSED(window);
+    TextureWindow* me = (TextureWindow*)userdata;
+    if (igBeginMenuBar()) {
+        textureWindow_printImportFromFileMenu(me);
+        textureWindow_printGenerateNewMenu(me);
+        igEndMenuBar();
+    }
+
+    textureWindow_printTextureSelection(me);
+
+    igSeparator();
+    const Texture* const curTexture = textureManager_getTextureByIndex(me->manager, me->curTextureIndex);
     TexGenerationContext* const generationContext = textureManager_getGenerationContext(me->manager, curTexture->id);
     if (generationContext == NULL)
         textureWindow_printImportedTexture(me, curTexture);
     else
         textureWindow_printGeneratedTexture(me, curTexture, generationContext);
-#undef BUFFER_SIZE
 }
 
 void textureWindow_printImportedTexture(TextureWindow* me, const Texture* texture)
@@ -296,6 +315,57 @@ void textureWindow_printGeneratedTexture(TextureWindow* me, const Texture* textu
         texgen_execute(generationContext);
         me->uploadedTextureIndex = -1;
     }
+}
+
+static bool isTextureAlreadyImported(TextureManager* manager, const char* filename)
+{
+    const int count = textureManager_getTextureCount(manager);
+    for (int i = 0; i < count; i++) {
+        const Texture* texture = textureManager_getTextureByIndex(manager, i);
+        const char* source = textureManager_getTextureSource(manager, texture);
+        if (strcmp(source, filename) == 0)
+            return true;
+    }
+    return false;
+}
+
+void textureWindow_printImportFromFileMenu(TextureWindow* me)
+{
+    if (igMenuItemBool("Import from file", "", false, true)) {
+        igOpenPopup("filePicker");
+        if (me->textureFiles != NULL)
+            stb_readdir_free(me->textureFiles);
+        me->textureFiles = stb_readdir_files_mask(TEXTURE_PATH, "*.png");
+    }
+    if (!igBeginPopup("filePicker", ImGuiWindowFlags_None))
+        return;
+    bool didAddSomething = false;
+    for (int i = 0; i < stb_arr_len(me->textureFiles); i++) {
+        const char* filename = me->textureFiles[i] + strlen(TEXTURE_PATH);
+        if (isTextureAlreadyImported(me->manager, filename))
+            continue;
+        didAddSomething = true;
+        igPushIDInt(i);
+        if (igMenuItemBool(filename, "", false, true)) {
+            textureManager_registerFile(me->manager, filename);
+            me->curTextureIndex = textureManager_getTextureCount(me->manager) - 1;
+        }
+        igPopID();
+    }
+    if (!didAddSomething)
+        igMenuItemBool("no textures found", "", false, false);
+    igEndPopup();
+}
+
+void textureWindow_printGenerateNewMenu(TextureWindow* me)
+{
+    if (!igMenuItemBool("Generate new", "", false, true))
+        return;
+    TexGeneratorInfo generatorInfo;
+    texgen_getGeneratorInfoByIndex(&generatorInfo, 0);
+    TexGenerationContext* texgenctx = textureManager_createGeneratedTexture(me->manager, generatorInfo.id, 64);
+    texgen_execute(texgenctx);
+    me->curTextureIndex = textureManager_getTextureCount(me->manager) - 1;
 }
 
 Window* textureWindow_asWindow(TextureWindow* me)

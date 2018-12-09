@@ -7,6 +7,8 @@
 #include "window.h"
 #include <glad/glad.h>
 
+#define TEXTURE_PATH "resources/textures/"
+
 SDL_Rect findBestFit(SDL_Rect target, float aspect);
 SDL_Rect padRect(SDL_Rect rect, GSize amount);
 
