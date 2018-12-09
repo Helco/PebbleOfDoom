@@ -14,7 +14,7 @@ void update_layer(Layer* layer, GContext* ctx)
   GColor* framebuffer = (GColor*)gbitmap_get_data(framebuffer_bitmap);
 
   renderer_render(renderer, framebuffer);
-  renderer_rotate(renderer, rotateRight);
+  renderer_rotate(renderer, rotationRight);
 
   graphics_release_frame_buffer(ctx, framebuffer_bitmap);
 }
