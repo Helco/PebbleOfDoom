@@ -199,12 +199,6 @@ void renderer_renderSector(Renderer* renderer, GColor* framebuffer, const DrawRe
         renderer_renderWall(renderer, framebuffer, request, i);
 }
 
-void renderer_moveLocation(Renderer* renderer, xz_t xz)
-{
-    xz = xz_rotate(xz, real_neg(renderer->location.angle)); // angle needs the be negated because xz_rotate is considering a righthand rotation to be in the positiv and left negativ (world space)
-    renderer->location.position = xz_add(renderer->location.position, xz);
-}
-
 void renderer_render(Renderer* renderer, GColor* framebuffer)
 {
     if (renderer->level == NULL)
@@ -233,7 +227,8 @@ void renderer_rotate(Renderer* renderer, real_t angle)
 
 void renderer_move(Renderer* renderer, xz_t directions)
 {
-    renderer_moveLocation(renderer, directions);
+    directions = xz_rotate(directions, real_neg(renderer->location.angle)); // angle needs the be negated because xz_rotate is considering a righthand rotation to be in the positiv and left negativ (world space)
+    renderer->location.position = xz_add(renderer->location.position, directions);
 }
 
 void renderer_moveVertical(Renderer* renderer, xy_t directions)
