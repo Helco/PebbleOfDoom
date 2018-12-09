@@ -87,8 +87,8 @@ typedef struct xy_t {
 #define xy_zero (xy(real_zero, real_zero))
 #define xy_right (xy(real_one, real_zero))
 #define xy_left (xy(real_neg(real_one), real_zero))
-#define xy_up (xy(real_zero, real_neg(real_one)))
-#define xy_down (xy(real_zero, real_one))
+#define xy_up (xy(real_zero, real_one))
+#define xy_down (xy(real_zero, real_neg(real_one)))
 xy_t xy(real_t x, real_t y);
 xy_t xy_add(xy_t a, xy_t b);
 xy_t xy_sub(xy_t a, xy_t b);
@@ -122,6 +122,12 @@ real_t xz_length(xz_t x);
 xz_t xz_normalize(xz_t x);
 xz_t xz_rotate(xz_t a, real_t angleInRad);
 xz_t xz_neg(xz_t a);
+
+//
+// Rotations
+//
+#define rotationLeft (real_one)
+#define rotationRight (real_neg(real_one))
 
 //
 // line intersection

@@ -140,58 +140,19 @@ void pcmockup_update(PCMockup *me)
     pcmockup_updateMainMenubar(me);
     windowContainer_endUpdate(me->windowContainer);
 
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+    {
+        if (event.type == SDL_QUIT)
+            me->isRunning = 0;
+        else if (event.type == SDL_KEYDOWN)
         {
-            if (event.type == SDL_QUIT)
-                me->isRunning = 0;
-            else if (event.type == SDL_KEYDOWN)
+            switch (event.key.keysym.sym)
             {
-                switch(event.key.keysym.sym)
-                {
-                    case (SDLK_ESCAPE): { me->isRunning = 0; }break;
-                    case (SDLK_w):
-                    {
-                        renderer_move(me->renderer, xz_forward);
-                    }break;
-                    case (SDLK_s):
-                    {
-                        renderer_move(me->renderer, xz_backward);
-                    }break;
-                    case (SDLK_a):
-                    {
-                        renderer_move(me->renderer, xz_left);
-                    }break;
-                    case (SDLK_d):
-                    {
-                        renderer_move(me->renderer, xz_right);
-                    }break;
-                    case (SDLK_RIGHT):
-                    {
-                        renderer_rotate(me->renderer, rotateRight);
-                    }break;
-                    case (SDLK_LEFT):
-                    {
-                        renderer_rotate(me->renderer, rotateLeft);
-                    }break;
-                    case (SDLK_UP):
-                    {
-                        renderer_moveVertical(me->renderer, xy_up);
-                    }break;
-                    case (SDLK_DOWN):
-                    {
-                        renderer_moveVertical(me->renderer, xy_down);
-                    }break;
-                    case (SDLK_SPACE):
-                    { 
-                        Location playerLocation;
-                        playerLocation.angle = real_degToRad(real_from_int(0));
-                        playerLocation.height = real_zero;
-                        playerLocation.position = xz(real_from_int(20), real_from_int(20));
-
-                renderer_moveTo(me->renderer, playerLocation);
-            }
-            break;
+            case (SDLK_ESCAPE):
+            {
+                me->isRunning = 0;
+            }break;
             }
         }
         windowContainer_handleEvent(me->windowContainer, &event);

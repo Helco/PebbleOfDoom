@@ -113,7 +113,7 @@ bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
 void renderer_project(const Renderer* me, const Sector* sector, const lineSeg_t* transformedSeg, WallSection* projected)
 {
     //const real_t halfHeight = real_div(real_from_int(sector->height), real_from_int(2));
-    const real_t relHeightOffset = real_sub(real_from_int(sector->heightOffset), real_add(me->location.height, me->eyeHeight));
+    const real_t relHeightOffset = real_add(real_from_int(sector->heightOffset), real_sub(me->location.height, me->eyeHeight));
 #define scale_height(value) (real_mul(real_from_int(HALF_RENDERER_HEIGHT), (value)))
     const real_t scaledWallHeight =    scale_height(real_add(real_from_int(sector->height), relHeightOffset));
     const real_t negScaledWallHeight = scale_height(relHeightOffset);
@@ -226,9 +226,9 @@ void renderer_render(Renderer* renderer, GColor* framebuffer)
     }
 };
 
-void renderer_rotate(Renderer* renderer, int angle)
+void renderer_rotate(Renderer* renderer, real_t angle)
 {
-    renderer->location.angle = real_add(renderer->location.angle, real_degToRad(real_from_int(angle)));
+    renderer->location.angle = real_add(renderer->location.angle, real_degToRad(angle));
 }
 
 void renderer_move(Renderer* renderer, xz_t directions)
