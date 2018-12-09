@@ -40,4 +40,9 @@
 #include <assert.h>
 #endif
 
+#ifdef POD_PEBBLE
+// bug mitigation
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
+
 #endif
