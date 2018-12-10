@@ -101,7 +101,7 @@ int real_compare(real_t a, real_t b)
     return (a.v > b.v) - (a.v < b.v);
 }
 
-bool_t real_inBetween(real_t value, real_t min, real_t max)
+bool real_inBetween(real_t value, real_t min, real_t max)
 {
     return value.v >= min.v && value.v <= max.v;
 }

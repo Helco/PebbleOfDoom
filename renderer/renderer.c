@@ -82,16 +82,16 @@ typedef struct
     } left, right;
 } WallSection;
 
-bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
+bool renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
 {
     xz_t leftIntersection, rightIntersection;
-    bool_t intersectsLeft = xz_lineIntersect(*wallSeg, me->leftFovSeg, &leftIntersection);
-    bool_t intersectsRight = xz_lineIntersect(*wallSeg, me->rightFovSeg, &rightIntersection);
+    bool intersectsLeft = xz_lineIntersect(*wallSeg, me->leftFovSeg, &leftIntersection);
+    bool intersectsRight = xz_lineIntersect(*wallSeg, me->rightFovSeg, &rightIntersection);
     real_t wallPhaseLeft = intersectsLeft ? xz_linePhase(*wallSeg, leftIntersection) : real_zero;
     real_t wallPhaseRight = intersectsRight ? xz_linePhase(*wallSeg, rightIntersection) : real_zero;
-    bool_t inWallSegLeft = real_inBetween(wallPhaseLeft, real_zero, real_one);
-    bool_t inWallSegRight = real_inBetween(wallPhaseRight, real_zero, real_one);
-    bool_t result = true;
+    bool inWallSegLeft = real_inBetween(wallPhaseLeft, real_zero, real_one);
+    bool inWallSegRight = real_inBetween(wallPhaseRight, real_zero, real_one);
+    bool result = true;
 
     if (real_compare(wallSeg->start.xz.z, me->leftFovSeg.start.xz.z) <= 0)
     {

@@ -1,16 +1,5 @@
 # Math funtions
 
-# Boolean
-There should exists a boolean value. Focus lies on speed not on memory.
-
-```
-bool_t a;
-a = true;
-a = false;
-if (a) { puts("Is true"); }
-else { puts("Is false"); }
-```
-
 # Real
 
 Real is a not-further-specified datatype to store numbers with both integer and fractional parts, according to the following interface.
@@ -39,7 +28,7 @@ real_t real_degToRad(real_t deg);
 real_t real_radToDeg(real_t rad);
 
 int real_compare(real_t a, real_t b);
-bool_t real_inBetween(real_t value, real_t min, real_t max);
+bool real_inBetween(real_t value, real_t min, real_t max);
 real_t real_min(real_t a, real_t b);
 real_t real_max(real_t a, real_t b);
 real_t real_abs(real_t a);
@@ -98,8 +87,8 @@ struct LineSeg_t {
     } end;
 }
 
-bool_t xz_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xz_t* result);
+bool xz_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xz_t* result);
 real_t xz_linePhase(lineSeg_t seg, xz_t intersection);
-bool_t xy_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xy_t* result);
+bool xy_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xy_t* result);
 real_t xy_linePhase(lineSeg_t seg, xy_t intersection);
 ```

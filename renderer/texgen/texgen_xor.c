@@ -1,7 +1,7 @@
 #include "texgen_internal.h"
 
 typedef struct TexGen_XOR_Params {
-    bool_t useColor;
+    bool useColor;
 } TexGen_XOR_Params;
 
 static const TexGen_XOR_Params texGen_xor_defaultParams = {
@@ -9,7 +9,7 @@ static const TexGen_XOR_Params texGen_xor_defaultParams = {
 };
 _Bool b;
 
-bool_t texGen_xor_execute(GColor* output, int logSize, const void* rawParams)
+bool texGen_xor_execute(GColor* output, int logSize, const void* rawParams)
 {
     const TexGen_XOR_Params* params = (const TexGen_XOR_Params*)rawParams;
     int size = 1 << logSize;

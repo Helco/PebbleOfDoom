@@ -19,7 +19,7 @@ const Uint32 imageWindow_SDLPixelFormat = SDL_PIXELFORMAT_ABGR8888;
 void imageWindow_beforeUpdate(Window* me, void* userdata);
 void imageWindow_contentUpdate(Window* me, void* userdata);
 
-ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect initialBounds, bool_t isEssential)
+ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect initialBounds, bool isEssential)
 {
     ImageWindow* me = (ImageWindow*)malloc(sizeof(ImageWindow));
     if (me == NULL)
@@ -134,12 +134,12 @@ void imageWindow_contentUpdate(Window* window, void* userdata)
     igPopStyleVar(1);
 }
 
-void imageWindow_toggle(ImageWindow* me, bool_t isOpen)
+void imageWindow_toggle(ImageWindow* me, bool isOpen)
 {
     window_setOpenState(me->window, isOpen ? WindowOpenState_Open : WindowOpenState_Closed);
 }
 
-bool_t imageWindow_isOpen(ImageWindow* me)
+bool imageWindow_isOpen(ImageWindow* me)
 {
     return window_getOpenState(me->window) == WindowOpenState_Open;
 }

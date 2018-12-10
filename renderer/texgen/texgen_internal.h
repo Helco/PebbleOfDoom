@@ -45,7 +45,7 @@
 #define TEXGENERATOR_HEADER(_name) \
     const TexGenerator* TEXGENERATOR_SYMBOL(_name) ()
 
-typedef bool_t (*TexGeneratorCallback)(GColor* output, int logSize, const void* params);
+typedef bool (*TexGeneratorCallback)(GColor* output, int logSize, const void* params);
 
 typedef struct TexGeneratorParam {
     TexGeneratorParameterInfo info;

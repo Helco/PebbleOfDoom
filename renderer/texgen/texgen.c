@@ -11,7 +11,7 @@ int texgen_getGeneratorCount()
     return sizeof(rawtexgen_registry) / sizeof(TexGeneratorInitializer);
 }
 
-bool_t texgen_getGeneratorInfoByIndex(TexGeneratorInfo* info, int index)
+bool texgen_getGeneratorInfoByIndex(TexGeneratorInfo* info, int index)
 {
     if (index < 0 || index >= texgen_getGeneratorCount())
         return false;
@@ -32,7 +32,7 @@ const TexGenerator* rawtexgen_getGeneratorByID(TexGeneratorID id)
     return NULL;
 }
 
-bool_t texgen_getGeneratorInfoByID(TexGeneratorInfo* info, TexGeneratorID id)
+bool texgen_getGeneratorInfoByID(TexGeneratorInfo* info, TexGeneratorID id)
 {
     const TexGenerator* generator = rawtexgen_getGeneratorByID(id);
     if (generator != NULL)
@@ -40,7 +40,7 @@ bool_t texgen_getGeneratorInfoByID(TexGeneratorInfo* info, TexGeneratorID id)
     return (generator != NULL);
 }
 
-bool_t texgen_getParameterInfoByIndex(TexGeneratorParameterInfo* info, TexGeneratorID id, int index)
+bool texgen_getParameterInfoByIndex(TexGeneratorParameterInfo* info, TexGeneratorID id, int index)
 {
     const TexGenerator* generator = rawtexgen_getGeneratorByID(id);
     if (generator == NULL)
@@ -62,7 +62,7 @@ const TexGeneratorParam* rawtexgen_getParameterByID(const TexGenerator* generato
     return NULL;
 }
 
-bool_t texgen_getParameterInfoByID(TexGeneratorParameterInfo* info, TexGeneratorID genId, TexGenParamID paramId)
+bool texgen_getParameterInfoByID(TexGeneratorParameterInfo* info, TexGeneratorID genId, TexGenParamID paramId)
 {
     const TexGenerator* generator = rawtexgen_getGeneratorByID(genId);
     if (generator == NULL)
@@ -148,12 +148,12 @@ void texgen_setParamFloat(TexGenerationContext* me, TexGenParamID id, float valu
     }
 }
 
-void texgen_setParamBool(TexGenerationContext* me, TexGenParamID id, bool_t value)
+void texgen_setParamBool(TexGenerationContext* me, TexGenParamID id, bool value)
 {
     const TexGeneratorParam* param = rawtexgen_getParameterByID(me->generator, id);
     if (param != NULL && param->info.type == TexGenParamType_Bool)
     {
-        bool_t* targetPtr = (bool_t*)rawtexgen_getParamPointer(param, me->paramBlock);
+        bool* targetPtr = (bool*)rawtexgen_getParamPointer(param, me->paramBlock);
         *targetPtr = value;
     }
 }
@@ -168,7 +168,7 @@ void texgen_getParams(TexGenerationContext* me, void* outParamBlock)
     memcpy(outParamBlock, me->paramBlock, me->generator->info.paramBlockSize);
 }
 
-bool_t texgen_execute(TexGenerationContext* me)
+bool texgen_execute(TexGenerationContext* me)
 {
     return me->generator->callback(me->pixels, me->logSize, me->paramBlock);
 }

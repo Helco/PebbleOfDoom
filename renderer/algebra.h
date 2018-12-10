@@ -1,5 +1,6 @@
 #ifndef ALGEBRA_H
 #define ALGEBRA_H
+#include <stdbool.h>
 
 //
 // Integer
@@ -13,13 +14,6 @@
 
 int lerpi(int value, int inputStart, int inputEnd, int outputStart, int outputEnd);
 int clampi(int start, int value, int end);
-
-//
-// Boolean
-//
-typedef int bool_t;
-#define true 1
-#define false 0
 
 //
 // Real
@@ -57,7 +51,7 @@ real_t real_degToRad(real_t deg);
 real_t real_radToDeg(real_t rad);
 
 int real_compare(real_t a, real_t b);
-bool_t real_inBetween(real_t value, real_t min, real_t max);
+bool real_inBetween(real_t value, real_t min, real_t max);
 real_t real_min(real_t a, real_t b);
 real_t real_max(real_t a, real_t b);
 real_t real_abs(real_t a);
@@ -143,9 +137,9 @@ typedef struct lineSeg_t {
     } end;
 } lineSeg_t;
 
-bool_t xz_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xz_t* result);
+bool xz_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xz_t* result);
 real_t xz_linePhase(lineSeg_t seg, xz_t intersection);
-bool_t xy_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xy_t* result);
+bool xy_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xy_t* result);
 real_t xy_linePhase(lineSeg_t seg, xy_t intersection);
 
 

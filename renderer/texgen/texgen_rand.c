@@ -1,8 +1,8 @@
 #include "texgen_internal.h"
 
 typedef struct TexGen_Rand_Params {
-    bool_t useColor;
-    bool_t useSeed;
+    bool useColor;
+    bool useSeed;
     int seed;
 } TexGen_Rand_Params;
 
@@ -11,7 +11,7 @@ static const TexGen_Rand_Params texGen_rand_defaultParams = {
     .useSeed = false
 };
 
-bool_t texGen_rand_execute(GColor* output, int logSize, const void* rawParams)
+bool texGen_rand_execute(GColor* output, int logSize, const void* rawParams)
 {
     const TexGen_Rand_Params* params = (const TexGen_Rand_Params*)rawParams;
     if (params->useSeed)

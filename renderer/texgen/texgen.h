@@ -40,19 +40,19 @@ typedef struct TexGeneratorParameterInfo {
 typedef struct TexGenerationContext TexGenerationContext;
 
 int texgen_getGeneratorCount();
-bool_t texgen_getGeneratorInfoByIndex(TexGeneratorInfo* info, int index);
-bool_t texgen_getGeneratorInfoByID(TexGeneratorInfo* info, TexGeneratorID id);
-bool_t texgen_getParameterInfoByIndex(TexGeneratorParameterInfo* info, TexGeneratorID id, int index);
-bool_t texgen_getParameterInfoByID(TexGeneratorParameterInfo* info, TexGeneratorID genId, TexGenParamID paramId);
+bool texgen_getGeneratorInfoByIndex(TexGeneratorInfo* info, int index);
+bool texgen_getGeneratorInfoByID(TexGeneratorInfo* info, TexGeneratorID id);
+bool texgen_getParameterInfoByIndex(TexGeneratorParameterInfo* info, TexGeneratorID id, int index);
+bool texgen_getParameterInfoByID(TexGeneratorParameterInfo* info, TexGeneratorID genId, TexGenParamID paramId);
 
 TexGenerationContext* texgen_init(TextureManagerHandle textureManager, TexGeneratorID id, int size);
 void texgen_free(TexGenerationContext* ctx);
 void texgen_setParamInt(TexGenerationContext* ctx, TexGenParamID id, int value);
 void texgen_setParamFloat(TexGenerationContext* ctx, TexGenParamID id, float value);
-void texgen_setParamBool(TexGenerationContext* ctx, TexGenParamID id, bool_t value);
+void texgen_setParamBool(TexGenerationContext* ctx, TexGenParamID id, bool value);
 void texgen_setParams(TexGenerationContext* ctx, const void* paramBlock);
 void texgen_getParams(TexGenerationContext* ctx, void* outParamBlock);
-bool_t texgen_execute(TexGenerationContext* ctx);
+bool texgen_execute(TexGenerationContext* ctx);
 TextureId texgen_getTextureId(TexGenerationContext* ctx);
 const Texture* texgen_getTexture(TexGenerationContext* ctx);
 

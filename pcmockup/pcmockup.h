@@ -10,11 +10,11 @@ SDL_Rect padRect(SDL_Rect rect, GSize amount);
 
 extern const Uint32 imageWindow_SDLPixelFormat;
 typedef struct ImageWindow ImageWindow;
-ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect initialBounds, bool_t isEssential);
+ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect initialBounds, bool isEssential);
 void imageWindow_free(ImageWindow* me);
 void imageWindow_setImageData(ImageWindow* me, GSize size, const SDL_Color* data);
-void imageWindow_toggle(ImageWindow* me, bool_t isOpen);
-bool_t imageWindow_isOpen(ImageWindow* me);
+void imageWindow_toggle(ImageWindow* me, bool isOpen);
+bool imageWindow_isOpen(ImageWindow* me);
 Window* imageWindow_asWindow(ImageWindow* me);
 
 typedef struct WindowGrid

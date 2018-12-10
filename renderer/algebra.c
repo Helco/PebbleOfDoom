@@ -174,7 +174,7 @@ xz_t xz_neg(xz_t a) {
 //
 // line-intersection
 //
-bool_t xz_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xz_t* result)
+bool xz_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xz_t* result)
 {
     xz_t seg1Vector = xz_sub(seg1.start.xz, seg1.end.xz);
     xz_t seg2Vector = xz_sub(seg2.start.xz, seg2.end.xz);
@@ -198,7 +198,7 @@ real_t xz_linePhase(lineSeg_t seg, xz_t intersection)
         : real_div(real_sub(seg.start.xz.z, intersection.z), segVector.z);
 }
 
-bool_t xy_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xy_t* result)
+bool xy_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xy_t* result)
 {
     return xz_lineIntersect(seg1, seg2, (xz_t*)result);
 }

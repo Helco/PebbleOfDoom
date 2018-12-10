@@ -5,7 +5,7 @@
 
 typedef struct
 {
-    bool_t transform;
+    bool transform;
 } RenderWorldOptions;
 static const RenderWorldOptions worldSpaceOptions = {
     .transform = false

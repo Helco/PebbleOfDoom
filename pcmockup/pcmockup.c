@@ -15,7 +15,7 @@ struct PCMockup
     PebbleWindow *pebbleWindow;
     DebugWindowSet *debugWindowSet;
     WindowContainer* windowContainer;
-    bool_t isRunning;
+    bool isRunning;
 };
 
 PCMockup *pcmockup_init()
