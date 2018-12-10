@@ -10,7 +10,7 @@ jobs:
       name: Linux PCMockup
       script:
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 90
-        - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/gcc-8 90
+        - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
         - bash ./travis/cmake_script.sh
     - stage: Build&Test
       name: Pebble
@@ -34,3 +34,4 @@ addons:
     - libgles2-mesa-dev
     - libsdl2-dev
     - gcc-8
+    - g++-8
