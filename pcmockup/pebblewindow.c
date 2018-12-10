@@ -17,15 +17,14 @@ struct PebbleWindow
 
 void pebbleWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata);
 
-PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds, GSize pebbleSize, Renderer* renderer)
+PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GSize pebbleSize, Renderer* renderer)
 {
     PebbleWindow* me = (PebbleWindow*)malloc(sizeof(PebbleWindow));
     if (me == NULL)
         return NULL;
     memset(me, 0, sizeof(PebbleWindow));
 
-    GRect b = { { initialBounds.x, initialBounds.y }, { initialBounds.w, initialBounds.h } };
-    me->window = imageWindow_init(parent, "Pebble screen", b, true);
+    me->window = imageWindow_init(parent, "Pebble screen", initialBounds, true);
     if (me->window == NULL)
     {
         pebbleWindow_free(me);

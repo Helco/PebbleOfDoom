@@ -5,8 +5,8 @@
 #include "renderer.h"
 #include "window.h"
 
-SDL_Rect findBestFit(SDL_Rect target, float aspect);
-SDL_Rect padRect(SDL_Rect rect, GSize amount);
+GRect findBestFit(GRect target, float aspect);
+GRect padRect(GRect rect, GSize amount);
 
 extern const Uint32 imageWindow_SDLPixelFormat;
 typedef struct ImageWindow ImageWindow;
@@ -23,7 +23,7 @@ typedef struct WindowGrid
     GSize totalSize;
 } WindowGrid;
 GSize windowGrid_getGridSize(const WindowGrid* grid);
-SDL_Rect windowGrid_getSingleBounds(const WindowGrid* grid, int windowI); // negative to select from end
+GRect windowGrid_getSingleBounds(const WindowGrid* grid, int windowI); // negative to select from end
 
 typedef struct SafeFramebuffer SafeFramebuffer;
 SafeFramebuffer* safeFramebuffer_init(GSize size, int canarySize); // canarySize in framebuffer sizes
@@ -33,7 +33,7 @@ void safeFramebuffer_prepare(SafeFramebuffer* me);
 void safeFramebuffer_check(SafeFramebuffer* me);
 
 typedef struct PebbleWindow PebbleWindow;
-PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds, GSize pebbleSize, Renderer* renderer);
+PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GSize pebbleSize, Renderer* renderer);
 void pebbleWindow_free(PebbleWindow* window);
 void pebbleWindow_startUpdate(PebbleWindow* me);
 void pebbleWindow_endUpdate(PebbleWindow* me);
@@ -41,7 +41,7 @@ GColor* pebbleWindow_getPebbleFramebuffer(PebbleWindow* window);
 ImageWindow* pebbleWindow_asImageWindow(PebbleWindow* window);
 
 typedef struct DebugWindow DebugWindow;
-DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* debugView, Renderer* renderer);
+DebugWindow* debugWindow_init(WindowContainer* parent, GRect bounds, const DebugView* debugView, Renderer* renderer);
 void debugWindow_free(DebugWindow* window);
 void debugWindow_update(DebugWindow* window);
 const DebugView* debugWindow_getDebugView(const DebugWindow* window);
