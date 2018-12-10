@@ -1,3 +1,4 @@
+#define _CRT_NONSTDC_NO_DEPRECATE
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>

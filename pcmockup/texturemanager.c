@@ -1,3 +1,4 @@
+#define _CRT_NONSTDC_NO_DEPRECATE
 #include "pcmockup.h"
 #include <string.h>
 #include <stb_image.h>
