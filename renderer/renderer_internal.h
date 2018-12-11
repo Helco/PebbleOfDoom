@@ -2,6 +2,10 @@
 #define RENDERER_INTERNAL_H
 #include "renderer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MAX_DRAW_DEPTH 16
 
 typedef struct DrawRequest {
@@ -33,5 +37,9 @@ void drawRequestStack_push(DrawRequestStack* stack, const Sector* sector, int le
 const DrawRequest* drawRequestStack_pop(DrawRequestStack* stack);
 
 void renderer_transformLine(const Renderer* me, const lineSeg_t* line, lineSeg_t* result);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

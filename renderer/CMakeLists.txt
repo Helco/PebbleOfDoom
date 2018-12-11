@@ -4,7 +4,7 @@
 
 set(sources_podrenderer
     renderer.h
-    renderer.c
+    renderer.cpp
     renderer_debug.c
     algebra_float.c
     algebra.h
@@ -29,6 +29,9 @@ target_include_directories(podrenderer
     PRIVATE "../pcmockup/" # to access pebble.h
     PRIVATE ${SDL2_INCLUDE_DIR} # for debug output
 )
+target_include_directories(podrenderer SYSTEM
+    PUBLIC "nostl"
+)
 target_compile_definitions(podrenderer
     PUBLIC REAL_USE_FLOAT
     PUBLIC DEBUG_WINDOWS
@@ -41,5 +44,6 @@ target_compile_options(podrenderer
 )
 target_link_libraries(podrenderer
     PUBLIC cimgui
+    PRIVATE nostl
 )
 enable_warnings(podrenderer)

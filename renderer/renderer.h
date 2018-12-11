@@ -10,6 +10,10 @@
 #define RENDERER_HEIGHT 144
 #define HALF_RENDERER_HEIGHT (RENDERER_HEIGHT / 2)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct Renderer Renderer;
 Renderer* renderer_init();
 void renderer_free(Renderer* renderer);
@@ -48,5 +52,7 @@ typedef struct DebugView
 int renderer_getDebugCount(const Renderer* renderer);
 const DebugView* renderer_getDebugViews(const Renderer* renderer);
 #endif
-
+#ifdef __cplusplus
+}
+#endif
 #endif

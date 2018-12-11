@@ -1,6 +1,7 @@
 #include <pebble.h>
 #include "platform.h"
 #include "level.h"
+#include <stdlib.h>
 
 Level *level_load(int levelId)
 {

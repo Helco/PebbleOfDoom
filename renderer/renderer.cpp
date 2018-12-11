@@ -1,6 +1,11 @@
+extern "C" {
+    #include <pebble.h>
+}
 #include "renderer_internal.h"
 #include "algebra.h"
 #include "platform.h"
+
+extern "C" {
 
 Renderer* renderer_init()
 {
@@ -252,12 +257,10 @@ void drawRequestStack_push(DrawRequestStack* stack, const Sector* sector, int le
     const int insertAt = stack->end;
     stack->end = (stack->end + 1) % MAX_DRAW_DEPTH;
     assert(stack->end != stack->start);
-    stack->requests[insertAt] = (DrawRequest) {
-        .sector = sector,
-        .left = left,
-        .right = right,
-        .sourceSector = sourceSector
-    };
+    stack->requests[insertAt].sector = sector;
+    stack->requests[insertAt].left = left;
+    stack->requests[insertAt].right = right;
+    stack->requests[insertAt].sourceSector = sourceSector;
 }
 
 const DrawRequest* drawRequestStack_pop(DrawRequestStack* stack)
@@ -267,4 +270,6 @@ const DrawRequest* drawRequestStack_pop(DrawRequestStack* stack)
     const DrawRequest* result = &stack->requests[stack->start];
     stack->start = (stack->start + 1) % MAX_DRAW_DEPTH;
     return result;
+}
+
 }
