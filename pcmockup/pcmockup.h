@@ -14,7 +14,7 @@ ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect 
 void imageWindow_free(ImageWindow* me);
 void imageWindow_setImageData(ImageWindow* me, GSize size, const SDL_Color* data);
 void imageWindow_toggle(ImageWindow* me, bool isOpen);
-bool imageWindow_isOpen(ImageWindow* me);
+bool imageWindow_isOpen(const ImageWindow* me);
 Window* imageWindow_asWindow(ImageWindow* me);
 
 typedef struct WindowGrid

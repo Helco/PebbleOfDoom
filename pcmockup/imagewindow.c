@@ -139,7 +139,7 @@ void imageWindow_toggle(ImageWindow* me, bool isOpen)
     window_setOpenState(me->window, isOpen ? WindowOpenState_Open : WindowOpenState_Closed);
 }
 
-bool imageWindow_isOpen(ImageWindow* me)
+bool imageWindow_isOpen(const ImageWindow* me)
 {
     return window_getOpenState(me->window) == WindowOpenState_Open;
 }
