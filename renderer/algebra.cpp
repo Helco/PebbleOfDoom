@@ -1,6 +1,12 @@
 #include "algebra.h"
 #include <math.h>
 
+#include <algorithm>
+
+using namespace std;
+
+extern "C" {
+
 //
 // Integer
 //
@@ -206,4 +212,6 @@ bool xy_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xy_t* result)
 real_t xy_linePhase(lineSeg_t seg, xy_t intersection)
 {
     return xz_linePhase(seg, xy_to_xz(intersection));
+}
+
 }

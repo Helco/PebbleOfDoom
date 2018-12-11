@@ -8,7 +8,7 @@ set(sources_podrenderer
     renderer_debug.c
     algebra_float.c
     algebra.h
-    algebra.c
+    algebra.cpp
     level.h
     level.c
 
@@ -32,6 +32,12 @@ target_include_directories(podrenderer
 target_compile_definitions(podrenderer
     PUBLIC REAL_USE_FLOAT
     PUBLIC DEBUG_WINDOWS
+)
+target_compile_options(podrenderer
+    PRIVATE
+        $<$<COMPILE_LANGUAGE:CXX>:-nostdlib>
+        $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>
+        $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
 )
 target_link_libraries(podrenderer
     PUBLIC cimgui

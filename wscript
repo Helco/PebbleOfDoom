@@ -21,6 +21,8 @@ def configure(ctx):
     Universal configuration: add your change prior to calling ctx.load('pebble_sdk').
     """
     ctx.load('pebble_sdk')
+    ctx.env.CXX = "arm-none-eabi-g++"
+    ctx.load("g++")
 
 
 def build(ctx):
@@ -33,10 +35,14 @@ def build(ctx):
         ctx.env = ctx.all_envs[platform]
         ctx.env.append_value('DEFINES', 'REAL_USE_FLOAT')
         ctx.env.append_value('DEFINES', 'POD_PEBBLE')
+        ctx.env.CXXFLAGS = list(ctx.env.CFLAGS)
+        ctx.env.CXXFLAGS.remove('-std=c99')
+        ctx.env.CXXFLAGS.extend(['-std=c++11', '-fPIE', '-fno-unwind-tables', '-fno-exceptions', '-fno-rtti'])
         ctx.set_group(ctx.env.PLATFORM_NAME)
         app_elf = '{}/pebble-app.elf'.format(ctx.env.BUILD_DIR)
         ctx.pbl_build(source=ctx.path.ant_glob([
             'renderer/*.c',
+            'renderer/*.cpp',
             'renderer/texgen/*.c',
             'pebbleapp/*.c',
         ]), target=app_elf, bin_type='app')

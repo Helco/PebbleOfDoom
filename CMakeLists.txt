@@ -28,7 +28,7 @@ function(enable_warnings TARGET)
             "-Werror" "-Wall" "-Wextra"
             "-Wpointer-arith" "-Wlogical-op"
             "-Wdisabled-optimization" "-Wunsafe-loop-optimizations"
-            "-Wc++-compat"
+            $<$<COMPILE_LANGUAGE:C>:-Wc++-compat>
         )
     endif()
 endfunction(enable_warnings)
@@ -41,7 +41,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/" ${CMAKE_MODULE_PATH})
 
 find_package(SDL2 REQUIRED)
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     link_libraries(m)
