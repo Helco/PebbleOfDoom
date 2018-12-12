@@ -9,6 +9,7 @@ set(sources_podrenderer
     algebra_float.c
     algebra_float.cpp
     algebra.h
+    algebra.c
     algebra.cpp
     level.h
     level.c

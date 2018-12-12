@@ -20,7 +20,29 @@ int clampi(int start, int value, int end);
 //
 // Real
 //
-class Real {
+namespace internal {
+    template<class T> class CommonAssignArithmetic {
+    public:
+        T& operator += (const T b) {
+            T& me = static_cast<T&>(*this);
+            return (me = me + b);
+        }
+        T& operator -= (const T b) {
+            T& me = static_cast<T&>(*this);
+            return (me = me - b);
+        }
+        T& operator *= (const T b) {
+            T& me = static_cast<T&>(*this);
+            return (me = me * b);
+        }
+        T& operator /= (const T b) {
+            T& me = static_cast<T&>(*this);
+            return (me = me / b);
+        }
+    };
+}
+
+class Real : public internal::CommonAssignArithmetic<Real> {
     #if defined REAL_USE_FLOAT
     float v;
     #else
@@ -32,19 +54,15 @@ public:
 
     int asInt() const;
     float asFloat() const;
-    int asString(char* str, int maxlen);
+    int asString(char* str, int maxlen) const;
 
     Real operator + (Real r) const;
-    Real& operator += (Real r);
     Real operator - (Real r) const;
-    Real& operator -= (Real r);
     Real operator * (Real r) const;
-    Real& operator *= (Real r);
     Real operator / (Real r) const;
-    Real& operator /= (Real r);
 
+    Real operator -() const;
     Real reciprocal() const;
-    Real neg() const;
 
     Real sin() const;
     Real cos() const;
@@ -69,8 +87,8 @@ public:
     Real ceil() const;
     Real round() const;
     Real fractional() const;
-    Real sqrt();
-    Real invSqrt();
+    Real sqrt() const;
+    Real invSqrt() const;
 
     static const Real one;
     static const Real zero;
@@ -94,25 +112,22 @@ typedef internal::LineSeg<internal::Vector2XY> LineSegXY;
 typedef internal::LineSeg<internal::Vector2XY> LineSegXZ;
 
 namespace internal {
-    template<class T> class Vector2Base : public T {
+    template<class T> class Vector2Base : public T, public internal::CommonAssignArithmetic<Real>  {
         typedef Vector2Base<T> Me;
     public:
         Vector2Base(Real a, Real b) : T(a, b) {}
 
         Me operator + (Me b) const;
-        Me& operator += (Me b);
         Me operator - (Me b) const;
-        Me& operator -= (Me b);
         Me operator * (Real f) const;
-        Me& operator *= (Real f);
         Me operator / (Real f) const;
-        Me& operator /= (Real f);
+
+        Me operator - () const;
 
         Me rotate(Real angleInRad) const;
-        Me cross(Me b) const;
-        Me dot(Me b) const;
+        Real cross(Me b) const;
+        Real dot(Me b) const;
         Me orthogonal() const;
-        Me neg() const;
 
         Real lengthSqr() const;
         Real length() const;
