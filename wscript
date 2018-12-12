@@ -37,7 +37,7 @@ def build(ctx):
         ctx.env.append_value('DEFINES', 'POD_PEBBLE')
         ctx.env.CXXFLAGS = list(ctx.env.CFLAGS)
         ctx.env.CXXFLAGS.remove('-std=c99')
-        ctx.env.CXXFLAGS.extend(['-std=c++11', '-fPIE', '-fno-unwind-tables', '-fno-exceptions', '-fno-rtti'])
+        ctx.env.CXXFLAGS.extend(['-std=c++14', '-fPIE', '-fno-unwind-tables', '-fno-exceptions', '-fno-rtti', "-Wno-builtin-declaration-mismatch"])
         ctx.set_group(ctx.env.PLATFORM_NAME)
         app_elf = '{}/pebble-app.elf'.format(ctx.env.BUILD_DIR)
         ctx.pbl_build(source=ctx.path.ant_glob([

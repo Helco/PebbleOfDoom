@@ -1,10 +1,6 @@
 #include "algebra.h"
 #include <math.h>
 
-#include <algorithm>
-
-using namespace std;
-
 extern "C" {
 
 //
@@ -19,7 +15,10 @@ int lerpi(int value, int inputStart, int inputEnd, int outputStart, int outputEn
 
 int clampi(int start, int value, int end)
 {
-    return max(start, min(value, end));
+    return
+        value < start ? start
+        : value > end ? end
+        : value;
 }
 
 //
