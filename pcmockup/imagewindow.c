@@ -16,6 +16,7 @@ struct ImageWindow
 
 const Uint32 imageWindow_SDLPixelFormat = SDL_PIXELFORMAT_ABGR8888;
 
+void imageWindow_dtor(Window* window, void* userdata);
 void imageWindow_beforeUpdate(Window* me, void* userdata);
 void imageWindow_contentUpdate(Window* me, void* userdata);
 
@@ -30,7 +31,7 @@ ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect 
     if (me->window == NULL)
     {
         fprintf(stderr, "Could not allocate new window\n");
-        imageWindow_free(me);
+        imageWindow_dtor(me->window, me);
         return NULL;
     }
     window_setInitialBounds(me->window, initialBounds);
@@ -44,12 +45,13 @@ ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect 
         .content = imageWindow_contentUpdate,
         .userdata = me
     });
+    window_addDestructor(me->window, imageWindow_dtor, me);
 
     glGenTextures(1, &me->textureID);
     if (me->textureID == 0)
     {
         fprintf(stderr, "glGenTextures: %d\n", glGetError());
-        imageWindow_free(me);
+        imageWindow_dtor(me->window, me);
         return NULL;
     }
     glEnable(GL_TEXTURE_2D);
@@ -66,10 +68,10 @@ ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect 
     return me;
 }
 
-void imageWindow_free(ImageWindow* me)
+void imageWindow_dtor(Window* window, void* userdata)
 {
-    if (me == NULL)
-        return;
+    UNUSED(window);
+    ImageWindow* me = (ImageWindow*)userdata;
     if (me->textureID != 0)
         glDeleteTextures(1, &me->textureID);
     free(me);

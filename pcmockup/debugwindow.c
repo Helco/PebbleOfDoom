@@ -78,8 +78,6 @@ void debugWindow_free(DebugWindow* me)
 {
     if (me == NULL)
         return;
-    if (me->window != NULL)
-        imageWindow_free(me->window);
     if (me->surface != NULL)
         SDL_FreeSurface(me->surface);
     if (me->renderer != NULL)

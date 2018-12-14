@@ -24,7 +24,6 @@ void uploadedTexture_setFromTexture(UploadedTexture* me, const Texture* texture)
 
 typedef struct ImageWindow ImageWindow;
 ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect initialBounds, bool_t isEssential);
-void imageWindow_free(ImageWindow* me);
 void imageWindow_setImageData(ImageWindow* me, GSize size, const SDL_Color* data);
 void imageWindow_toggle(ImageWindow* me, bool_t isOpen);
 bool_t imageWindow_isOpen(ImageWindow* me);
