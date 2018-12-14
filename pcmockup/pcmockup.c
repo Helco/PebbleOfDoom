@@ -256,5 +256,5 @@ Uint32 getWindowIDByEvent(const SDL_Event* ev)
 
 bool pcmockup_initDebugWindowSDL(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* renderer)
 {
-    return debugWindow_init(parent, bounds, view, renderer) != NULL;
+    return debugWindowSDL_init(parent, bounds, view, renderer) != NULL;
 }
