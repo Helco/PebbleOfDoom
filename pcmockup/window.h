@@ -17,7 +17,8 @@ typedef struct WindowCallbacks {
     WindowUpdateCallback
         beforeUpdate,
         contentUpdate,
-        afterUpdate;
+        afterUpdate,
+        mainMenubar;
     WindowDragCallback drag;
     WindowKeyCallback
         keyDown,
@@ -37,22 +38,25 @@ void window_scheduleFree(Window* window);
 GRect window_getBounds(const Window* window);
 bool window_isFocused(const Window* window);
 WindowOpenState window_getOpenState(const Window* window);
+const char* window_getMenubarSection(const Window* window);
 void window_setTitle(Window* window, const char* title);
 void window_setFlags(Window* window, ImGuiWindowFlags flags);
 void window_setOpenState(Window* window, WindowOpenState state);
 void window_setInitialBounds(Window* window, GRect bounds);
+void window_setMenubarSection(Window* window, const char* section);
 void window_addCallbacks(Window* window, WindowCallbacks callbacks);
 void window_updateMenubar(Window* window);
 
 typedef struct WindowContainer WindowContainer;
 WindowContainer* windowContainer_init(GSize windowSize);
 void windowContainer_free(WindowContainer* me);
-void windowContainer_startUpdate(WindowContainer* me);
-void windowContainer_endUpdate(WindowContainer* me);
+void windowContainer_update(WindowContainer* me);
 Window* windowContainer_newWindow(WindowContainer* me, const char* title);
 void windowContainer_freeWindow(WindowContainer* me, Window* window);
 Window* windowContainer_getFocusedWindow(WindowContainer* me);
 void windowContainer_handleEvent(WindowContainer* me, const SDL_Event* ev);
+void windowContainer_addMenubarHandler(WindowContainer* me, WindowUpdateCallback callback,
+    const char* section, void* userdata);
 
 typedef struct WindowGrid
 {

@@ -41,15 +41,9 @@ PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds,
 GColor* pebbleWindow_getPebbleFramebuffer(PebbleWindow* window);
 ImageWindow* pebbleWindow_asImageWindow(PebbleWindow* window);
 
+typedef bool (*DebugWindowConstructor)(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* renderer);
 typedef struct DebugWindow DebugWindow;
 DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* debugView, Renderer* renderer);
-const DebugView* debugWindow_getDebugView(const DebugWindow* window);
-ImageWindow* debugWindow_asImageWindow(DebugWindow* window);
-
-typedef struct DebugWindowSet DebugWindowSet;
-DebugWindowSet* debugWindowSet_init(WindowContainer* parent, const WindowGrid* grid, Renderer* renderer);
-void debugWindowSet_free(DebugWindowSet* set);
-void debugWindowSet_updateMenubar(DebugWindowSet* me);
 
 typedef struct PCMockup PCMockup;
 PCMockup* pcmockup_init();

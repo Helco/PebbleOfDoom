@@ -17,7 +17,6 @@ set(sources_pcmockup
     pcmockup.c
     pebblewindow.c
     debugwindow.c
-    debugwindowset.c
     windowgrid.c
     safeframebuffer.c
     rendererinterface.c
@@ -31,6 +30,7 @@ assign_source_group(${sources_pcmockup})
 
 add_executable(pcmockup ${sources_pcmockup})
 target_link_libraries(pcmockup
+    "-lasan"
     ${SDL2_LIBRARY}
     stb
     podrenderer
@@ -38,6 +38,7 @@ target_link_libraries(pcmockup
 target_include_directories(pcmockup
     PRIVATE ${SDL2_INCLUDE_DIR}
 )
+target_compile_options(pcmockup PRIVATE "-fsanitize=address")
 set_target_properties(pcmockup PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
 )

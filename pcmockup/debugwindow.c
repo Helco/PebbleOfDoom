@@ -30,6 +30,7 @@ SDL_Surface* createSDLSurface(int w, int h, Uint32 format)
 
 void debugWindow_free(void *userdata);
 void debugWindow_contentUpdate(void* userdata);
+void debugWindow_updateMenubar(void* userdata);
 void debugWindow_onDrag(int button, ImVec2 delta, void* userdata);
 void debugWindow_onKeyDown(SDL_Keysym sym, void* userdata);
 
@@ -52,8 +53,10 @@ DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const De
         .drag = debugWindow_onDrag,
         .keyDown = debugWindow_onKeyDown,
         .contentUpdate = debugWindow_contentUpdate,
+        .mainMenubar = debugWindow_updateMenubar,
         .userdata = me
     });
+    window_setMenubarSection(imageWindow_asWindow(me->window), "Debug windows");
 
     me->surface = createSDLSurface(bounds.w, bounds.h, SDL_PIXELFORMAT_ABGR8888);
     if (me->surface == NULL)
@@ -101,6 +104,14 @@ void debugWindow_contentUpdate(void* userdata)
     me->view->callback.sdl(me->podRenderer, me->renderer, me->offset, me->view->userdata);
 
     imageWindow_setImageData(me->window, GSize(me->surface->w, me->surface->h), (SDL_Color*)me->surface->pixels);
+}
+
+void debugWindow_updateMenubar(void* userdata)
+{
+    DebugWindow* me = (DebugWindow*)userdata;
+    bool isOpen = imageWindow_isOpen(me->window);
+    igMenuItemBoolPtr(me->view->name, NULL, &isOpen, true);
+    imageWindow_toggle(me->window, isOpen);
 }
 
 void debugWindow_updateOffset(DebugWindow* me)

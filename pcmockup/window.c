@@ -26,6 +26,7 @@ void window_callDestructor(Window* me);
 void window_callBeforeUpdate(Window* me);
 void window_callContentUpdate(Window* me);
 void window_callAfterUpdate(Window* me);
+void window_callMainMenubar(void* userdata);
 void window_callDrag(Window* me, int mouseKey, ImVec2 delta);
 void window_callKeyDown(Window* me, SDL_Keysym sym);
 void window_callKeyUp(Window* me, SDL_Keysym sym);
@@ -41,6 +42,8 @@ Window* window_init(WindowContainer* parent)
     me->initialPos = me->currentPos = (ImVec2) { -1, -1 };
     me->initialSize = me->currentSize = (ImVec2) { -1, -1 };
     window_setTitle(me, "");
+    windowContainer_addMenubarHandlerWithWindow(me->parent,
+        window_callMainMenubar, me, NULL, me);
     return me;
 }
 
@@ -135,6 +138,11 @@ WindowOpenState window_getOpenState(const Window* me)
     return me->openState;
 }
 
+const char* window_getMenubarSection(const Window* me)
+{
+    return *windowContainer_getMenubarSectionPtr(me->parent, me);
+}
+
 bool window_isFocused(const Window* me)
 {
     return me->isFocused;
@@ -176,6 +184,16 @@ void window_updateMenubar(Window* me)
         window_setOpenState(me, isOpen ? WindowOpenState_Open : WindowOpenState_Closed);
 }
 
+void window_setMenubarSection(Window* me, const char* section)
+{
+    char** sectionPtr = windowContainer_getMenubarSectionPtr(me->parent, me);
+    if (*sectionPtr != NULL)
+        free(*sectionPtr);
+    *sectionPtr = (section != NULL && strcmp(section, "") != 0)
+        ? strdup(section)
+        : NULL;
+}
+
 void window_addCallbacks(Window* me, WindowCallbacks callbacks)
 {
     assert(me->callbackCount < MAX_CALLBACKS);
@@ -213,6 +231,15 @@ void window_callAfterUpdate(Window* me)
     for (int i = 0; i < me->callbackCount; i++) {
         if (me->callbacks[i].afterUpdate)
             me->callbacks[i].afterUpdate(me->callbacks[i].userdata);
+    }
+}
+
+void window_callMainMenubar(void* userdata)
+{
+    Window* me = (Window*)userdata;
+    for (int i = 0; i < me->callbackCount; i++) {
+        if (me->callbacks[i].mainMenubar)
+            me->callbacks[i].mainMenubar(me->callbacks[i].userdata);
     }
 }
 

@@ -13,11 +13,16 @@ struct PCMockup
     Renderer *renderer;
     Level* level;
     TextureManager* textureManager;
-    PebbleWindow *pebbleWindow;
-    DebugWindowSet *debugWindowSet;
     WindowContainer* windowContainer;
     bool_t isRunning;
 };
+
+bool pcmockup_initDebugWindowSDL(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* renderer);
+static const DebugWindowConstructor debugWindowConstructors[] = {
+    [DebugViewType_SDL] = pcmockup_initDebugWindowSDL
+};
+
+void pcmockup_updateMainMenubar(void* userdata);
 
 PCMockup *pcmockup_init()
 {
@@ -35,6 +40,7 @@ PCMockup *pcmockup_init()
         pcmockup_free(me);
         return NULL;
     }
+    const int debugWindowCount = renderer_getDebugCount(me->renderer);
 
     me->level = level_load(0);
     if (me->level == NULL)
@@ -68,32 +74,35 @@ PCMockup *pcmockup_init()
         pcmockup_free(me);
         return NULL;
     }
+    windowContainer_addMenubarHandler(me->windowContainer,
+        pcmockup_updateMainMenubar, "PCMockup", me);
 
     WindowGrid windowGrid;
-    windowGrid.windowCount = 1 + renderer_getDebugCount(me->renderer);
+    windowGrid.windowCount = 1 + debugWindowCount;
     windowGrid.totalSize = WINDOW_START_SIZE;
 
-    me->pebbleWindow = pebbleWindow_init(
+    PebbleWindow* pebbleWindow = pebbleWindow_init(
         me->windowContainer,
         windowGrid_getSingleBounds(&windowGrid, 0),
         GSize(RENDERER_WIDTH, RENDERER_HEIGHT),
         me->renderer
     );
-    if (me->pebbleWindow == NULL)
+    if (pebbleWindow == NULL)
     {
         pcmockup_free(me);
         return NULL;
     }
 
-    me->debugWindowSet = debugWindowSet_init(
-        me->windowContainer,
-        &windowGrid,
-        me->renderer
-    );
-    if (me->debugWindowSet == NULL)
+    for (int i = 0; i < debugWindowCount; i++)
     {
-        pcmockup_free(me);
-        return NULL;
+        const DebugView* debugView = &renderer_getDebugViews(me->renderer)[i];
+        if (!debugWindowConstructors[debugView->type](
+            me->windowContainer,
+            windowGrid_getSingleBounds(&windowGrid, -1 - i),
+            debugView, me->renderer)) {
+            pcmockup_free(me);
+            return NULL;
+        }
     }
 
     TextureWindow* textureWindow = textureWindow_init(me->windowContainer, me->textureManager);
@@ -113,8 +122,6 @@ void pcmockup_free(PCMockup *me)
         return;
     if (me->windowContainer != NULL)
         windowContainer_free(me->windowContainer);
-    if (me->debugWindowSet != NULL)
-        debugWindowSet_free(me->debugWindowSet);
     if (me->level != NULL)
         level_free(me->level);
     if (me->textureManager != NULL)
@@ -124,27 +131,16 @@ void pcmockup_free(PCMockup *me)
     free(me);
 }
 
-void pcmockup_updateMainMenubar(PCMockup* me)
+void pcmockup_updateMainMenubar(void* userdata)
 {
-    if (!igBeginMainMenuBar())
-        return;
-
-    if (igBeginMenu("PCMockup", true))
-    {
-        if (igMenuItemBool("Exit", NULL, false, true))
-            me->isRunning = false;
-        igEndMenu();
-    }
-    debugWindowSet_updateMenubar(me->debugWindowSet);
-
-    igEndMainMenuBar();
+    PCMockup* me = (PCMockup*)userdata;
+    if (igMenuItemBool("Exit", NULL, false, true))
+        me->isRunning = false;
 }
 
 void pcmockup_update(PCMockup *me)
 {
-    windowContainer_startUpdate(me->windowContainer);
-    pcmockup_updateMainMenubar(me);
-    windowContainer_endUpdate(me->windowContainer);
+    windowContainer_update(me->windowContainer);
 
     SDL_Event event;
     while (SDL_PollEvent(&event))
@@ -256,4 +252,9 @@ Uint32 getWindowIDByEvent(const SDL_Event* ev)
             return ev->text.windowID;
     }
     return UINT32_MAX;
+}
+
+bool pcmockup_initDebugWindowSDL(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* renderer)
+{
+    return debugWindow_init(parent, bounds, view, renderer) != NULL;
 }
