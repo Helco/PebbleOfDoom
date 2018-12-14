@@ -28,9 +28,9 @@ SDL_Surface* createSDLSurface(int w, int h, Uint32 format)
     return surface;
 }
 
-void debugWindow_dtor(Window* window, void *userdata);
-void debugWindow_onDrag(Window* window, int button, ImVec2 delta, void* userdata);
-void debugWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata);
+void debugWindow_free(void *userdata);
+void debugWindow_onDrag(int button, ImVec2 delta, void* userdata);
+void debugWindow_onKeyDown(SDL_Keysym sym, void* userdata);
 
 DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* podRenderer)
 {
@@ -43,28 +43,28 @@ DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const De
     me->window = imageWindow_init(parent, view->name, b, false);
     if (me->window == NULL)
     {
-        debugWindow_dtor(NULL, me);
+        debugWindow_free(me);
         return NULL;
     }
-    window_setDragCallback(imageWindow_asWindow(me->window), debugWindow_onDrag, me);
-    window_setKeyCallbacks(imageWindow_asWindow(me->window), (WindowKeyCallbacks) {
-        .down = debugWindow_onKeyDown,
+    window_addCallbacks(imageWindow_asWindow(me->window), (WindowCallbacks) {
+        .destruct = debugWindow_free,
+        .drag = debugWindow_onDrag,
+        .keyDown = debugWindow_onKeyDown,
         .userdata = me
     });
-    window_addDestructor(imageWindow_asWindow(me->window), debugWindow_dtor, me);
 
     me->surface = createSDLSurface(bounds.w, bounds.h, SDL_PIXELFORMAT_ABGR8888);
     if (me->surface == NULL)
     {
         fprintf(stderr, "createSDLSurface: %s\n", SDL_GetError());
-        debugWindow_dtor(NULL, me);
+        debugWindow_free(me);
         return NULL;
     }
 
     me->renderer = SDL_CreateSoftwareRenderer(me->surface);
     if (me->renderer == NULL)
     {
-        debugWindow_dtor(NULL, me);
+        debugWindow_free(me);
         return NULL;
     }
 
@@ -76,9 +76,8 @@ DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const De
     return me;
 }
 
-void debugWindow_dtor(Window* window, void *userdata)
+void debugWindow_free(void *userdata)
 {
-    UNUSED(window);
     DebugWindow* me = (DebugWindow*)userdata;
     if (me->surface != NULL)
         SDL_FreeSurface(me->surface);
@@ -116,9 +115,8 @@ void debugWindow_updateOffset(DebugWindow* me)
     );
 }
 
-void debugWindow_onDrag(Window* window, int button, ImVec2 delta, void* userdata)
+void debugWindow_onDrag(int button, ImVec2 delta, void* userdata)
 {
-    UNUSED(window);
     if (button != 2) // middle mouse button
         return;
     DebugWindow* me = (DebugWindow*)userdata;
@@ -127,9 +125,8 @@ void debugWindow_onDrag(Window* window, int button, ImVec2 delta, void* userdata
     debugWindow_updateOffset(me);
 }
 
-void debugWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata)
+void debugWindow_onKeyDown(SDL_Keysym sym, void* userdata)
 {
-    UNUSED(window);
     static const float zoomSpeed = 0.1f;
     static const float moveSpeed = 8.0f;
     real_t zoomDelta = real_zero;

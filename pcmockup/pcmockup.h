@@ -77,7 +77,6 @@ const char* textureManager_getTextureSource(TextureManager* me, const Texture* t
 
 typedef struct TextureWindow TextureWindow;
 TextureWindow* textureWindow_init(WindowContainer* parent, TextureManager* manager);
-void textureWindow_free(TextureWindow* me);
 Window* textureWindow_asWindow(TextureWindow* me);
 
 #endif

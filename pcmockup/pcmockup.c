@@ -15,7 +15,6 @@ struct PCMockup
     TextureManager* textureManager;
     PebbleWindow *pebbleWindow;
     DebugWindowSet *debugWindowSet;
-    TextureWindow* textureWindow;
     WindowContainer* windowContainer;
     bool_t isRunning;
 };
@@ -97,8 +96,8 @@ PCMockup *pcmockup_init()
         return NULL;
     }
 
-    me->textureWindow = textureWindow_init(me->windowContainer, me->textureManager);
-    if (me->textureWindow == NULL)
+    TextureWindow* textureWindow = textureWindow_init(me->windowContainer, me->textureManager);
+    if (textureWindow == NULL)
     {
         pcmockup_free(me);
         return NULL;
@@ -114,8 +113,6 @@ void pcmockup_free(PCMockup *me)
         return;
     if (me->windowContainer != NULL)
         windowContainer_free(me->windowContainer);
-    if (me->textureWindow != NULL)
-        textureWindow_free(me->textureWindow);
     if (me->debugWindowSet != NULL)
         debugWindowSet_free(me->debugWindowSet);
     if (me->level != NULL)
@@ -139,11 +136,6 @@ void pcmockup_updateMainMenubar(PCMockup* me)
         igEndMenu();
     }
     debugWindowSet_updateMenubar(me->debugWindowSet);
-    if (igBeginMenu("Tools", true))
-    {
-        window_updateMenubar(textureWindow_asWindow(me->textureWindow));
-        igEndMenu();
-    }
 
     igEndMainMenuBar();
 }

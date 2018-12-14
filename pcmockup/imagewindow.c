@@ -16,9 +16,9 @@ struct ImageWindow
 
 const Uint32 imageWindow_SDLPixelFormat = SDL_PIXELFORMAT_ABGR8888;
 
-void imageWindow_dtor(Window* window, void* userdata);
-void imageWindow_beforeUpdate(Window* me, void* userdata);
-void imageWindow_contentUpdate(Window* me, void* userdata);
+void imageWindow_free(void* userdata);
+void imageWindow_beforeUpdate(void* userdata);
+void imageWindow_contentUpdate(void* userdata);
 
 ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect initialBounds, bool_t isEssential)
 {
@@ -31,7 +31,7 @@ ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect 
     if (me->window == NULL)
     {
         fprintf(stderr, "Could not allocate new window\n");
-        imageWindow_dtor(me->window, me);
+        imageWindow_free(me);
         return NULL;
     }
     window_setInitialBounds(me->window, initialBounds);
@@ -40,18 +40,18 @@ ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect 
         ImGuiWindowFlags_NoScrollbar |
         ImGuiWindowFlags_NoScrollWithMouse |
         ImGuiWindowFlags_NoCollapse);
-    window_setUpdateCallbacks(me->window, (WindowUpdateCallbacks) {
-        .before = imageWindow_beforeUpdate,
-        .content = imageWindow_contentUpdate,
+    window_addCallbacks(me->window, (WindowCallbacks) {
+        .destruct = imageWindow_free,
+        .beforeUpdate = imageWindow_beforeUpdate,
+        .contentUpdate = imageWindow_contentUpdate,
         .userdata = me
     });
-    window_addDestructor(me->window, imageWindow_dtor, me);
 
     glGenTextures(1, &me->textureID);
     if (me->textureID == 0)
     {
         fprintf(stderr, "glGenTextures: %d\n", glGetError());
-        imageWindow_dtor(me->window, me);
+        imageWindow_free(me);
         return NULL;
     }
     glEnable(GL_TEXTURE_2D);
@@ -68,9 +68,8 @@ ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect 
     return me;
 }
 
-void imageWindow_dtor(Window* window, void* userdata)
+void imageWindow_free(void* userdata)
 {
-    UNUSED(window);
     ImageWindow* me = (ImageWindow*)userdata;
     if (me->textureID != 0)
         glDeleteTextures(1, &me->textureID);
@@ -105,9 +104,8 @@ void imageWindow_constrainWindowSize(ImGuiSizeCallbackData* data)
     data->DesiredSize = byWidthArea > byHeightArea ? byWidth : byHeight;
 }
 
-void imageWindow_beforeUpdate(Window* window, void* userdata)
+void imageWindow_beforeUpdate(void* userdata)
 {
-    UNUSED(window);
     ImageWindow* me = (ImageWindow*)userdata;
     const ImVec2
         zero = { 0, 0 },
@@ -117,10 +115,10 @@ void imageWindow_beforeUpdate(Window* window, void* userdata)
     igPushStyleVarVec2(ImGuiStyleVar_WindowPadding, zero);  // space between image and window border
 }
 
-void imageWindow_contentUpdate(Window* window, void* userdata)
+void imageWindow_contentUpdate(void* userdata)
 {
     ImageWindow* me = (ImageWindow*)userdata;
-    const GSize windowSize = window_getBounds(window).size;
+    const GSize windowSize = window_getBounds(me->window).size;
     const ImVec2
         zero = { 0, 0 },
         one = { 1, 1 },

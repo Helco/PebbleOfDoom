@@ -10,7 +10,8 @@ struct TextureWindow {
     char** textureFiles; // allocated with stb_readdir_*
 };
 
-void textureWindow_updateContent(Window* window, void* userdata);
+void textureWindow_free(void* userdata);
+void textureWindow_updateContent(void* userdata);
 void textureWindow_printImportedTexture(TextureWindow* me, const Texture* texture);
 void textureWindow_printGeneratedTexture(TextureWindow* me, const Texture* texture, TexGenerationContext* generationContext);
 void textureWindow_printImportFromFileMenu(TextureWindow* me);
@@ -33,9 +34,10 @@ TextureWindow* textureWindow_init(WindowContainer* parent, TextureManager* manag
         ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_MenuBar);
     window_setOpenState(me->window, WindowOpenState_Closed);
-    window_setUpdateCallbacks(me->window, (WindowUpdateCallbacks) {
+    window_addCallbacks(me->window, (WindowCallbacks) {
         .userdata = me,
-        .content = textureWindow_updateContent
+        .destruct = textureWindow_free,
+        .contentUpdate = textureWindow_updateContent
     });
 
     me->uploadedTexture = uploadedTexture_init();
@@ -50,10 +52,9 @@ TextureWindow* textureWindow_init(WindowContainer* parent, TextureManager* manag
     return me;
 }
 
-void textureWindow_free(TextureWindow* me)
+void textureWindow_free(void* userdata)
 {
-    if (me == NULL)
-        return;
+    TextureWindow* me = (TextureWindow*)userdata;
     if (me->uploadedTexture != NULL)
         uploadedTexture_free(me->uploadedTexture);
     if (me->textureFiles != NULL)
@@ -61,8 +62,9 @@ void textureWindow_free(TextureWindow* me)
     free(me);
 }
 
-void textureWindow_updateTexture(TextureWindow* me)
+void textureWindow_updateTexture(void* userdata)
 {
+    TextureWindow* me = (TextureWindow*)userdata;
     const Texture* const curTexture = textureManager_getTextureByIndex(me->manager, me->curTextureIndex);
     if (me->uploadedTextureIndex != me->curTextureIndex) {
         uploadedTexture_setFromTexture(me->uploadedTexture, curTexture);
@@ -98,9 +100,8 @@ void textureWindow_printTextureSelection(TextureWindow* me)
 #undef BUFFER_SIZE
 }
 
-void textureWindow_updateContent(Window* window, void* userdata)
+void textureWindow_updateContent(void* userdata)
 {
-    UNUSED(window);
     TextureWindow* me = (TextureWindow*)userdata;
     if (igBeginMenuBar()) {
         textureWindow_printImportFromFileMenu(me);

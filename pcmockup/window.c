@@ -4,13 +4,7 @@
 
 #define MOUSE_BUTTON_COUNT 5 // even imgui uses this "magic" number
 #define DEFAULT_MOUSE_THRESHOLD -1.0f
-#define MAX_DESTRUCTORS 8
-
-typedef struct WindowDestructor
-{
-    WindowDestructorCallback callback;
-    void* userdata;
-} WindowDestructor;
+#define MAX_CALLBACKS 8
 
 struct Window
 {
@@ -22,13 +16,17 @@ struct Window
     WindowOpenState openState;
     ImVec2 lastDragDelta[MOUSE_BUTTON_COUNT];
 
-    void* onDragUserdata;
-    WindowUpdateCallbacks onUpdate;
-    WindowDragCallback onDrag;
-    WindowKeyCallbacks onKey;
-    WindowDestructor destructors[MAX_DESTRUCTORS];
-    int destructorCount;
+    WindowCallbacks callbacks[MAX_CALLBACKS];
+    int callbackCount;
 };
+
+void window_callDestructor(Window* me);
+void window_callBeforeUpdate(Window* me);
+void window_callContentUpdate(Window* me);
+void window_callAfterUpdate(Window* me);
+void window_callDrag(Window* me, int mouseKey, ImVec2 delta);
+void window_callKeyDown(Window* me, SDL_Keysym sym);
+void window_callKeyUp(Window* me, SDL_Keysym sym);
 
 Window* window_init()
 {
@@ -47,8 +45,7 @@ void window_free(Window* me)
 {
     if (me == NULL)
         return;
-    for (int i = 0; i < me->destructorCount; i++)
-        me->destructors[i].callback(me, me->destructors[i].userdata);
+    window_callDestructor(me);
     if (me->title != NULL)
         free(me->title);
     free(me);
@@ -58,8 +55,7 @@ void window_update(Window* me)
 {
     if (me->openState == WindowOpenState_Closed)
         return;
-    if (me->onUpdate.before != NULL)
-        me->onUpdate.before(me, me->onUpdate.userdata);
+    window_callBeforeUpdate(me);
 
     bool isOpen = (me->openState == WindowOpenState_Open);
     bool* isOpenPtr = me->openState == WindowOpenState_Unclosable ? NULL : &isOpen;
@@ -72,20 +68,18 @@ void window_update(Window* me)
     igGetWindowSize_nonUDT(&me->currentSize);
     me->isFocused = igIsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 
-    if (me->onUpdate.content != NULL)
-        me->onUpdate.content(me, me->onUpdate.userdata);
+    window_callContentUpdate(me);
 
     igEnd();
     if (isOpenPtr != NULL)
         me->openState = isOpen ? WindowOpenState_Open : WindowOpenState_Closed;
 
-    if (me->onUpdate.after != NULL)
-        me->onUpdate.after(me, me->onUpdate.userdata);
+    window_callAfterUpdate(me);
 }
 
 static bool window_shouldHandleDrag(const Window* me, int button)
 {
-    if (!igIsMouseDragging(button, DEFAULT_MOUSE_THRESHOLD) || me->onDrag == NULL)
+    if (!igIsMouseDragging(button, DEFAULT_MOUSE_THRESHOLD))
         return false;
     const ImVec2 dragSource = igGetIO()->MouseClickedPos[button];
     return
@@ -106,17 +100,17 @@ void window_handleDragEvent(Window* me)
         igGetMouseDragDelta_nonUDT(&delta, button, DEFAULT_MOUSE_THRESHOLD);
 
         ImVec2 deltaDelta = { delta.x - lastDelta.x, delta.y - lastDelta.y };
-        me->onDrag(me, button, deltaDelta, me->onDragUserdata);
+        window_callDrag(me, button, deltaDelta);
         me->lastDragDelta[button] = delta;
     }
 }
 
 void window_handleKeyEvent(Window* me, SDL_Keysym sym, bool isDown)
 {
-    if (isDown && me->onKey.down != NULL)
-        me->onKey.down(me, sym, me->onKey.userdata);
-    if (!isDown && me->onKey.up != NULL)
-        me->onKey.up(me, sym, me->onKey.userdata);
+    if (isDown)
+        window_callKeyDown(me, sym);
+    else
+        window_callKeyUp(me, sym);
 }
 
 GRect window_getBounds(const Window* me)
@@ -164,22 +158,6 @@ void window_setInitialBounds(Window* me, GRect bounds)
         me->currentSize = me->initialSize;
 }
 
-void window_setUpdateCallbacks(Window* me, WindowUpdateCallbacks callbacks)
-{
-    me->onUpdate = callbacks;
-}
-
-void window_setDragCallback(Window* me, WindowDragCallback callback, void* userdata)
-{
-    me->onDrag = callback;
-    me->onDragUserdata = userdata;
-}
-
-void window_setKeyCallbacks(Window* me, WindowKeyCallbacks callbacks)
-{
-    me->onKey = callbacks;
-}
-
 void window_updateMenubar(Window* me)
 {
     bool isOpen = (me->openState == WindowOpenState_Open);
@@ -189,12 +167,65 @@ void window_updateMenubar(Window* me)
         window_setOpenState(me, isOpen ? WindowOpenState_Open : WindowOpenState_Closed);
 }
 
-void window_addDestructor(Window* me, WindowDestructorCallback callback, void* userdata)
+void window_addCallbacks(Window* me, WindowCallbacks callbacks)
 {
-    assert(me->destructorCount < MAX_DESTRUCTORS);
-    me->destructors[me->destructorCount] = (WindowDestructor) {
-        .callback = callback,
-        .userdata = userdata
-    };
-    me->destructorCount++;
+    assert(me->callbackCount < MAX_CALLBACKS);
+    me->callbacks[me->callbackCount] = callbacks;
+    me->callbackCount++;
+}
+
+void window_callDestructor(Window* me)
+{
+    for (int i = 0; i < me->callbackCount; i++) {
+        if (me->callbacks[i].destruct)
+            me->callbacks[i].destruct(me->callbacks[i].userdata);
+    }
+}
+
+void window_callBeforeUpdate(Window* me)
+{
+    for (int i = 0; i < me->callbackCount; i++) {
+        if (me->callbacks[i].beforeUpdate)
+            me->callbacks[i].beforeUpdate(me->callbacks[i].userdata);
+    }
+}
+
+void window_callContentUpdate(Window* me)
+{
+    for (int i = 0; i < me->callbackCount; i++) {
+        if (me->callbacks[i].contentUpdate)
+            me->callbacks[i].contentUpdate(me->callbacks[i].userdata);
+    }
+}
+
+void window_callAfterUpdate(Window* me)
+{
+    for (int i = 0; i < me->callbackCount; i++) {
+        if (me->callbacks[i].afterUpdate)
+            me->callbacks[i].afterUpdate(me->callbacks[i].userdata);
+    }
+}
+
+void window_callDrag(Window* me, int mouseKey, ImVec2 delta)
+{
+    for (int i = 0; i < me->callbackCount; i++) {
+        if (me->callbacks[i].drag)
+            me->callbacks[i].drag(mouseKey, delta, me->callbacks[i].userdata);
+    }
+}
+
+void window_callKeyDown(Window* me, SDL_Keysym sym)
+{
+    for (int i = 0; i < me->callbackCount; i++) {
+        if (me->callbacks[i].keyDown)
+            me->callbacks[i].keyDown(sym, me->callbacks[i].userdata);
+    }
+}
+
+void window_callKeyUp(Window* me, SDL_Keysym sym)
+{
+    for (int i = 0; i < me->callbackCount; i++) {
+        if (me->callbacks[i].keyUp)
+            me->callbacks[i].keyUp(sym, me->callbacks[i].userdata);
+    }
 }
