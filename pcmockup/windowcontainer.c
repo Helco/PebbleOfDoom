@@ -147,7 +147,7 @@ static bool findInStringArray(const char *const * array, const char* string)
     return false;
 }
 
-static const char *const * windowContainer_findUniqueMenubarSections(WindowContainer* me)
+static const char** windowContainer_findUniqueMenubarSections(WindowContainer* me)
 {
     const int sectionsByteSize = (me->menubarHandlerCount + 1) * sizeof(const char*);
     const char** sectionNames = (const char**)malloc(sectionsByteSize);
@@ -178,7 +178,8 @@ static void windowContainer_updateMainMenubar(WindowContainer* me)
     if (!igBeginMainMenuBar())
         return;
 
-    const char *const * curSectionName = windowContainer_findUniqueMenubarSections(me);
+    const char** sectionNames = windowContainer_findUniqueMenubarSections(me);
+    const char** curSectionName = sectionNames;
     while (*curSectionName != NULL) {
         if (igBeginMenu(*curSectionName, true)) {
             windowContainer_updateMainMenubarSection(me, *curSectionName);
@@ -186,6 +187,7 @@ static void windowContainer_updateMainMenubar(WindowContainer* me)
         }
         curSectionName++;
     }
+    free(sectionNames);
     windowContainer_updateMainMenubarSection(me, NULL);
 
     igEndMainMenuBar();
@@ -255,13 +257,15 @@ void windowContainer_freeWindow(WindowContainer* me, Window* window)
     int index = windowContainer_findWindowIndex(me, window);
     if (index < 0)
         return;
-    window_free(window);
     int windowsAfter = me->windowCount - index - 1;
     memmove(me->windows + index, me->windows + index + 1, windowsAfter * sizeof(Window*));
     me->windowCount--;
+    window_free(window);
 
     int menubarIndex = windowContainer_findMenubarHandlerIndex(me, window);
     if (menubarIndex >= 0) {
+        if (me->menubarHandlers[menubarIndex].section != NULL)
+            free(me->menubarHandlers[menubarIndex].section);
         int handlersAfter = me->menubarHandlerCount - menubarIndex - 1;
         memmove(
             me->menubarHandlers + menubarIndex,
