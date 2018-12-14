@@ -143,10 +143,6 @@ void pcmockup_updateMainMenubar(PCMockup* me)
 void pcmockup_update(PCMockup *me)
 {
     windowContainer_startUpdate(me->windowContainer);
-    GColor *framebuffer = pebbleWindow_getPebbleFramebuffer(me->pebbleWindow);
-    pebbleWindow_startUpdate(me->pebbleWindow);
-    renderer_render(me->renderer, framebuffer);
-    pebbleWindow_endUpdate(me->pebbleWindow);
     pcmockup_updateMainMenubar(me);
     windowContainer_endUpdate(me->windowContainer);
 

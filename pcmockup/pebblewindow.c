@@ -16,6 +16,7 @@ struct PebbleWindow
 };
 
 void pebbleWindow_free(void* userdata);
+void pebbleWindow_contentUpdate(void* userdata);
 void pebbleWindow_onKeyDown(SDL_Keysym sym, void* userdata);
 
 PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds, GSize pebbleSize, Renderer* renderer)
@@ -34,6 +35,7 @@ PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds,
     }
     window_addCallbacks(imageWindow_asWindow(me->window), (WindowCallbacks) {
         .destruct = pebbleWindow_free,
+        .contentUpdate = pebbleWindow_contentUpdate,
         .keyDown = pebbleWindow_onKeyDown,
         .userdata = me
     });
@@ -115,13 +117,11 @@ static void prv_pebbleWindow_convertPebbleToTexture(PebbleWindow* me)
     }
 }
 
-void pebbleWindow_startUpdate(PebbleWindow* me)
+void pebbleWindow_contentUpdate(void* userdata)
 {
+    PebbleWindow* me = (PebbleWindow*)userdata;
     safeFramebuffer_prepare(me->framebuffer);
-}
-
-void pebbleWindow_endUpdate(PebbleWindow* me)
-{
+    renderer_render(me->renderer, pebbleWindow_getPebbleFramebuffer(me));
     safeFramebuffer_check(me->framebuffer);
     prv_pebbleWindow_convertPebbleToTexture(me);
     imageWindow_setImageData(me->window, me->pebbleSize, me->textureData);

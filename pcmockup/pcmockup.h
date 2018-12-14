@@ -38,8 +38,6 @@ void safeFramebuffer_check(SafeFramebuffer* me);
 
 typedef struct PebbleWindow PebbleWindow;
 PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds, GSize pebbleSize, Renderer* renderer);
-void pebbleWindow_startUpdate(PebbleWindow* me);
-void pebbleWindow_endUpdate(PebbleWindow* me);
 GColor* pebbleWindow_getPebbleFramebuffer(PebbleWindow* window);
 ImageWindow* pebbleWindow_asImageWindow(PebbleWindow* window);
 
