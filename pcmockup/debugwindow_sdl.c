@@ -48,6 +48,7 @@ DebugWindowSDL* debugWindowSDL_init(WindowContainer* parent, SDL_Rect bounds, co
         debugWindowSDL_free(me);
         return NULL;
     }
+    window_setMenubarSection(imageWindow_asWindow(me->window), "Debug windows");
     window_addCallbacks(imageWindow_asWindow(me->window), (WindowCallbacks) {
         .destruct = debugWindowSDL_free,
         .drag = debugWindowSDL_onDrag,
@@ -56,7 +57,6 @@ DebugWindowSDL* debugWindowSDL_init(WindowContainer* parent, SDL_Rect bounds, co
         .mainMenubar = debugWindowSDL_updateMenubar,
         .userdata = me
     });
-    window_setMenubarSection(imageWindow_asWindow(me->window), "Debug windows");
 
     me->surface = createSDLSurface(bounds.w, bounds.h, SDL_PIXELFORMAT_ABGR8888);
     if (me->surface == NULL)

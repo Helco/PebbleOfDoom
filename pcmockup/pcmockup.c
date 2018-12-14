@@ -18,8 +18,10 @@ struct PCMockup
 };
 
 bool pcmockup_initDebugWindowSDL(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* renderer);
+bool pcmockup_initDebugWindowImGui(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* renderer);
 static const DebugWindowConstructor debugWindowConstructors[] = {
-    [DebugViewType_SDL] = pcmockup_initDebugWindowSDL
+    [DebugViewType_SDL] = pcmockup_initDebugWindowSDL,
+    [DebugViewType_ImGui] = pcmockup_initDebugWindowImGui
 };
 
 void pcmockup_updateMainMenubar(void* userdata);
@@ -257,4 +259,9 @@ Uint32 getWindowIDByEvent(const SDL_Event* ev)
 bool pcmockup_initDebugWindowSDL(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* renderer)
 {
     return debugWindowSDL_init(parent, bounds, view, renderer) != NULL;
+}
+
+bool pcmockup_initDebugWindowImGui(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* renderer)
+{
+    return debugWindowImGui_init(parent, bounds, view, renderer) != NULL;
 }
