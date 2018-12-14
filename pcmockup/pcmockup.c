@@ -147,7 +147,6 @@ void pcmockup_update(PCMockup *me)
     pebbleWindow_startUpdate(me->pebbleWindow);
     renderer_render(me->renderer, framebuffer);
     pebbleWindow_endUpdate(me->pebbleWindow);
-    debugWindowSet_update(me->debugWindowSet);
     pcmockup_updateMainMenubar(me);
     windowContainer_endUpdate(me->windowContainer);
 

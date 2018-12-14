@@ -45,14 +45,12 @@ ImageWindow* pebbleWindow_asImageWindow(PebbleWindow* window);
 
 typedef struct DebugWindow DebugWindow;
 DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* debugView, Renderer* renderer);
-void debugWindow_update(DebugWindow* window);
 const DebugView* debugWindow_getDebugView(const DebugWindow* window);
 ImageWindow* debugWindow_asImageWindow(DebugWindow* window);
 
 typedef struct DebugWindowSet DebugWindowSet;
 DebugWindowSet* debugWindowSet_init(WindowContainer* parent, const WindowGrid* grid, Renderer* renderer);
 void debugWindowSet_free(DebugWindowSet* set);
-void debugWindowSet_update(DebugWindowSet* set);
 void debugWindowSet_updateMenubar(DebugWindowSet* me);
 
 typedef struct PCMockup PCMockup;

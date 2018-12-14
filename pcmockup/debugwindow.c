@@ -29,6 +29,7 @@ SDL_Surface* createSDLSurface(int w, int h, Uint32 format)
 }
 
 void debugWindow_free(void *userdata);
+void debugWindow_contentUpdate(void* userdata);
 void debugWindow_onDrag(int button, ImVec2 delta, void* userdata);
 void debugWindow_onKeyDown(SDL_Keysym sym, void* userdata);
 
@@ -50,6 +51,7 @@ DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const De
         .destruct = debugWindow_free,
         .drag = debugWindow_onDrag,
         .keyDown = debugWindow_onKeyDown,
+        .contentUpdate = debugWindow_contentUpdate,
         .userdata = me
     });
 
@@ -88,24 +90,17 @@ void debugWindow_free(void *userdata)
     free(me);
 }
 
-void debugWindow_startUpdate(DebugWindow* me)
+void debugWindow_contentUpdate(void* userdata)
 {
+    DebugWindow* me = (DebugWindow*)userdata;
     float scale = real_to_float(me->zoom);
     SDL_SetRenderDrawColor(me->renderer, 0, 0, 0, 255);
     SDL_RenderClear(me->renderer);
     SDL_RenderSetScale(me->renderer, scale, scale);
-}
 
-void debugWindow_endUpdate(DebugWindow* me)
-{
-    imageWindow_setImageData(me->window, GSize(me->surface->w, me->surface->h), (SDL_Color*)me->surface->pixels);
-}
-
-void debugWindow_update(DebugWindow* me)
-{
-    debugWindow_startUpdate(me);
     me->view->callback.sdl(me->podRenderer, me->renderer, me->offset, me->view->userdata);
-    debugWindow_endUpdate(me);
+
+    imageWindow_setImageData(me->window, GSize(me->surface->w, me->surface->h), (SDL_Color*)me->surface->pixels);
 }
 
 void debugWindow_updateOffset(DebugWindow* me)

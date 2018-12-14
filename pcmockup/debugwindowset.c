@@ -58,16 +58,6 @@ void debugWindowSet_free(DebugWindowSet* me)
     return;
 }
 
-void debugWindowSet_update(DebugWindowSet* me)
-{
-#ifdef DEBUG_WINDOWS
-    for (int i = 0; i < me->count; i++)
-    {
-        debugWindow_update(me->windows[i]);
-    }
-#endif
-}
-
 void debugWindowSet_updateMenubar(DebugWindowSet* me)
 {
 #ifdef DEBUG_WINDOWS
