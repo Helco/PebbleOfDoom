@@ -29,14 +29,6 @@ void imageWindow_toggle(ImageWindow* me, bool_t isOpen);
 bool_t imageWindow_isOpen(ImageWindow* me);
 Window* imageWindow_asWindow(ImageWindow* me);
 
-typedef struct WindowGrid
-{
-    int windowCount;
-    GSize totalSize;
-} WindowGrid;
-GSize windowGrid_getGridSize(const WindowGrid* grid);
-SDL_Rect windowGrid_getSingleBounds(const WindowGrid* grid, int windowI); // negative to select from end
-
 typedef struct SafeFramebuffer SafeFramebuffer;
 SafeFramebuffer* safeFramebuffer_init(GSize size, int canarySize); // canarySize in framebuffer sizes
 void safeFramebuffer_free(SafeFramebuffer* me);

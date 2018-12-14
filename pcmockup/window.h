@@ -58,4 +58,12 @@ Window* windowContainer_newWindow(WindowContainer* me, const char* title);
 Window* windowContainer_getFocusedWindow(WindowContainer* me);
 void windowContainer_handleEvent(WindowContainer* me, const SDL_Event* ev);
 
+typedef struct WindowGrid
+{
+    int windowCount;
+    GSize totalSize;
+} WindowGrid;
+GSize windowGrid_getGridSize(const WindowGrid* grid);
+SDL_Rect windowGrid_getSingleBounds(const WindowGrid* grid, int windowI); // negative to select from end
+
 #endif
