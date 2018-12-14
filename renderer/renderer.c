@@ -2,6 +2,9 @@
 #include "algebra.h"
 #include "platform.h"
 
+#define NEAR_PLANE 1.0f
+#define FAR_PLANE 500
+
 Renderer* renderer_init()
 {
     Renderer* me = (Renderer*)malloc(sizeof(Renderer));
@@ -12,21 +15,7 @@ Renderer* renderer_init()
     }
     memset(me, 0, sizeof(Renderer));
 
-    me->halfFov = real_degToRad(real_from_int(30));
-
-    xz_t nearPlane, farPlane;
-    nearPlane.z = real_from_float(1.0f);
-    farPlane.z = real_from_int(500);
-
-    const real_t tanHalfFov = real_tan(me->halfFov);
-    const real_t minus_one = real_from_int(-1);
-    nearPlane.x = real_mul(tanHalfFov, nearPlane.z);
-    farPlane.x = real_mul(tanHalfFov, farPlane.z);
-    me->leftFovSeg.start.xz = xz(real_mul(minus_one, nearPlane.x), nearPlane.z);
-    me->leftFovSeg.end.xz = xz(real_mul(minus_one, farPlane.x), farPlane.z);
-    me->rightFovSeg.start.xz = nearPlane;
-    me->rightFovSeg.end.xz = farPlane;
-    me->fovStuff = real_div(real_from_int(HALF_RENDERER_WIDTH), tanHalfFov);
+    renderer_setFieldOfView(me, real_degToRad(real_from_int(60)));
     me->eyeHeight = real_from_int(12);
 
     return me;
@@ -37,6 +26,26 @@ void renderer_free(Renderer* me)
     if (me == NULL)
         return;
     free(me);
+}
+
+void renderer_setFieldOfView(Renderer* me, real_t fov)
+{
+    me->fov = fov;
+    const real_t halfFoV = real_div(fov, real_from_int(2));
+
+    xz_t nearPlane, farPlane;
+    nearPlane.z = real_from_float(NEAR_PLANE);
+    farPlane.z = real_from_int(FAR_PLANE);
+
+    const real_t tanHalfFov = real_tan(halfFoV);
+    const real_t minus_one = real_from_int(-1);
+    nearPlane.x = real_mul(tanHalfFov, nearPlane.z);
+    farPlane.x = real_mul(tanHalfFov, farPlane.z);
+    me->leftFovSeg.start.xz = xz(real_mul(minus_one, nearPlane.x), nearPlane.z);
+    me->leftFovSeg.end.xz = xz(real_mul(minus_one, farPlane.x), farPlane.z);
+    me->rightFovSeg.start.xz = nearPlane;
+    me->rightFovSeg.end.xz = farPlane;
+    me->fovStuff = real_div(real_from_int(HALF_RENDERER_WIDTH), tanHalfFov);
 }
 
 void renderer_setLevel(Renderer* renderer, const Level* level)

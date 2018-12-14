@@ -20,7 +20,7 @@ struct Renderer
     const Level* level;
     Location location;
     real_t eyeHeight;
-    real_t fovStuff, halfFov;
+    real_t fovStuff, fov;
     lineSeg_t leftFovSeg, rightFovSeg;
     int yTop[RENDERER_WIDTH], yBottom[RENDERER_WIDTH];
     DrawRequestStack drawRequests;
@@ -32,6 +32,7 @@ void drawRequestStack_reset(DrawRequestStack* stack);
 void drawRequestStack_push(DrawRequestStack* stack, const Sector* sector, int left, int right, const Sector* sourceSector);
 const DrawRequest* drawRequestStack_pop(DrawRequestStack* stack);
 
+void renderer_setFieldOfView(Renderer* me, real_t newFov);
 void renderer_transformLine(const Renderer* me, const lineSeg_t* line, lineSeg_t* result);
 
 #endif
