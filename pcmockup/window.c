@@ -1,8 +1,16 @@
 #define _CRT_NONSTDC_NO_DEPRECATE
 #include "window_internal.h"
+#include <assert.h>
 
 #define MOUSE_BUTTON_COUNT 5 // even imgui uses this "magic" number
 #define DEFAULT_MOUSE_THRESHOLD -1.0f
+#define MAX_DESTRUCTORS 8
+
+typedef struct WindowDestructor
+{
+    WindowDestructorCallback callback;
+    void* userdata;
+} WindowDestructor;
 
 struct Window
 {
@@ -18,6 +26,8 @@ struct Window
     WindowUpdateCallbacks onUpdate;
     WindowDragCallback onDrag;
     WindowKeyCallbacks onKey;
+    WindowDestructor destructors[MAX_DESTRUCTORS];
+    int destructorCount;
 };
 
 Window* window_init()
@@ -37,6 +47,8 @@ void window_free(Window* me)
 {
     if (me == NULL)
         return;
+    for (int i = 0; i < me->destructorCount; i++)
+        me->destructors[i].callback(me, me->destructors[i].userdata);
     if (me->title != NULL)
         free(me->title);
     free(me);
@@ -175,4 +187,14 @@ void window_updateMenubar(Window* me)
     igMenuItemBoolPtr(me->title, NULL, isOpenPtr, true);
     if (isOpenPtr)
         window_setOpenState(me, isOpen ? WindowOpenState_Open : WindowOpenState_Closed);
+}
+
+void window_addDestructor(Window* me, WindowDestructorCallback callback, void* userdata)
+{
+    assert(me->destructorCount < MAX_DESTRUCTORS);
+    me->destructors[me->destructorCount] = (WindowDestructor) {
+        .callback = callback,
+        .userdata = userdata
+    };
+    me->destructorCount++;
 }

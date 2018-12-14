@@ -7,6 +7,7 @@
 #include "sdl.include.h"
 
 typedef struct Window Window;
+typedef void (*WindowDestructorCallback)(Window* window, void* userdata);
 typedef void (*WindowUpdateCallback)(Window* window, void* userdata);
 typedef struct WindowUpdateCallbacks
 {
@@ -46,6 +47,7 @@ void window_setUpdateCallbacks(Window* window, WindowUpdateCallbacks callbacks);
 void window_setDragCallback(Window* window, WindowDragCallback callback, void* userdata);
 void window_setKeyCallbacks(Window* window, WindowKeyCallbacks callbacks);
 void window_updateMenubar(Window* window);
+void window_addDestructor(Window* window, WindowDestructorCallback callback, void* userdata);
 
 typedef struct WindowContainer WindowContainer;
 WindowContainer* windowContainer_init(GSize windowSize);
