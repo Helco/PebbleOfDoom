@@ -71,6 +71,8 @@ ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect 
 void imageWindow_free(void* userdata)
 {
     ImageWindow* me = (ImageWindow*)userdata;
+    if (me->window != NULL)
+        window_scheduleFree(me->window);
     if (me->textureID != 0)
         glDeleteTextures(1, &me->textureID);
     free(me);

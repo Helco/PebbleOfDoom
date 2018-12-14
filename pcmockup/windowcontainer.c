@@ -156,10 +156,30 @@ Window* windowContainer_newWindow(WindowContainer* me, const char* title)
         me->windows = (Window**)realloc(me->windows, sizeof(Window*) * me->windowCapacity);
         assert(me->windows != NULL);
     }
-    Window* newWindow = window_init();
+    Window* newWindow = window_init(me);
     window_setTitle(newWindow, title);
     me->windows[me->windowCount++] = newWindow;
     return newWindow;
+}
+
+static int windowContainer_findWindowIndex(WindowContainer* me, const Window* window)
+{
+    for (int i = 0; i < me->windowCount; i++) {
+        if (me->windows[i] == window)
+            return i;
+    }
+    return -1;
+}
+
+void windowContainer_freeWindow(WindowContainer* me, Window* window)
+{
+    int index = windowContainer_findWindowIndex(me, window);
+    if (index < 0)
+        return;
+    window_free(window);
+
+    int windowsAfter = me->windowCount - index - 1;
+    memmove(me->windows + index, me->windows + index + 1, windowsAfter * sizeof(Window*));
 }
 
 Window* windowContainer_getFocusedWindow(WindowContainer* me)

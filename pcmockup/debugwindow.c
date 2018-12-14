@@ -79,6 +79,8 @@ DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const De
 void debugWindow_free(void *userdata)
 {
     DebugWindow* me = (DebugWindow*)userdata;
+    if (me->window != NULL)
+        window_scheduleFree(imageWindow_asWindow(me->window));
     if (me->surface != NULL)
         SDL_FreeSurface(me->surface);
     if (me->renderer != NULL)

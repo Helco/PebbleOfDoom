@@ -33,6 +33,7 @@ typedef enum WindowOpenState
 
 Uint32 getWindowIDByEvent(const SDL_Event* ev);
 
+void window_scheduleFree(Window* window);
 GRect window_getBounds(const Window* window);
 bool window_isFocused(const Window* window);
 WindowOpenState window_getOpenState(const Window* window);
@@ -49,6 +50,7 @@ void windowContainer_free(WindowContainer* me);
 void windowContainer_startUpdate(WindowContainer* me);
 void windowContainer_endUpdate(WindowContainer* me);
 Window* windowContainer_newWindow(WindowContainer* me, const char* title);
+void windowContainer_freeWindow(WindowContainer* me, Window* window);
 Window* windowContainer_getFocusedWindow(WindowContainer* me);
 void windowContainer_handleEvent(WindowContainer* me, const SDL_Event* ev);
 

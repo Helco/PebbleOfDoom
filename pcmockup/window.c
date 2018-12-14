@@ -8,6 +8,7 @@
 
 struct Window
 {
+    WindowContainer* parent;
     char* title;
     ImVec2 currentPos, currentSize;
     ImVec2 initialPos, initialSize;
@@ -18,6 +19,7 @@ struct Window
 
     WindowCallbacks callbacks[MAX_CALLBACKS];
     int callbackCount;
+    bool isDestructing;
 };
 
 void window_callDestructor(Window* me);
@@ -28,23 +30,30 @@ void window_callDrag(Window* me, int mouseKey, ImVec2 delta);
 void window_callKeyDown(Window* me, SDL_Keysym sym);
 void window_callKeyUp(Window* me, SDL_Keysym sym);
 
-Window* window_init()
+Window* window_init(WindowContainer* parent)
 {
     Window* me = (Window*)malloc(sizeof(Window));
     if (me == NULL)
         return NULL;
     memset(me, 0, sizeof(Window));
 
+    me->parent = parent;
     me->initialPos = me->currentPos = (ImVec2) { -1, -1 };
     me->initialSize = me->currentSize = (ImVec2) { -1, -1 };
     window_setTitle(me, "");
     return me;
 }
 
+void window_scheduleFree(Window* me)
+{
+    windowContainer_freeWindow(me->parent, me);
+}
+
 void window_free(Window* me)
 {
-    if (me == NULL)
+    if (me == NULL || me->isDestructing)
         return;
+    me->isDestructing = true;
     window_callDestructor(me);
     if (me->title != NULL)
         free(me->title);
@@ -176,7 +185,8 @@ void window_addCallbacks(Window* me, WindowCallbacks callbacks)
 
 void window_callDestructor(Window* me)
 {
-    for (int i = 0; i < me->callbackCount; i++) {
+    // call destructors in reverse for more predictable
+    for (int i = me->callbackCount - 1; i >= 0; i--) {
         if (me->callbacks[i].destruct)
             me->callbacks[i].destruct(me->callbacks[i].userdata);
     }
