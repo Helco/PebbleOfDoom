@@ -46,6 +46,7 @@ typedef struct DebugView
         DebugViewCallback_SDL sdl;
         DebugViewCallback_ImGui imgui;
     } callback;
+    bool_t startsOpened;
     const void* userdata; // given to the callbacks
 } DebugView;
 

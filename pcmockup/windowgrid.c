@@ -41,7 +41,7 @@ GSize windowGrid_getGridSize(const WindowGrid* grid)
         h = i / 2;
         w = h + (i % 2);
         i++;
-    } while(w * h <= grid->windowCount);
+    } while(w * h < max(grid->windowCount, 2));
     return GSize(w, h);
 }
 

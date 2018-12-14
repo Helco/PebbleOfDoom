@@ -178,7 +178,8 @@ static const DebugView debugViews[] = {
         .name = "world-space",
         .type = DebugViewType_SDL,
         .callback = { .sdl = renderer_debug_renderWorld },
-        .userdata = &worldSpaceOptions
+        .userdata = &worldSpaceOptions,
+        .startsOpened = true
     },
     {
         .name = "player-space",
@@ -196,7 +197,8 @@ static const DebugView debugViews[] = {
         .name = "camera",
         .type = DebugViewType_ImGui,
         .callback = { .imgui = renderer_debug_cameraOptions },
-        .userdata = NULL
+        .userdata = NULL,
+        .startsOpened = true
     }
 };
 

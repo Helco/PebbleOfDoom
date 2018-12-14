@@ -49,6 +49,8 @@ DebugWindowSDL* debugWindowSDL_init(WindowContainer* parent, SDL_Rect bounds, co
         return NULL;
     }
     window_setMenubarSection(imageWindow_asWindow(me->window), "Debug windows");
+    window_setOpenState(imageWindow_asWindow(me->window), view->startsOpened
+        ? WindowOpenState_Open : WindowOpenState_Closed);
     window_addCallbacks(imageWindow_asWindow(me->window), (WindowCallbacks) {
         .destruct = debugWindowSDL_free,
         .drag = debugWindowSDL_onDrag,

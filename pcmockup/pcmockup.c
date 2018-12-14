@@ -26,6 +26,16 @@ static const DebugWindowConstructor debugWindowConstructors[] = {
 
 void pcmockup_updateMainMenubar(void* userdata);
 
+static int countOpenDebugWindows(Renderer* renderer)
+{
+    int count = 0;
+    for (int i = 0; i < renderer_getDebugCount(renderer); i++) {
+        if (renderer_getDebugViews(renderer)[i].startsOpened)
+            count++;
+    }
+    return count;
+}
+
 PCMockup *pcmockup_init()
 {
     PCMockup *me = (PCMockup *)malloc(sizeof(PCMockup));
@@ -42,7 +52,6 @@ PCMockup *pcmockup_init()
         pcmockup_free(me);
         return NULL;
     }
-    const int debugWindowCount = renderer_getDebugCount(me->renderer);
 
     me->level = level_load(0);
     if (me->level == NULL)
@@ -80,7 +89,7 @@ PCMockup *pcmockup_init()
         pcmockup_updateMainMenubar, "PCMockup", me);
 
     WindowGrid windowGrid;
-    windowGrid.windowCount = 1 + debugWindowCount;
+    windowGrid.windowCount = 1 + countOpenDebugWindows(me->renderer);
     windowGrid.totalSize = WINDOW_START_SIZE;
 
     PebbleWindow* pebbleWindow = pebbleWindow_init(
@@ -95,12 +104,14 @@ PCMockup *pcmockup_init()
         return NULL;
     }
 
-    for (int i = 0; i < debugWindowCount; i++)
+    int gridPlace = -1;
+    for (int i = 0; i < renderer_getDebugCount(me->renderer); i++)
     {
         const DebugView* debugView = &renderer_getDebugViews(me->renderer)[i];
+        const int curGridPlace = debugView->startsOpened ? gridPlace-- : -1 - i;
         if (!debugWindowConstructors[debugView->type](
             me->windowContainer,
-            windowGrid_getSingleBounds(&windowGrid, -1 - i),
+            windowGrid_getSingleBounds(&windowGrid, curGridPlace),
             debugView, me->renderer)) {
             pcmockup_free(me);
             return NULL;
