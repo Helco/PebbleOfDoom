@@ -118,8 +118,6 @@ void pcmockup_free(PCMockup *me)
         textureWindow_free(me->textureWindow);
     if (me->debugWindowSet != NULL)
         debugWindowSet_free(me->debugWindowSet);
-    if (me->pebbleWindow != NULL)
-        pebbleWindow_free(me->pebbleWindow);
     if (me->level != NULL)
         level_free(me->level);
     if (me->textureManager != NULL)

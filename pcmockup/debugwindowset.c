@@ -53,14 +53,7 @@ void debugWindowSet_free(DebugWindowSet* me)
     if (me == NULL)
         return;
     if (me->windows != NULL)
-    {
-        for (int i = 0; i < me->count; i++)
-        {
-            if (me->windows[i] != NULL)
-                debugWindow_free(me->windows[i]);
-        }
         free(me->windows);
-    }
     free(me);
     return;
 }

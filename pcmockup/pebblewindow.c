@@ -15,6 +15,7 @@ struct PebbleWindow
     GSize pebbleSize;
 };
 
+void pebbleWindow_dtor(Window* window, void* userdata);
 void pebbleWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata);
 
 PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds, GSize pebbleSize, Renderer* renderer)
@@ -28,19 +29,20 @@ PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds,
     me->window = imageWindow_init(parent, "Pebble screen", b, true);
     if (me->window == NULL)
     {
-        pebbleWindow_free(me);
+        pebbleWindow_dtor(NULL, me);
         return NULL;
     }
     window_setKeyCallbacks(imageWindow_asWindow(me->window), (WindowKeyCallbacks) {
         .down = pebbleWindow_onKeyDown,
         .userdata = me
     });
+    window_addDestructor(imageWindow_asWindow(me->window), pebbleWindow_dtor, me);
 
     me->textureData = (SDL_Color*)malloc(sizeof(SDL_Color) * pebbleSize.w * pebbleSize.h);
     if (me->textureData == NULL)
     {
         fprintf(stderr, "Could not allocate pebble texture!\n");
-        pebbleWindow_free(me);
+        pebbleWindow_dtor(NULL, me);
         return NULL;
     }
 
@@ -48,14 +50,14 @@ PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds,
     if (me->texturePixelFormat == NULL)
     {
         fprintf(stderr, "SDL_AllocFormat: %s\n", SDL_GetError());
-        pebbleWindow_free(me);
+        pebbleWindow_dtor(NULL, me);
         return NULL;
     }
 
     me->framebuffer = safeFramebuffer_init(pebbleSize, CANARY_BUFFER_SIZE);
     if (me->framebuffer == NULL)
     {
-        pebbleWindow_free(me);
+        pebbleWindow_dtor(NULL, me);
         return NULL;
     }
 
@@ -64,10 +66,10 @@ PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds,
     return me;
 }
 
-void pebbleWindow_free(PebbleWindow* me)
+void pebbleWindow_dtor(Window* window, void* userdata)
 {
-    if (me == NULL)
-        return;
+    UNUSED(window);
+    PebbleWindow* me = (PebbleWindow*)userdata;
     if (me->textureData != NULL)
         free(me->textureData);
     if (me->framebuffer != NULL)
