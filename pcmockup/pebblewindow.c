@@ -34,6 +34,7 @@ PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds,
         return NULL;
     }
     window_addCallbacks(imageWindow_asWindow(me->window), (WindowCallbacks) {
+        .tag = PebbleWindow_Tag,
         .destruct = pebbleWindow_free,
         .contentUpdate = pebbleWindow_contentUpdate,
         .keyDown = pebbleWindow_onKeyDown,

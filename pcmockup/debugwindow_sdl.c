@@ -52,6 +52,7 @@ DebugWindowSDL* debugWindowSDL_init(WindowContainer* parent, SDL_Rect bounds, co
     window_setOpenState(imageWindow_asWindow(me->window), view->startsOpened
         ? WindowOpenState_Open : WindowOpenState_Closed);
     window_addCallbacks(imageWindow_asWindow(me->window), (WindowCallbacks) {
+        .tag = DebugWindow_Tag,
         .destruct = debugWindowSDL_free,
         .drag = debugWindowSDL_onDrag,
         .keyDown = debugWindowSDL_onKeyDown,

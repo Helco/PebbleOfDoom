@@ -12,6 +12,7 @@ typedef void (*WindowUpdateCallback)(void* userdata);
 typedef void (*WindowDragCallback)(int mouseKey, ImVec2 delta, void* userdata);
 typedef void (*WindowKeyCallback)(SDL_Keysym sym, void* userdata);
 typedef struct WindowCallbacks {
+    uint32_t tag;
     void* userdata;
     WindowDestructorCallback destruct;
     WindowUpdateCallback
@@ -39,6 +40,7 @@ GRect window_getBounds(const Window* window);
 bool window_isFocused(const Window* window);
 WindowOpenState window_getOpenState(const Window* window);
 const char* window_getMenubarSection(const Window* window);
+bool window_hasTag(const Window* window, uint32_t tag);
 void window_setTitle(Window* window, const char* title);
 void window_setFlags(Window* window, ImGuiWindowFlags flags);
 void window_setOpenState(Window* window, WindowOpenState state);
@@ -57,6 +59,8 @@ Window* windowContainer_getFocusedWindow(WindowContainer* me);
 void windowContainer_handleEvent(WindowContainer* me, const SDL_Event* ev);
 void windowContainer_addMenubarHandler(WindowContainer* me, WindowUpdateCallback callback,
     const char* section, void* userdata);
+int windowContainer_getWindowCount(const WindowContainer* me);
+Window* windowContainer_getWindowByIndex(WindowContainer* me, int index);
 
 typedef struct WindowGrid
 {

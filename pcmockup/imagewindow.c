@@ -41,6 +41,7 @@ ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect 
         ImGuiWindowFlags_NoScrollWithMouse |
         ImGuiWindowFlags_NoCollapse);
     window_addCallbacks(me->window, (WindowCallbacks) {
+        .tag = ImageWindow_Tag,
         .destruct = imageWindow_free,
         .beforeUpdate = imageWindow_beforeUpdate,
         .contentUpdate = imageWindow_contentUpdate,

@@ -329,3 +329,14 @@ char** windowContainer_getMenubarSectionPtr(WindowContainer* me, const Window* w
     assert(menubarIndex >= 0);
     return &me->menubarHandlers[menubarIndex].section;
 }
+
+int windowContainer_getWindowCount(const WindowContainer* me)
+{
+    return me->windowCount;
+}
+
+Window* windowContainer_getWindowByIndex(WindowContainer* me, int index)
+{
+    assert(index >= 0 && index < me->windowCount);
+    return me->windows[index];
+}

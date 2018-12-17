@@ -37,6 +37,7 @@ DebugWindowImGui* debugWindowImGui_init(WindowContainer* parent, SDL_Rect bounds
     window_setOpenState(me->window, view->startsOpened
         ? WindowOpenState_Open : WindowOpenState_Closed);
     window_addCallbacks(me->window, (WindowCallbacks) {
+        .tag = DebugWindow_Tag,
         .destruct = debugWindowImGui_free,
         .contentUpdate = debugWindowImGui_contentUpdate,
         .mainMenubar = debugWindowImGui_updateMenubar,

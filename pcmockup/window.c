@@ -143,6 +143,15 @@ const char* window_getMenubarSection(const Window* me)
     return *windowContainer_getMenubarSectionPtr(me->parent, me);
 }
 
+bool window_hasTag(const Window* window, uint32_t tag)
+{
+    for (int i = 0; i < window->callbackCount; i++) {
+        if (window->callbacks[i].tag == tag)
+            return true;
+    }
+    return false;
+}
+
 bool window_isFocused(const Window* me)
 {
     return me->isFocused;
