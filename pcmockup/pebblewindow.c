@@ -73,7 +73,7 @@ void pebbleWindow_free(void* userdata)
 {
     PebbleWindow* me = (PebbleWindow*)userdata;
     if (me->window != NULL)
-        window_scheduleFree(imageWindow_asWindow(me->window));
+        window_free(imageWindow_asWindow(me->window));
     if (me->textureData != NULL)
         free(me->textureData);
     if (me->framebuffer != NULL)

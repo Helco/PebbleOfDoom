@@ -88,7 +88,7 @@ void debugWindowSDL_free(void *userdata)
 {
     DebugWindowSDL* me = (DebugWindowSDL*)userdata;
     if (me->window != NULL)
-        window_scheduleFree(imageWindow_asWindow(me->window));
+        window_free(imageWindow_asWindow(me->window));
     if (me->surface != NULL)
         SDL_FreeSurface(me->surface);
     if (me->renderer != NULL)

@@ -47,12 +47,12 @@ Window* window_init(WindowContainer* parent)
     return me;
 }
 
-void window_scheduleFree(Window* me)
+void window_free(Window* me)
 {
     windowContainer_freeWindow(me->parent, me);
 }
 
-void window_free(Window* me)
+void window_internal_free(Window* me)
 {
     if (me == NULL || me->isDestructing)
         return;

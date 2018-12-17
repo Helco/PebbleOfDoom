@@ -260,7 +260,7 @@ void windowContainer_freeWindow(WindowContainer* me, Window* window)
     int windowsAfter = me->windowCount - index - 1;
     memmove(me->windows + index, me->windows + index + 1, windowsAfter * sizeof(Window*));
     me->windowCount--;
-    window_free(window);
+    window_internal_free(window);
 
     int menubarIndex = windowContainer_findMenubarHandlerIndex(me, window);
     if (menubarIndex >= 0) {

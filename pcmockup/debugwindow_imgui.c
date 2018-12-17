@@ -53,7 +53,7 @@ void debugWindowImGui_free(void* userdata)
 {
     DebugWindowImGui* me = (DebugWindowImGui*)userdata;
     if (me->window != NULL)
-        window_scheduleFree(me->window);
+        window_free(me->window);
     free(me);
 }
 
