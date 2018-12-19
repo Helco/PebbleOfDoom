@@ -91,29 +91,29 @@ bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg, TexCoord* texC
     real_t wallPhaseRight = intersectsRight ? xz_linePhase(*wallSeg, rightIntersection) : real_zero;
     bool_t inWallSegLeft = real_inBetween(wallPhaseLeft, real_zero, real_one);
     bool_t inWallSegRight = real_inBetween(wallPhaseRight, real_zero, real_one);
+    real_t texCoordAmpl = real_abs(real_sub(texCoord->start.x, texCoord->end.x));
+    real_t texCoordStart = real_min(texCoord->start.x, texCoord->end.x);
     bool_t result = true;
 
     if (real_compare(wallSeg->start.xz.z, me->leftFovSeg.start.xz.z) <= 0)
     {
-
-        wallSeg->start.xz = (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft)
-            ? leftIntersection
+        bool_t useRightIntersection = (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight);
+        wallSeg->start.xz = useRightIntersection
+           ? leftIntersection
             : inWallSegRight ? rightIntersection : (result = false, xz_zero);
+        if (useRightIntersection)
+            texCoord->start.x = real_add(real_mul(wallPhaseRight, texCoordAmpl), texCoordStart);
     }
 
     if (real_compare(wallSeg->end.xz.z, me->leftFovSeg.start.xz.z) <= 0)
     {
-        wallSeg->end.xz = (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight)
+        bool_t useLeftIntersection = (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft);
+        wallSeg->end.xz = useLeftIntersection
             ? rightIntersection
             : inWallSegLeft ? leftIntersection : (result = false, xz_zero);
+        if (useLeftIntersection)
+            texCoord->end.x = real_add(real_mul(wallPhaseLeft, texCoordAmpl), texCoordStart);
     }
-
-    real_t texCoordAmpl = real_abs(real_sub(texCoord->start.x, texCoord->end.x));
-    real_t texCoordStart = real_min(texCoord->start.x, texCoord->end.x);
-    if (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight)
-        texCoord->start.x = real_add(real_mul(wallPhaseRight, texCoordAmpl), texCoordStart);
-    if (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft)
-        texCoord->end.x = real_add(real_mul(wallPhaseLeft, texCoordAmpl), texCoordStart);
     return result;
 }
 
@@ -145,7 +145,6 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
     const Sector* const sector = request->sector;
     const Wall* const wall = &sector->walls[wallIndex];
     const real_t nearPlane = me->leftFovSeg.start.xz.z;
-    const Texture* texture = texture_load(me->textureManager, wall->texture);
 
     lineSeg_t wallSeg;
     renderer_transformWall(me, sector, wallIndex, &wallSeg);
@@ -171,7 +170,7 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
     }
 
     // render wall
-    const Texture* texture = texture_load(me->textureManager, wall->texture);
+    const Texture* const texture = texture_load(me->textureManager, wall->texture);
     const int renderLeft = max(0, p.left.x);
     const int renderRight = min(RENDERER_WIDTH - 1, p.right.x);
     for (int x = renderLeft; x <= renderRight; x++) {
@@ -189,10 +188,14 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
             me->yTop[x] = yPortalEnd = clampi(yBottom, lerpi(portalNomEnd, 0, sector->height, yCurStart, yCurEnd), yTop);
         }
 
-        real_t xLerped = real_norm_lerp(real_from_int(x),
-            real_from_int(renderLeft), real_from_int(renderRight),
-            texCoord.start.x, texCoord.end.x);
-        int texCol = real_to_int(real_mul(xLerped, real_from_int(texture->size.w)));
+        real_t xNorm = real_div(real_from_int(x - p.left.x), real_from_int(p.right.x - p.left.x));
+        real_t invZLerped = real_lerp(xNorm, real_reciprocal(wallSeg.start.xz.z), real_reciprocal(wallSeg.end.xz.z));
+        real_t invTexLerped = real_lerp(xNorm,
+            real_div(texCoord.start.x, wallSeg.start.xz.z),
+            real_div(texCoord.end.x, wallSeg.end.xz.z)
+        );
+        real_t texLerped = real_div(invTexLerped, invZLerped);
+        int texCol = real_to_int(real_mul(texLerped, real_from_int(texture->size.w)));
 
         real_t yNormalized = yCurStart >= 0 ? real_zero
             : real_div(real_from_int(-yCurStart), real_from_int(yCurEnd - yCurStart));
