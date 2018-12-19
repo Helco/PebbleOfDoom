@@ -97,22 +97,22 @@ bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg, TexCoord* texC
 
     if (real_compare(wallSeg->start.xz.z, me->leftFovSeg.start.xz.z) <= 0)
     {
-        bool_t useRightIntersection = (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight);
-        wallSeg->start.xz = useRightIntersection
+        bool_t useLeftIntersection = (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft);
+        wallSeg->start.xz = useLeftIntersection
            ? leftIntersection
             : inWallSegRight ? rightIntersection : (result = false, xz_zero);
-        if (useRightIntersection)
-            texCoord->start.x = real_add(real_mul(wallPhaseRight, texCoordAmpl), texCoordStart);
+        if (useLeftIntersection)
+            texCoord->start.x = real_add(real_mul(wallPhaseLeft, texCoordAmpl), texCoordStart);
     }
 
     if (real_compare(wallSeg->end.xz.z, me->leftFovSeg.start.xz.z) <= 0)
     {
-        bool_t useLeftIntersection = (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft);
-        wallSeg->end.xz = useLeftIntersection
+        bool_t useRightIntersection = (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight);
+        wallSeg->end.xz = useRightIntersection
             ? rightIntersection
             : inWallSegLeft ? leftIntersection : (result = false, xz_zero);
-        if (useLeftIntersection)
-            texCoord->end.x = real_add(real_mul(wallPhaseLeft, texCoordAmpl), texCoordStart);
+        if (useRightIntersection)
+            texCoord->end.x = real_add(real_mul(wallPhaseRight, texCoordAmpl), texCoordStart);
     }
     return result;
 }
@@ -171,12 +171,12 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
 
     // render wall
     const Texture* const texture = texture_load(me->textureManager, wall->texture);
-    const int renderLeft = max(0, p.left.x);
-    const int renderRight = min(RENDERER_WIDTH - 1, p.right.x);
+    const int renderLeft = max(request->left, p.left.x);
+    const int renderRight = min(request->right, p.right.x);
     for (int x = renderLeft; x <= renderRight; x++) {
         const int yBottom = me->yBottom[x];
         const int yTop = me->yTop[x];
-        GColor* curPixel = framebuffer + x * RENDERER_HEIGHT;
+        GColor* curPixel = framebuffer + x * RENDERER_HEIGHT + yBottom;
         int yCurStart = lerpi(x, p.left.x, p.right.x, p.left.yStart, p.right.yStart);
         int yCurEnd = lerpi(x, p.left.x, p.right.x, p.left.yEnd, p.right.yEnd);
         if (yCurEnd < yBottom || yCurStart > yTop || yCurStart >= yCurEnd)
