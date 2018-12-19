@@ -66,7 +66,7 @@ void renderer_renderDebugSector(Renderer* me, SDL_Renderer* sdlRenderer, xz_t of
         lineSeg_t wallLine;
         wallLine.start.xz = curWall->startCorner;
         wallLine.end.xz = sector->walls[(i + 1) % sector->wallCount].startCorner;
-        renderer_setDebugColor(sdlRenderer, curWall->color);
+        renderer_setDebugColor(sdlRenderer, GColorFromRGB((i % 3 == 0) * 255, (i % 3 == 1) * 255, (i % 3 == 2) * 255));
         renderer_renderSDLDebugLine(me, sdlRenderer, offset, wallLine, opts);
     }
 }

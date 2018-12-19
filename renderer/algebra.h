@@ -63,6 +63,7 @@ real_t real_max(real_t a, real_t b);
 real_t real_abs(real_t a);
 int real_signInt(real_t a);
 real_t real_lerp(real_t value, real_t start, real_t end); // input amplitude is normal 1
+real_t real_norm_lerp(real_t value, real_t inputStart, real_t inputEnd, real_t outputStart, real_t outputEnd);
 real_t real_clamp(real_t minimum, real_t value, real_t maximum);
 
 real_t real_floor(real_t a);

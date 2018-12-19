@@ -82,7 +82,7 @@ typedef struct
     } left, right;
 } WallSection;
 
-bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
+bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg, TexCoord* texCoord)
 {
     xz_t leftIntersection, rightIntersection;
     bool_t intersectsLeft = xz_lineIntersect(*wallSeg, me->leftFovSeg, &leftIntersection);
@@ -91,23 +91,29 @@ bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg)
     real_t wallPhaseRight = intersectsRight ? xz_linePhase(*wallSeg, rightIntersection) : real_zero;
     bool_t inWallSegLeft = real_inBetween(wallPhaseLeft, real_zero, real_one);
     bool_t inWallSegRight = real_inBetween(wallPhaseRight, real_zero, real_one);
+    real_t texCoordAmpl = real_abs(real_sub(texCoord->start.x, texCoord->end.x));
+    real_t texCoordStart = real_min(texCoord->start.x, texCoord->end.x);
     bool_t result = true;
 
     if (real_compare(wallSeg->start.xz.z, me->leftFovSeg.start.xz.z) <= 0)
     {
-
-        wallSeg->start.xz = (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft)
-            ? leftIntersection
+        bool_t useLeftIntersection = (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft);
+        wallSeg->start.xz = useLeftIntersection
+           ? leftIntersection
             : inWallSegRight ? rightIntersection : (result = false, xz_zero);
+        if (useLeftIntersection)
+            texCoord->start.x = real_add(real_mul(wallPhaseLeft, texCoordAmpl), texCoordStart);
     }
 
     if (real_compare(wallSeg->end.xz.z, me->leftFovSeg.start.xz.z) <= 0)
     {
-        wallSeg->end.xz = (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight)
+        bool_t useRightIntersection = (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight);
+        wallSeg->end.xz = useRightIntersection
             ? rightIntersection
             : inWallSegLeft ? leftIntersection : (result = false, xz_zero);
+        if (useRightIntersection)
+            texCoord->end.x = real_add(real_mul(wallPhaseRight, texCoordAmpl), texCoordStart);
     }
-
     return result;
 }
 
@@ -139,12 +145,14 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
     const Sector* const sector = request->sector;
     const Wall* const wall = &sector->walls[wallIndex];
     const real_t nearPlane = me->leftFovSeg.start.xz.z;
+
     lineSeg_t wallSeg;
     renderer_transformWall(me, sector, wallIndex, &wallSeg);
     if (real_compare(wallSeg.start.xz.z, nearPlane) < 0 && real_compare(wallSeg.end.xz.z, nearPlane) < 0)
         return;
 
-    if (!renderer_clipByFov(me, &wallSeg))
+    TexCoord texCoord = wall->texCoord;
+    if (!renderer_clipByFov(me, &wallSeg, &texCoord))
         return;
 
     WallSection p;
@@ -162,7 +170,10 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
     }
 
     // render wall
-    for (int x = max(request->left, p.left.x); x <= min(request->right, p.right.x); x++) {
+    const Texture* const texture = texture_load(me->textureManager, wall->texture);
+    const int renderLeft = max(request->left, p.left.x);
+    const int renderRight = min(request->right, p.right.x);
+    for (int x = renderLeft; x <= renderRight; x++) {
         const int yBottom = me->yBottom[x];
         const int yTop = me->yTop[x];
         GColor* curPixel = framebuffer + x * RENDERER_HEIGHT + yBottom;
@@ -177,21 +188,54 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
             me->yTop[x] = yPortalEnd = clampi(yBottom, lerpi(portalNomEnd, 0, sector->height, yCurStart, yCurEnd), yTop);
         }
 
+        real_t xNorm = real_div(real_from_int(x - p.left.x), real_from_int(p.right.x - p.left.x));
+        real_t invZLerped = real_lerp(xNorm, real_reciprocal(wallSeg.start.xz.z), real_reciprocal(wallSeg.end.xz.z));
+        real_t invTexLerped = real_lerp(xNorm,
+            real_div(texCoord.start.x, wallSeg.start.xz.z),
+            real_div(texCoord.end.x, wallSeg.end.xz.z)
+        );
+        real_t texLerped = real_div(invTexLerped, invZLerped);
+        int texCol = real_to_int(real_mul(texLerped, real_from_int(texture->size.w)));
+
+        real_t yNormalized = yCurStart >= 0 ? real_zero
+            : real_div(real_from_int(-yCurStart), real_from_int(yCurEnd - yCurStart));
+        real_t texRow = real_mul(real_lerp(yNormalized, texCoord.start.y, texCoord.end.y), real_from_int(texture->size.h));
+        real_t texRowIncr = real_div(
+            real_mul(real_sub(texCoord.end.y, texCoord.start.y), real_from_int(texture->size.h)),
+            real_from_int(yCurEnd - yCurStart + 1));
+
         int y;
         for (y = yBottom; y < max(yBottom, yCurStart); y++)
             *(curPixel++) = sector->floorColor;
         for (; y <= min(yTop, yPortalStart - 1); y++)
-            *(curPixel++) = wall->color;
+        {
+            int texRowI = real_to_int(texRow);
+            *(curPixel++) = texture->pixels[
+                (texRowI % texture->size.h) * texture->size.w +
+                (texCol % texture->size.w)
+            ];
+            texRow = real_add(texRow, texRowIncr);
+        }
         if (wall->portalTo >= 0) {
             //for (; y <= min(yTop, yPortalEnd); y++)
                 //*(curPixel++) = ((y / 4) % 2) ? GColorFromRGB(255, 0, 255) : GColorFromRGB(0, 0, 0);
+            texRow = real_add(texRow, real_mul(texRowIncr, real_from_int(min(yTop, yPortalEnd) - y + 1)));
             curPixel += yPortalEnd - y;
             for (y = yPortalEnd; y <= min(yTop, yCurEnd); y++)
-                *(curPixel++) = wall->color;
+            {
+                int texRowI = real_to_int(texRow);
+                *(curPixel++) = texture->pixels[
+                    (texRowI % texture->size.h) * texture->size.w +
+                    (texCol % texture->size.w)
+                ];
+                texRow = real_add(texRow, texRowIncr);
+            }
         }
         for (; y <= yTop; y++)
             *(curPixel++) = sector->ceilColor;
     }
+
+    texture_free(me->textureManager, texture);
 }
 
 void renderer_renderSector(Renderer* renderer, GColor* framebuffer, const DrawRequest* request)

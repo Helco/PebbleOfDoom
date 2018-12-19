@@ -17,6 +17,7 @@ protected:
     const real_t three = real_from_int(3);
     const real_t four = real_from_int(4);
     const real_t five = real_from_int(5);
+    const real_t eight = real_from_int(8);
     const real_t ten = real_from_int(10);
     const real_t halfpi = real_div(real_pi, real_from_int(2));
 
