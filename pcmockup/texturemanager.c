@@ -161,7 +161,7 @@ const Texture* textureManager_createEmptyTexture(TextureManager* me, GSize size,
 
 void textureManager_resizeEmptyTexture(TextureManager* me, TextureId id, GSize newSize, GColor** outputPtr)
 {
-    assert(id >= 0 && id <= me->count);
+    assert(id >= 0 && id < me->count);
     assert(newSize.w >= 0 && newSize.h >= 0);
 
     LoadedTexture* loadedTexture = &me->textures[id];

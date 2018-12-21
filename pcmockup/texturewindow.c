@@ -305,9 +305,9 @@ bool textureWindow_printGenerationParameters(TexGenerationContext* generationCon
 void textureWindow_printGeneratedTexture(TextureWindow* me, const Texture* texture, TexGenerationContext* generationContext)
 {
     UNUSED(me, texture);
-    bool shouldRegenerate = false;
-    shouldRegenerate = shouldRegenerate || textureWindow_printGenerators(generationContext);
-    shouldRegenerate = shouldRegenerate || textureWindow_printGenerationSize(generationContext);
+    bool shouldRegenerate =
+        textureWindow_printGenerators(generationContext) ||
+        textureWindow_printGenerationSize(generationContext);
     igSeparator();
     shouldRegenerate = shouldRegenerate || textureWindow_printGenerationParameters(generationContext);
 
