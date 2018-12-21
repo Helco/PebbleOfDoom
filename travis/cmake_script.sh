@@ -1,8 +1,11 @@
 #!/bin/bash
 set -e
-mkdir -p build
+if [ ! -d "build" ]
+then
+    mkdir build
+fi
 cd build
 
-cmake ..
+cmake ${POD_CMAKE_ARGS} ..
 cmake --build .
 ctest

@@ -6,18 +6,23 @@ branches:
 
 jobs:
   include:
+    # - stage: Build&Test
+    #   name: Linux PCMockup
+    #   script: bash ./travis/cmake_script.sh
+    # - stage: Build&Test
+    #   name: Pebble
+    #   before_script: bash ./travis/pebble_before_script.sh
+    #   script: bash ./travis/pebble_script.sh
+    #   cache:
+    #     directories:
+    #       - $HOME/pebble-dev
+    #       - $HOME/.cache/pip
+    #       - $HOME/.pebble-sdk
     - stage: Build&Test
-      name: Linux PCMockup
+      name: Windows PCMockup
+      os: windows
+      before_script: source ./travis/windows_before_script.sh
       script: bash ./travis/cmake_script.sh
-    - stage: Build&Test
-      name: Pebble
-      before_script: bash ./travis/pebble_before_script.sh
-      script: bash ./travis/pebble_script.sh
-      cache:
-        directories:
-          - $HOME/pebble-dev
-          - $HOME/.cache/pip
-          - $HOME/.pebble-sdk
 
 addons:
   apt:
