@@ -9,21 +9,28 @@
     typedef type _texgen_type; \
     TEXGENERATOR_HEADER(name) { \
         static const TexGeneratorParam _texgeneratorParams_##name [] = {
-#define TEXGENPARAM(_id,_description,_typeenum,_member) { \
+#define TEXGENPARAM(_id,_description,_typeenum,_member,_min,_max) { \
     .info = { \
         .id = _id, \
         .name = #_member, \
         .description = _description, \
-        .type = _typeenum \
+        .type = _typeenum, \
+        .range = { .min = _min, .max = _max } \
     }, \
     .offset = TEXGENERATOR_OFFSETOF(_texgen_type, _member) \
     },
-#define TEXGENPARAM_INT(id,description,member) \
-    TEXGENPARAM(id, description, TexGenParamType_Int, member)
-#define TEXGENPARAM_FLOAT(id,description,member) \
-    TEXGENPARAM(id, description, TexGenParamType_Float, member)
+#define TEXGENPARAM_INT(id,description,member,_min,_max) \
+    TEXGENPARAM(id, description, TexGenParamType_Int, member, \
+        { .integer = _min }, \
+        { .integer = _max })
+#define TEXGENPARAM_FLOAT(id,description,member,_min,_max) \
+    TEXGENPARAM(id, description, TexGenParamType_Float, member, \
+        { .floating = _min }, \
+        { .floating = _max })
 #define TEXGENPARAM_BOOL(id,description,member) \
-    TEXGENPARAM(id, description, TexGenParamType_Bool, member)
+    TEXGENPARAM(id, description, TexGenParamType_Bool, member, { .integer = 0 }, { .integer = 1 })
+#define TEXGENPARAM_COLOR(id,description,member) \
+    TEXGENPARAM(id, description, TexGenParamType_Color, member, { .integer = 0 }, { .integer = 255 })
 
 #define END_TEXGENERATOR(_name,_id,_description,_defaultParams,_callback) \
     }; \

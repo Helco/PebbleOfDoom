@@ -81,6 +81,24 @@ static int prv_abs_to_logsize(int absSize)
     return logSize;
 }
 
+static bool_t prv_texgen_resetToGenerator(TexGenerationContext* me, const TexGenerator* generator)
+{
+    if (me->generator == generator)
+        return true;
+    if (me->paramBlock != NULL)
+        free(me->paramBlock);
+    me->paramBlock = malloc(generator->info.paramBlockSize);
+    if (me->paramBlock == NULL)
+    {
+        texgen_free(me);
+        return false;
+    }
+    memcpy(me->paramBlock, generator->defaultParamBlock, generator->info.paramBlockSize);
+
+    me->generator = generator;
+    return true;
+}
+
 TexGenerationContext* texgen_init(TextureManagerHandle textureManager, TexGeneratorID id, int absSize)
 {
     int logSize = prv_abs_to_logsize(absSize);
@@ -102,16 +120,12 @@ TexGenerationContext* texgen_init(TextureManagerHandle textureManager, TexGenera
         texgen_free(me);
         return NULL;
     }
-    texture_load(textureManager, me->texture->id); // keep texture loaded
 
-    me->paramBlock = malloc(generator->info.paramBlockSize);
-    if (me->paramBlock == NULL)
+    if (!prv_texgen_resetToGenerator(me, generator))
     {
         texgen_free(me);
         return NULL;
     }
-
-    me->generator = generator;
     me->textureManager = textureManager;
     me->logSize = logSize;
     return me;
@@ -126,6 +140,20 @@ void texgen_free(TexGenerationContext* me)
     if (me->paramBlock != NULL)
         free(me->paramBlock);
     free(me);
+}
+
+void texgen_setSize(TexGenerationContext* ctx, int newAbsSize)
+{
+    ctx->logSize = prv_abs_to_logsize(newAbsSize);
+    assert(ctx->logSize != 0);
+    texture_resizeEmpty(ctx->textureManager, ctx->texture->id, GSize(newAbsSize, newAbsSize), &ctx->pixels);
+}
+
+void texgen_setGenerator(TexGenerationContext* ctx, TexGeneratorID id)
+{
+    const TexGenerator* generator = rawtexgen_getGeneratorByID(id);
+    if (generator != NULL)
+        prv_texgen_resetToGenerator(ctx, generator);
 }
 
 void texgen_setParamInt(TexGenerationContext* me, TexGenParamID id, int value)
@@ -158,9 +186,73 @@ void texgen_setParamBool(TexGenerationContext* me, TexGenParamID id, bool_t valu
     }
 }
 
+void texgen_setParamColor(TexGenerationContext* me, TexGenParamID id, GColor value)
+{
+    const TexGeneratorParam* param = rawtexgen_getParameterByID(me->generator, id);
+    if (param != NULL && param->info.type == TexGenParamType_Color)
+    {
+        GColor* targetPtr = (GColor*)rawtexgen_getParamPointer(param, me->paramBlock);
+        *targetPtr = value;
+    }
+}
+
 void texgen_setParams(TexGenerationContext* me, const void* paramBlock)
 {
     memcpy(me->paramBlock, paramBlock, me->generator->info.paramBlockSize);
+}
+
+int texgen_getLogSize(TexGenerationContext* ctx)
+{
+    return ctx->logSize;
+}
+
+TexGeneratorID texgen_getGenerator(TexGenerationContext* ctx)
+{
+    return ctx->generator->info.id;
+}
+
+int texgen_getParamInt(TexGenerationContext* me, TexGenParamID id)
+{
+    const TexGeneratorParam* param = rawtexgen_getParameterByID(me->generator, id);
+    if (param != NULL && param->info.type == TexGenParamType_Int)
+    {
+        int* targetPtr = (int*)rawtexgen_getParamPointer(param, me->paramBlock);
+        return *targetPtr;
+    }
+    return 0;
+}
+
+float texgen_getParamFloat(TexGenerationContext* me, TexGenParamID id)
+{
+    const TexGeneratorParam* param = rawtexgen_getParameterByID(me->generator, id);
+    if (param != NULL && param->info.type == TexGenParamType_Float)
+    {
+        float* targetPtr = (float*)rawtexgen_getParamPointer(param, me->paramBlock);
+        return *targetPtr;
+    }
+    return 0;
+}
+
+bool_t texgen_getParamBool(TexGenerationContext* me, TexGenParamID id)
+{
+    const TexGeneratorParam* param = rawtexgen_getParameterByID(me->generator, id);
+    if (param != NULL && param->info.type == TexGenParamType_Bool)
+    {
+        bool_t* targetPtr = (bool_t*)rawtexgen_getParamPointer(param, me->paramBlock);
+        return *targetPtr;
+    }
+    return false;
+}
+
+GColor texgen_getParamColor(TexGenerationContext* me, TexGenParamID id)
+{
+    const TexGeneratorParam* param = rawtexgen_getParameterByID(me->generator, id);
+    if (param != NULL && param->info.type == TexGenParamType_Color)
+    {
+        GColor* targetPtr = (GColor*)rawtexgen_getParamPointer(param, me->paramBlock);
+        return *targetPtr;
+    }
+    return GColorFromRGBA(0, 0, 0, 0);
 }
 
 void texgen_getParams(TexGenerationContext* me, void* outParamBlock)

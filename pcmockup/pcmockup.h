@@ -3,12 +3,25 @@
 #include "sdl.include.h"
 #include "pebble.h"
 #include "renderer.h"
+#include "texgen/texgen.h"
 #include "window.h"
+#include <glad/glad.h>
+
+#define TEXTURE_PATH "resources/textures/"
 
 SDL_Rect findBestFit(SDL_Rect target, float aspect);
 SDL_Rect padRect(SDL_Rect rect, GSize amount);
 
 extern const Uint32 imageWindow_SDLPixelFormat;
+typedef struct UploadedTexture UploadedTexture;
+UploadedTexture* uploadedTexture_init();
+void uploadedTexture_free(UploadedTexture* me);
+GLuint uploadedTexture_getGLTextureId(UploadedTexture* me);
+GSize uploadedTexture_getSize(UploadedTexture* me);
+void uploadedTexture_setFrom32Bit(UploadedTexture* me, GSize size, const SDL_Color* pixels);
+void uploadedTexture_setFrom8Bit(UploadedTexture* me, GSize size, const GColor* pixels);
+void uploadedTexture_setFromTexture(UploadedTexture* me, const Texture* texture);
+
 typedef struct ImageWindow ImageWindow;
 ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect initialBounds, bool_t isEssential);
 void imageWindow_free(ImageWindow* me);
@@ -65,6 +78,17 @@ void textureManager_free(TextureManager* me); // asserts that all textures are f
 TextureId textureManager_registerFile(TextureManager* me, const char* filename); // relative to texture folder
 const Texture* textureManager_loadTexture(TextureManager* me, TextureId id);
 const Texture* textureManager_createEmptyTexture(TextureManager* me, GSize size, GColor** outputPtr);
+void textureManager_resizeEmptyTexture(TextureManager* me, TextureId id, GSize newSize, GColor** outputPtr);
 void textureManager_freeTexture(TextureManager* me, const Texture* texture);
+TexGenerationContext* textureManager_createGeneratedTexture(TextureManager* me, TexGeneratorID id, int size);
+TexGenerationContext* textureManager_getGenerationContext(TextureManager* me, TextureId id);
+int textureManager_getTextureCount(TextureManager* me);
+const Texture* textureManager_getTextureByIndex(TextureManager* me, int index);
+const char* textureManager_getTextureSource(TextureManager* me, const Texture* texture);
+
+typedef struct TextureWindow TextureWindow;
+TextureWindow* textureWindow_init(WindowContainer* parent, TextureManager* manager);
+void textureWindow_free(TextureWindow* me);
+Window* textureWindow_asWindow(TextureWindow* me);
 
 #endif

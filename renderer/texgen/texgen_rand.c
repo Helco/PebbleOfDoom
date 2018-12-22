@@ -44,7 +44,7 @@ BEGIN_TEXGENERATOR(Rand, TexGen_Rand_Params)
     TEXGENPARAM_INT(
         TexGenParam_Rand_Seed,
         "seed to initialize randomness",
-        seed)
+        seed, 0, RAND_MAX)
 END_TEXGENERATOR(Rand,
     TexGenerator_Rand,
     "random filled texure",

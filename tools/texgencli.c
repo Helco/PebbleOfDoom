@@ -1,7 +1,9 @@
+#define _CRT_NONSTDC_NO_DEPRECATE
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
 #include <errno.h>
+#include <time.h>
 #include "stb.include.h"
 #include "platform.h"
 #include "texgen/texgen.h"
@@ -45,16 +47,30 @@ void texgencli_print_generator_header(const TexGeneratorInfo* info)
     printf(" \"%s\" - %s\n", info->name, info->description);
 }
 
+void texgencli_print_generator_param_range(const TexGeneratorParameterInfo* info)
+{
+    if (info->type == TexGenParamType_Int &&
+        (info->range.min.integer != -1 || info->range.max.integer != -1)) {
+        printf("    Range: %d -> %d\n", info->range.min.integer, info->range.max.integer);
+    }
+    if (info->type == TexGenParamType_Float &&
+        (info->range.min.floating != -1.0f || info->range.max.floating != -1.0f)) {
+        printf("    Range: %.3f -> %.3f\n", info->range.min.floating, info->range.max.floating);
+    }
+}
+
 void texgencli_print_generator_param(const TexGeneratorParameterInfo* info)
 {
     static const char* TYPE_NAMES[] = {
         [TexGenParamType_Int] =   "int  ",
         [TexGenParamType_Float] = "float",
-        [TexGenParamType_Bool] =  "bool "
+        [TexGenParamType_Bool] =  "bool ",
+        [TexGenParamType_Color] = "color"
     };
     printf("  - %s ", TYPE_NAMES[info->type]);
     texgencli_print_fourcc(info->id);
     printf(" \"%s\" - %s\n", info->name, info->description);
+    texgencli_print_generator_param_range(info);
 }
 
 bool texgencli_parse_int(const char* param, int* value)
@@ -86,6 +102,32 @@ bool texgencli_parse_bool(const char* param, bool* value)
         strcmp(param, "yes") == 0 ||
         strcmp(param, "YES") == 0;
     return true;
+}
+
+bool texgencli_parse_color(const char* param, GColor* value)
+{
+    bool result = true;
+    char* dupParam = strdup(param);
+    if (stb_regex("^[0-9]+$", dupParam)) {
+        int intValue = atoi(param);
+        if (intValue > 255) {
+            printf("Invalid color number: %d\n", intValue);
+            result = false;
+        }
+        value->argb = (uint8_t)intValue;
+    }
+    else if (stb_regex("^[0-3],[0-3],[0-3](,[0-3])?$", dupParam)) {
+        value->r = param[0] - '0';
+        value->g = param[2] - '0';
+        value->b = param[4] - '0';
+        value->a = param[5] == '\0' ? 3 : param[6] - '0';
+    }
+    else {
+        printf("Did not recognize color format: %s\n", param);
+        result = false;
+    }
+    free(dupParam);
+    return result;
 }
 
 bool texgencli_parse_fourcc(const char* param, uint32_t* fourcc)
@@ -181,11 +223,12 @@ void texgencli_write_texture(const Texture* texture, const char* path)
     assert(rgbaPixels != NULL);
     texgencli_convert_texture_to_rgba(texture, rgbaPixels);
 
-    stbi_write_png(
+    if (stbi_write_png(
         path,
         texture->size.w, texture->size.h, 4,
         rgbaPixels,
-        4 * texture->size.w);
+        4 * texture->size.w) == 0)
+        printf("Writing texture \"%s\" failed!\n", path);
     free(rgbaPixels);
 }
 
@@ -294,6 +337,21 @@ bool texgencli_opt_set_bool_param(const char* const * params, void* userdata)
     return true;
 }
 
+bool texgencli_opt_set_color_param(const char* const * params, void* userdata)
+{
+    TexGenCLI* cli = (TexGenCLI*)userdata;
+    if (!texgencli_require_context(cli))
+        return false;
+    TexGeneratorParameterInfo info;
+    if (!texgencli_find_parameter(cli, &info, params[0]))
+        return false;
+    GColor value;
+    if (!texgencli_parse_color(params[1], &value))
+        return false;
+    texgen_setParamColor(cli->generationContext, info.id, value);
+    return true;
+}
+
 bool texgencli_opt_generate(const char* const * params, void* userdata)
 {
     TexGenCLI* cli = (TexGenCLI*)userdata;
@@ -310,7 +368,8 @@ static const OptionsSpecification texgencli_spec = {
     .extraHelpText =
         "<gid> / <pid> - may be name or FourCC (if printable)\n"
         "<int> - may be signed or unsigned (range -2^31 -> 2^31-1)\n"
-        "<bool> - everything other than '1', 'true' or 'yes' is false\n",
+        "<bool> - everything other than '1', 'true' or 'yes' is false\n"
+        "<color> - either single number (0 -> 255) or R,G,B[,A] (0-3)\n",
     .handlers = {
         {
             .opt = "-h|--help",
@@ -359,6 +418,12 @@ static const OptionsSpecification texgencli_spec = {
             .paramCount = 2
         },
         {
+            .opt = "-pc|--param-color",
+            .description = "<pid> <color> - Sets color parameter",
+            .callback = texgencli_opt_set_color_param,
+            .paramCount = 2
+        },
+        {
             .opt = "-o|--output",
             .description = "<path> - Generates texture to png file",
             .callback = texgencli_opt_generate,
@@ -370,6 +435,7 @@ static const OptionsSpecification texgencli_spec = {
 
 int main(int argc, char* argv[])
 {
+    srand((unsigned int)time(NULL));
     TexGenCLI cli = {
         .generator = { .id = InvalidGeneratorID },
         .generationContext = NULL,
@@ -406,6 +472,13 @@ const Texture* texture_createEmpty(TextureManagerHandle manager, GSize size, GCo
     if (contentPtr != NULL)
         *contentPtr = texture->pixels;
     return texture;
+}
+
+void texture_resizeEmpty(TextureManagerHandle manager, TextureId id, GSize newSize, GColor** contentPtr)
+{
+    // this is not needed for the cli
+    UNUSED(manager, id, newSize, contentPtr);
+    assert(false && "Unimplemented function: texture_resizeEmpty");
 }
 
 void texture_free(TextureManagerHandle manager, const Texture* texture)
