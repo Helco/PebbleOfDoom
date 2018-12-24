@@ -67,6 +67,6 @@ typedef struct WindowGrid
     GSize totalSize;
 } WindowGrid;
 GSize windowGrid_getGridSize(const WindowGrid* grid);
-SDL_Rect windowGrid_getSingleBounds(const WindowGrid* grid, int windowI); // negative to select from end
+GRect windowGrid_getSingleBounds(const WindowGrid* grid, int windowI); // negative to select from end
 
 #endif

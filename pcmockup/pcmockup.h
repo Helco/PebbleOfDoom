@@ -10,8 +10,8 @@
 
 #define TEXTURE_PATH "resources/textures/"
 
-SDL_Rect findBestFit(SDL_Rect target, float aspect);
-SDL_Rect padRect(SDL_Rect rect, GSize amount);
+GRect findBestFit(GRect target, float aspect);
+GRect padRect(GRect rect, GSize amount);
 
 extern const Uint32 imageWindow_SDLPixelFormat;
 typedef struct UploadedTexture UploadedTexture;
@@ -39,16 +39,16 @@ void safeFramebuffer_prepare(SafeFramebuffer* me);
 void safeFramebuffer_check(SafeFramebuffer* me);
 
 typedef struct PebbleWindow PebbleWindow;
-PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds, GSize pebbleSize, Renderer* renderer);
+PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GSize pebbleSize, Renderer* renderer);
 GColor* pebbleWindow_getPebbleFramebuffer(PebbleWindow* window);
 ImageWindow* pebbleWindow_asImageWindow(PebbleWindow* window);
 #define PebbleWindow_Tag FOURCC('P', 'E', 'B', 'B')
 
-typedef bool (*DebugWindowConstructor)(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* renderer);
+typedef bool (*DebugWindowConstructor)(WindowContainer* parent, GRect bounds, const DebugView* view, Renderer* renderer);
 typedef struct DebugWindowSDL DebugWindowSDL;
-DebugWindowSDL* debugWindowSDL_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* debugView, Renderer* renderer);
+DebugWindowSDL* debugWindowSDL_init(WindowContainer* parent, GRect bounds, const DebugView* debugView, Renderer* renderer);
 typedef struct DebugWindowImGui DebugWindowImGui;
-DebugWindowImGui* debugWindowImGui_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* debugView, Renderer* renderer);
+DebugWindowImGui* debugWindowImGui_init(WindowContainer* parent, GRect bounds, const DebugView* debugView, Renderer* renderer);
 #define DebugWindow_Tag FOURCC('D', 'E', 'B', 'V')
 
 typedef struct PCMockup PCMockup;

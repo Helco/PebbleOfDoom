@@ -34,15 +34,14 @@ void debugWindowSDL_updateMenubar(void* userdata);
 void debugWindowSDL_onDrag(int button, ImVec2 delta, void* userdata);
 void debugWindowSDL_onKeyDown(SDL_Keysym sym, void* userdata);
 
-DebugWindowSDL* debugWindowSDL_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* podRenderer)
+DebugWindowSDL* debugWindowSDL_init(WindowContainer* parent, GRect bounds, const DebugView* view, Renderer* podRenderer)
 {
     DebugWindowSDL* me = (DebugWindowSDL*)malloc(sizeof(DebugWindowSDL));
     if (me == NULL)
         return NULL;
     memset(me, 0, sizeof(DebugWindowSDL));
 
-    GRect b = { { bounds.x, bounds.y }, { bounds.w, bounds.h} };
-    me->window = imageWindow_init(parent, view->name, b, false);
+    me->window = imageWindow_init(parent, view->name, bounds, false);
     if (me->window == NULL)
     {
         debugWindowSDL_free(me);
@@ -61,7 +60,7 @@ DebugWindowSDL* debugWindowSDL_init(WindowContainer* parent, SDL_Rect bounds, co
         .userdata = me
     });
 
-    me->surface = createSDLSurface(bounds.w, bounds.h, SDL_PIXELFORMAT_ABGR8888);
+    me->surface = createSDLSurface(bounds.size.w, bounds.size.h, SDL_PIXELFORMAT_ABGR8888);
     if (me->surface == NULL)
     {
         fprintf(stderr, "createSDLSurface: %s\n", SDL_GetError());
@@ -78,7 +77,7 @@ DebugWindowSDL* debugWindowSDL_init(WindowContainer* parent, SDL_Rect bounds, co
 
     me->position = xz(real_zero, real_zero);
     me->zoom = real_one;
-    me->offset = xz(real_from_int(bounds.w / 2), real_from_int(bounds.h / 2));
+    me->offset = xz(real_from_int(bounds.size.w / 2), real_from_int(bounds.size.h / 2));
     me->podRenderer = podRenderer;
     me->view = view;
     return me;

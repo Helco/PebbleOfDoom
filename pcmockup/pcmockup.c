@@ -17,8 +17,8 @@ struct PCMockup
     bool_t isRunning;
 };
 
-bool pcmockup_initDebugWindowSDL(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* renderer);
-bool pcmockup_initDebugWindowImGui(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* renderer);
+bool pcmockup_initDebugWindowSDL(WindowContainer* parent, GRect bounds, const DebugView* view, Renderer* renderer);
+bool pcmockup_initDebugWindowImGui(WindowContainer* parent, GRect bounds, const DebugView* view, Renderer* renderer);
 static const DebugWindowConstructor debugWindowConstructors[] = {
     [DebugViewType_SDL] = pcmockup_initDebugWindowSDL,
     [DebugViewType_ImGui] = pcmockup_initDebugWindowImGui
@@ -214,34 +214,38 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-SDL_Rect findBestFit(SDL_Rect src, float dstAspect)
+GRect findBestFit(GRect src, float dstAspect)
 {
-    SDL_Rect dst;
-    const float srcAspect = (float)src.w / src.h;
+    GRect dst;
+    const float srcAspect = (float)src.size.w / src.size.h;
     if (srcAspect > dstAspect)
     {
-        dst.y = 0;
-        dst.h = src.h;
-        dst.w = (int)(dstAspect * src.h);
-        dst.x = (src.w / 2) - (dst.w / 2);
+        dst.origin.y = 0;
+        dst.size.h = src.size.h;
+        dst.size.w = (int)(dstAspect * src.size.h);
+        dst.origin.x = (src.size.w / 2) - (dst.size.w / 2);
     }
     else
     {
-        dst.x = 0;
-        dst.w = src.w;
-        dst.h = (int)(src.w / dstAspect);
-        dst.y = (src.h / 2) - (dst.h / 2);
+        dst.origin.x = 0;
+        dst.size.w = src.size.w;
+        dst.size.h = (int)(src.size.w / dstAspect);
+        dst.origin.y = (src.size.h / 2) - (dst.size.h / 2);
     }
     return dst;
 }
 
-SDL_Rect padRect(SDL_Rect rect, GSize amount)
+GRect padRect(GRect rect, GSize amount)
 {
-    return (SDL_Rect) {
-        rect.x + amount.w / 2,
-        rect.y + amount.h / 2,
-        rect.w - amount.w,
-        rect.h - amount.h
+    return (GRect) {
+        .origin = {
+            rect.origin.x + amount.w / 2,
+            rect.origin.y + amount.h / 2
+        },
+        .size = {
+            rect.size.w - amount.w,
+            rect.size.h - amount.h
+        }
     };
 }
 
@@ -267,12 +271,12 @@ Uint32 getWindowIDByEvent(const SDL_Event* ev)
     return UINT32_MAX;
 }
 
-bool pcmockup_initDebugWindowSDL(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* renderer)
+bool pcmockup_initDebugWindowSDL(WindowContainer* parent, GRect bounds, const DebugView* view, Renderer* renderer)
 {
     return debugWindowSDL_init(parent, bounds, view, renderer) != NULL;
 }
 
-bool pcmockup_initDebugWindowImGui(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* renderer)
+bool pcmockup_initDebugWindowImGui(WindowContainer* parent, GRect bounds, const DebugView* view, Renderer* renderer)
 {
     return debugWindowImGui_init(parent, bounds, view, renderer) != NULL;
 }

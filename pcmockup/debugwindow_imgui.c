@@ -14,7 +14,7 @@ void debugWindowImGui_free(void* userdata);
 void debugWindowImGui_contentUpdate(void* userdata);
 void debugWindowImGui_updateMenubar(void* userdata);
 
-DebugWindowImGui* debugWindowImGui_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* renderer)
+DebugWindowImGui* debugWindowImGui_init(WindowContainer* parent, GRect bounds, const DebugView* view, Renderer* renderer)
 {
     DebugWindowImGui* me = (DebugWindowImGui*)malloc(sizeof(DebugWindowImGui));
     if (me == NULL)
@@ -24,14 +24,13 @@ DebugWindowImGui* debugWindowImGui_init(WindowContainer* parent, SDL_Rect bounds
         ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_AlwaysAutoResize;
 
-    GRect b = { { bounds.x, bounds.y }, { bounds.w, bounds.h} };
     me->window = windowContainer_newWindow(parent, view->name);
     if (me->window == NULL)
     {
         debugWindowImGui_free(me);
         return NULL;
     }
-    window_setInitialBounds(me->window, b);
+    window_setInitialBounds(me->window, bounds);
     window_setFlags(me->window, me->flags);
     window_setMenubarSection(me->window, "Debug windows");
     window_setOpenState(me->window, view->startsOpened
