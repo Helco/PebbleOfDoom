@@ -12,6 +12,7 @@ struct TextureWindow {
 
 void textureWindow_free(void* userdata);
 void textureWindow_updateContent(void* userdata);
+void textureWindow_updateMenubar(void* userdata);
 void textureWindow_printImportedTexture(TextureWindow* me, const Texture* texture);
 void textureWindow_printGeneratedTexture(TextureWindow* me, const Texture* texture, TexGenerationContext* generationContext);
 void textureWindow_printImportFromFileMenu(TextureWindow* me);
@@ -37,8 +38,10 @@ TextureWindow* textureWindow_init(WindowContainer* parent, TextureManager* manag
     window_addCallbacks(me->window, (WindowCallbacks) {
         .userdata = me,
         .destruct = textureWindow_free,
-        .contentUpdate = textureWindow_updateContent
+        .contentUpdate = textureWindow_updateContent,
+        .mainMenubar = textureWindow_updateMenubar
     });
+    window_setMenubarSection(me->window, "Tools");
 
     me->uploadedTexture = uploadedTexture_init();
     if (me->uploadedTexture == NULL) {
@@ -367,6 +370,12 @@ void textureWindow_printGenerateNewMenu(TextureWindow* me)
     TexGenerationContext* texgenctx = textureManager_createGeneratedTexture(me->manager, generatorInfo.id, 64);
     texgen_execute(texgenctx);
     me->curTextureIndex = textureManager_getTextureCount(me->manager) - 1;
+}
+
+void textureWindow_updateMenubar(void* userdata)
+{
+    TextureWindow* me = (TextureWindow*)userdata;
+    window_updateMenubar(me->window);
 }
 
 Window* textureWindow_asWindow(TextureWindow* me)
