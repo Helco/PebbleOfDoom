@@ -63,6 +63,7 @@ endif()
 ###################################################################
 
 add_subdirectory("renderer")
+add_subdirectory("bluelevel")
 add_subdirectory("test")
 add_subdirectory("pcmockup")
 add_subdirectory("tools")
