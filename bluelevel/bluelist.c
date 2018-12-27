@@ -22,7 +22,7 @@ struct BlueList {
     BlueListEntry* entries;
 };
 
-static int bluelist_getNextCapacity(int oldCapacity) {
+static int blueList_getNextCapacity(int oldCapacity) {
     const int CHUNK_SIZE = 16;
     return oldCapacity <= 0
         ? CHUNK_SIZE
@@ -31,7 +31,7 @@ static int bluelist_getNextCapacity(int oldCapacity) {
             : oldCapacity * 2;
 }
 
-BlueList* raw_bluelist_new(const char* typeName, int elementSize)
+BlueList* raw_blueList_new(const char* typeName, int elementSize)
 {
     BlueList* list = (BlueList*)malloc(sizeof(BlueList));
     assert(list != NULL);
@@ -46,13 +46,13 @@ BlueList* raw_bluelist_new(const char* typeName, int elementSize)
     return list;
 }
 
-void bluelist_free(BlueList* list)
+void blueList_free(BlueList* list)
 {
     assert(list != NULL);
 
     if (list->count > 0 && list->destructor != NULL) {
         for (int i = 0; i < list->count; i++)
-            list->destructor(raw_bluelist_get(list, i), list->destructorUserdata);
+            list->destructor(raw_blueList_get(list, i), list->destructorUserdata);
     }
     if (list->typeName != NULL)
         free(list->typeName);
@@ -61,42 +61,42 @@ void bluelist_free(BlueList* list)
     free(list);
 }
 
-void raw_bluelist_setDestructor(BlueList* list, RawBlueListDestructor destructor, void* userdata)
+void raw_blueList_setDestructor(BlueList* list, RawBlueListDestructor destructor, void* userdata)
 {
     assert(list != NULL);
     list->destructor = destructor;
     list->destructorUserdata = userdata;
 }
 
-void raw_bluelist_requireType(BlueList* list, const char* typeName)
+void raw_blueList_requireType(BlueList* list, const char* typeName)
 {
     assert(list != NULL && typeName != NULL);
     assert(strcmp(list->typeName, typeName) == 0);
 }
 
-void* raw_bluelist_get(BlueList* list, int index)
+void* raw_blueList_get(BlueList* list, int index)
 {
     assert(list != NULL && index >= 0 && index < list->count);
     return list->entries[index].data;
 }
 
-const void* raw_bluelist_constget(const BlueList* list, int index)
+const void* raw_blueList_constget(const BlueList* list, int index)
 {
     assert(list != NULL && index >= 0 && index < list->count);
     return list->entries[index].data;
 }
 
-int bluelist_add(BlueList* list, const void* element)
+int blueList_add(BlueList* list, const void* element)
 {
-    return bluelist_addWithId(list, element, list->nextId++);
+    return blueList_addWithId(list, element, list->nextId++);
 }
 
-int bluelist_addWithId(BlueList* list, const void* element, BlueEntryID id)
+int blueList_addWithId(BlueList* list, const void* element, BlueEntryID id)
 {
     assert(list != NULL && list->count <= list->capacity);
     assert(element != NULL);
     if (list->count == list->capacity) {
-        list->capacity = bluelist_getNextCapacity(list->capacity);
+        list->capacity = blueList_getNextCapacity(list->capacity);
         const int memorySize = list->capacity * (sizeof(BlueListEntry) + list->elementSize);
         list->entries = (BlueListEntry*)realloc(list->entries, memorySize);
         assert(list->entries != NULL);
@@ -109,7 +109,7 @@ int bluelist_addWithId(BlueList* list, const void* element, BlueEntryID id)
     return index;
 }
 
-void bluelist_swap(BlueList* list, int fromIndex, int toIndex)
+void blueList_swap(BlueList* list, int fromIndex, int toIndex)
 {
     assert(list != NULL);
     assert(fromIndex >= 0 && fromIndex < list->count);
@@ -124,9 +124,9 @@ void bluelist_swap(BlueList* list, int fromIndex, int toIndex)
     list->changeCount++;
 }
 
-void bluelist_removeByIndex(BlueList* list, int index)
+void blueList_removeByIndex(BlueList* list, int index)
 {
-    void* element = raw_bluelist_get(list, index);
+    void* element = raw_blueList_get(list, index);
     if (list->destructor != NULL)
         list->destructor(element, list->destructorUserdata);
 
@@ -140,49 +140,49 @@ void bluelist_removeByIndex(BlueList* list, int index)
     list->changeCount++;
 }
 
-bool bluelist_removeById(BlueList* list, BlueEntryID id)
+bool blueList_removeById(BlueList* list, BlueEntryID id)
 {
-    int index = bluelist_findById(list, id);
+    int index = blueList_findById(list, id);
     if (index >= 0) {
-        bluelist_removeByIndex(list, index);
+        blueList_removeByIndex(list, index);
         return true;
     }
     return false;
 }
 
-void bluelist_removeByPtr(BlueList* list, const void* element)
+void blueList_removeByPtr(BlueList* list, const void* element)
 {
-    int index = bluelist_findByPtr(list, element);
+    int index = blueList_findByPtr(list, element);
     assert(index >= 0);
-    bluelist_removeByIndex(list, index);
+    blueList_removeByIndex(list, index);
 }
 
-int bluelist_getCount(const BlueList* list)
+int blueList_getCount(const BlueList* list)
 {
     assert(list != NULL);
     return list->count;
 }
 
-int bluelist_getChangeCount(const BlueList* list)
+int blueList_getChangeCount(const BlueList* list)
 {
     return list->changeCount;
 }
 
-BlueEntryID bluelist_getIdByIndex(const BlueList* list, int index)
+BlueEntryID blueList_getIdByIndex(const BlueList* list, int index)
 {
     assert(list != NULL);
     assert(index >= 0 && index < list->count);
     return list->entries[index].id;
 }
 
-BlueEntryID bluelist_getIdByPtr(const BlueList* list, const void* element)
+BlueEntryID blueList_getIdByPtr(const BlueList* list, const void* element)
 {
     assert(list != NULL && element != NULL);
-    int index = bluelist_findByPtr(list, element);
-    return bluelist_getIdByIndex(list, index);
+    int index = blueList_findByPtr(list, element);
+    return blueList_getIdByIndex(list, index);
 }
 
-int bluelist_findById(const BlueList* list, BlueEntryID id)
+int blueList_findById(const BlueList* list, BlueEntryID id)
 {
     assert(list != NULL);
     for (int i = 0; i < list->count; i++) {
@@ -192,7 +192,7 @@ int bluelist_findById(const BlueList* list, BlueEntryID id)
     return -1;
 }
 
-int bluelist_findByPtr(const BlueList* list, const void* element)
+int blueList_findByPtr(const BlueList* list, const void* element)
 {
     assert(list != NULL && element != NULL);
     const int fullEntrySize = list->elementSize + sizeof(BlueListEntry);
@@ -204,29 +204,29 @@ int bluelist_findByPtr(const BlueList* list, const void* element)
     return index;
 }
 
-static void raw_bluelist_innersort(BlueList* list, RawBlueListComparer comparer, void* userdata, int left, int right)
+static void raw_blueList_innersort(BlueList* list, RawBlueListComparer comparer, void* userdata, int left, int right)
 {
     if (left >= right)
         return;
-    const void* pivot = raw_bluelist_constget(list, (left + right) / 2);
+    const void* pivot = raw_blueList_constget(list, (left + right) / 2);
     int i = left;
     int j = right;
     while(true) {
-        while (comparer(raw_bluelist_constget(list, i), pivot, userdata) < 0)
+        while (comparer(raw_blueList_constget(list, i), pivot, userdata) < 0)
             i++;
-        while (comparer(raw_bluelist_constget(list, j), pivot, userdata) > 0)
+        while (comparer(raw_blueList_constget(list, j), pivot, userdata) > 0)
             j--;
         if (i >= j)
             break;
-        bluelist_swap(list, i, j);
+        blueList_swap(list, i, j);
     }
 
-    raw_bluelist_innersort(list, comparer, userdata, left, j);
-    raw_bluelist_innersort(list, comparer, userdata, j + 1, right);
+    raw_blueList_innersort(list, comparer, userdata, left, j);
+    raw_blueList_innersort(list, comparer, userdata, j + 1, right);
 }
 
-void raw_bluelist_sort(BlueList* list, RawBlueListComparer comparer, void* userdata)
+void raw_blueList_sort(BlueList* list, RawBlueListComparer comparer, void* userdata)
 {
     assert(list != NULL && comparer != NULL);
-    raw_bluelist_innersort(list, comparer, userdata, 0, list->count - 1);
+    raw_blueList_innersort(list, comparer, userdata, 0, list->count - 1);
 }
