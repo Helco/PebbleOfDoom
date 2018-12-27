@@ -123,12 +123,12 @@ TextureId textureManager_registerFile(TextureManager* me, const char* filename)
         return INVALID_TEXTURE_ID;
     }
     prv_convertRGBAtoPebbleImage(rgbaPixels, pebblePixels, width, height);
+    stbi_image_free(rgbaPixels);
 
     LoadedTexture* loadedTex = prv_textureManager_nextEntry(me);
     if (loadedTex == NULL)
     {
         fprintf(stderr, "Could not allocate texture entry\n");
-        stbi_image_free(rgbaPixels);
         free(pebblePixels);
         return INVALID_TEXTURE_ID;
     }

@@ -41,23 +41,23 @@ GSize windowGrid_getGridSize(const WindowGrid* grid)
         h = i / 2;
         w = h + (i % 2);
         i++;
-    } while(w * h <= grid->windowCount);
+    } while(w * h < max(grid->windowCount, 2));
     return GSize(w, h);
 }
 
-SDL_Rect windowGrid_getSingleBounds(const WindowGrid* grid, int windowI)
+GRect windowGrid_getSingleBounds(const WindowGrid* grid, int windowI)
 {
     GSize gridSize = windowGrid_getGridSize(grid);
-    SDL_Rect totalBounds = { 0, 0, grid->totalSize.w, grid->totalSize.h };
+    GRect totalBounds = { .origin = { 0, 0 }, .size = grid->totalSize };
     totalBounds = findBestFit(totalBounds, (float)gridSize.w / gridSize.h);
     if (windowI < 0)
         windowI = gridSize.w * gridSize.h + windowI;
 
-    SDL_Rect bounds;
-    bounds.w = totalBounds.w / gridSize.w;
-    bounds.h = totalBounds.h / gridSize.h;
-    bounds.x = totalBounds.x + bounds.w * (windowI % gridSize.w);
-    bounds.y = totalBounds.y + bounds.h * (windowI / gridSize.w);
+    GRect bounds;
+    bounds.size.w = totalBounds.size.w / gridSize.w;
+    bounds.size.h = totalBounds.size.h / gridSize.h;
+    bounds.origin.x = totalBounds.origin.x + bounds.size.w * (windowI % gridSize.w);
+    bounds.origin.y = totalBounds.origin.y + bounds.size.h * (windowI / gridSize.w);
 
     return padRect(bounds, WINDOWGRID_PADDING);
 }

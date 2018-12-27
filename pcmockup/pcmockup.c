@@ -13,12 +13,28 @@ struct PCMockup
     Renderer *renderer;
     Level* level;
     TextureManager* textureManager;
-    PebbleWindow *pebbleWindow;
-    DebugWindowSet *debugWindowSet;
-    TextureWindow* textureWindow;
     WindowContainer* windowContainer;
     bool_t isRunning;
 };
+
+bool pcmockup_initDebugWindowSDL(WindowContainer* parent, GRect bounds, const DebugView* view, Renderer* renderer);
+bool pcmockup_initDebugWindowImGui(WindowContainer* parent, GRect bounds, const DebugView* view, Renderer* renderer);
+static const DebugWindowConstructor debugWindowConstructors[] = {
+    [DebugViewType_SDL] = pcmockup_initDebugWindowSDL,
+    [DebugViewType_ImGui] = pcmockup_initDebugWindowImGui
+};
+
+void pcmockup_updateMainMenubar(void* userdata);
+
+static int countOpenDebugWindows(Renderer* renderer)
+{
+    int count = 0;
+    for (int i = 0; i < renderer_getDebugCount(renderer); i++) {
+        if (renderer_getDebugViews(renderer)[i].startsOpened)
+            count++;
+    }
+    return count;
+}
 
 PCMockup *pcmockup_init()
 {
@@ -69,36 +85,41 @@ PCMockup *pcmockup_init()
         pcmockup_free(me);
         return NULL;
     }
+    windowContainer_addMenubarHandler(me->windowContainer,
+        pcmockup_updateMainMenubar, "PCMockup", me);
 
     WindowGrid windowGrid;
-    windowGrid.windowCount = 1 + renderer_getDebugCount(me->renderer);
+    windowGrid.windowCount = 1 + countOpenDebugWindows(me->renderer);
     windowGrid.totalSize = WINDOW_START_SIZE;
 
-    me->pebbleWindow = pebbleWindow_init(
+    PebbleWindow* pebbleWindow = pebbleWindow_init(
         me->windowContainer,
         windowGrid_getSingleBounds(&windowGrid, 0),
         GSize(RENDERER_WIDTH, RENDERER_HEIGHT),
         me->renderer
     );
-    if (me->pebbleWindow == NULL)
+    if (pebbleWindow == NULL)
     {
         pcmockup_free(me);
         return NULL;
     }
 
-    me->debugWindowSet = debugWindowSet_init(
-        me->windowContainer,
-        &windowGrid,
-        me->renderer
-    );
-    if (me->debugWindowSet == NULL)
+    int gridPlace = -1;
+    for (int i = 0; i < renderer_getDebugCount(me->renderer); i++)
     {
-        pcmockup_free(me);
-        return NULL;
+        const DebugView* debugView = &renderer_getDebugViews(me->renderer)[i];
+        const int curGridPlace = debugView->startsOpened ? gridPlace-- : -1 - i;
+        if (!debugWindowConstructors[debugView->type](
+            me->windowContainer,
+            windowGrid_getSingleBounds(&windowGrid, curGridPlace),
+            debugView, me->renderer)) {
+            pcmockup_free(me);
+            return NULL;
+        }
     }
 
-    me->textureWindow = textureWindow_init(me->windowContainer, me->textureManager);
-    if (me->textureWindow == NULL)
+    TextureWindow* textureWindow = textureWindow_init(me->windowContainer, me->textureManager);
+    if (textureWindow == NULL)
     {
         pcmockup_free(me);
         return NULL;
@@ -114,12 +135,6 @@ void pcmockup_free(PCMockup *me)
         return;
     if (me->windowContainer != NULL)
         windowContainer_free(me->windowContainer);
-    if (me->textureWindow != NULL)
-        textureWindow_free(me->textureWindow);
-    if (me->debugWindowSet != NULL)
-        debugWindowSet_free(me->debugWindowSet);
-    if (me->pebbleWindow != NULL)
-        pebbleWindow_free(me->pebbleWindow);
     if (me->level != NULL)
         level_free(me->level);
     if (me->textureManager != NULL)
@@ -129,37 +144,16 @@ void pcmockup_free(PCMockup *me)
     free(me);
 }
 
-void pcmockup_updateMainMenubar(PCMockup* me)
+void pcmockup_updateMainMenubar(void* userdata)
 {
-    if (!igBeginMainMenuBar())
-        return;
-
-    if (igBeginMenu("PCMockup", true))
-    {
-        if (igMenuItemBool("Exit", NULL, false, true))
-            me->isRunning = false;
-        igEndMenu();
-    }
-    debugWindowSet_updateMenubar(me->debugWindowSet);
-    if (igBeginMenu("Tools", true))
-    {
-        window_updateMenubar(textureWindow_asWindow(me->textureWindow));
-        igEndMenu();
-    }
-
-    igEndMainMenuBar();
+    PCMockup* me = (PCMockup*)userdata;
+    if (igMenuItemBool("Exit", NULL, false, true))
+        me->isRunning = false;
 }
 
 void pcmockup_update(PCMockup *me)
 {
-    windowContainer_startUpdate(me->windowContainer);
-    GColor *framebuffer = pebbleWindow_getPebbleFramebuffer(me->pebbleWindow);
-    pebbleWindow_startUpdate(me->pebbleWindow);
-    renderer_render(me->renderer, framebuffer);
-    pebbleWindow_endUpdate(me->pebbleWindow);
-    debugWindowSet_update(me->debugWindowSet);
-    pcmockup_updateMainMenubar(me);
-    windowContainer_endUpdate(me->windowContainer);
+    windowContainer_update(me->windowContainer);
 
     SDL_Event event;
     while (SDL_PollEvent(&event))
@@ -220,34 +214,38 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-SDL_Rect findBestFit(SDL_Rect src, float dstAspect)
+GRect findBestFit(GRect src, float dstAspect)
 {
-    SDL_Rect dst;
-    const float srcAspect = (float)src.w / src.h;
+    GRect dst;
+    const float srcAspect = (float)src.size.w / src.size.h;
     if (srcAspect > dstAspect)
     {
-        dst.y = 0;
-        dst.h = src.h;
-        dst.w = (int)(dstAspect * src.h);
-        dst.x = (src.w / 2) - (dst.w / 2);
+        dst.origin.y = 0;
+        dst.size.h = src.size.h;
+        dst.size.w = (int)(dstAspect * src.size.h);
+        dst.origin.x = (src.size.w / 2) - (dst.size.w / 2);
     }
     else
     {
-        dst.x = 0;
-        dst.w = src.w;
-        dst.h = (int)(src.w / dstAspect);
-        dst.y = (src.h / 2) - (dst.h / 2);
+        dst.origin.x = 0;
+        dst.size.w = src.size.w;
+        dst.size.h = (int)(src.size.w / dstAspect);
+        dst.origin.y = (src.size.h / 2) - (dst.size.h / 2);
     }
     return dst;
 }
 
-SDL_Rect padRect(SDL_Rect rect, GSize amount)
+GRect padRect(GRect rect, GSize amount)
 {
-    return (SDL_Rect) {
-        rect.x + amount.w / 2,
-        rect.y + amount.h / 2,
-        rect.w - amount.w,
-        rect.h - amount.h
+    return (GRect) {
+        .origin = {
+            rect.origin.x + amount.w / 2,
+            rect.origin.y + amount.h / 2
+        },
+        .size = {
+            rect.size.w - amount.w,
+            rect.size.h - amount.h
+        }
     };
 }
 
@@ -271,4 +269,14 @@ Uint32 getWindowIDByEvent(const SDL_Event* ev)
             return ev->text.windowID;
     }
     return UINT32_MAX;
+}
+
+bool pcmockup_initDebugWindowSDL(WindowContainer* parent, GRect bounds, const DebugView* view, Renderer* renderer)
+{
+    return debugWindowSDL_init(parent, bounds, view, renderer) != NULL;
+}
+
+bool pcmockup_initDebugWindowImGui(WindowContainer* parent, GRect bounds, const DebugView* view, Renderer* renderer)
+{
+    return debugWindowImGui_init(parent, bounds, view, renderer) != NULL;
 }

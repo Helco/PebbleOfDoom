@@ -5,12 +5,13 @@
 #include "renderer.h"
 #include "texgen/texgen.h"
 #include "window.h"
+#include "platform.h"
 #include <glad/glad.h>
 
 #define TEXTURE_PATH "resources/textures/"
 
-SDL_Rect findBestFit(SDL_Rect target, float aspect);
-SDL_Rect padRect(SDL_Rect rect, GSize amount);
+GRect findBestFit(GRect target, float aspect);
+GRect padRect(GRect rect, GSize amount);
 
 extern const Uint32 imageWindow_SDLPixelFormat;
 typedef struct UploadedTexture UploadedTexture;
@@ -24,19 +25,11 @@ void uploadedTexture_setFromTexture(UploadedTexture* me, const Texture* texture)
 
 typedef struct ImageWindow ImageWindow;
 ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect initialBounds, bool_t isEssential);
-void imageWindow_free(ImageWindow* me);
 void imageWindow_setImageData(ImageWindow* me, GSize size, const SDL_Color* data);
 void imageWindow_toggle(ImageWindow* me, bool_t isOpen);
 bool_t imageWindow_isOpen(ImageWindow* me);
 Window* imageWindow_asWindow(ImageWindow* me);
-
-typedef struct WindowGrid
-{
-    int windowCount;
-    GSize totalSize;
-} WindowGrid;
-GSize windowGrid_getGridSize(const WindowGrid* grid);
-SDL_Rect windowGrid_getSingleBounds(const WindowGrid* grid, int windowI); // negative to select from end
+#define ImageWindow_Tag FOURCC('I', 'M', 'G', 'W')
 
 typedef struct SafeFramebuffer SafeFramebuffer;
 SafeFramebuffer* safeFramebuffer_init(GSize size, int canarySize); // canarySize in framebuffer sizes
@@ -46,25 +39,17 @@ void safeFramebuffer_prepare(SafeFramebuffer* me);
 void safeFramebuffer_check(SafeFramebuffer* me);
 
 typedef struct PebbleWindow PebbleWindow;
-PebbleWindow* pebbleWindow_init(WindowContainer* parent, SDL_Rect initialBounds, GSize pebbleSize, Renderer* renderer);
-void pebbleWindow_free(PebbleWindow* window);
-void pebbleWindow_startUpdate(PebbleWindow* me);
-void pebbleWindow_endUpdate(PebbleWindow* me);
+PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GSize pebbleSize, Renderer* renderer);
 GColor* pebbleWindow_getPebbleFramebuffer(PebbleWindow* window);
 ImageWindow* pebbleWindow_asImageWindow(PebbleWindow* window);
+#define PebbleWindow_Tag FOURCC('P', 'E', 'B', 'B')
 
-typedef struct DebugWindow DebugWindow;
-DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* debugView, Renderer* renderer);
-void debugWindow_free(DebugWindow* window);
-void debugWindow_update(DebugWindow* window);
-const DebugView* debugWindow_getDebugView(const DebugWindow* window);
-ImageWindow* debugWindow_asImageWindow(DebugWindow* window);
-
-typedef struct DebugWindowSet DebugWindowSet;
-DebugWindowSet* debugWindowSet_init(WindowContainer* parent, const WindowGrid* grid, Renderer* renderer);
-void debugWindowSet_free(DebugWindowSet* set);
-void debugWindowSet_update(DebugWindowSet* set);
-void debugWindowSet_updateMenubar(DebugWindowSet* me);
+typedef bool (*DebugWindowConstructor)(WindowContainer* parent, GRect bounds, const DebugView* view, Renderer* renderer);
+typedef struct DebugWindowSDL DebugWindowSDL;
+DebugWindowSDL* debugWindowSDL_init(WindowContainer* parent, GRect bounds, const DebugView* debugView, Renderer* renderer);
+typedef struct DebugWindowImGui DebugWindowImGui;
+DebugWindowImGui* debugWindowImGui_init(WindowContainer* parent, GRect bounds, const DebugView* debugView, Renderer* renderer);
+#define DebugWindow_Tag FOURCC('D', 'E', 'B', 'V')
 
 typedef struct PCMockup PCMockup;
 PCMockup* pcmockup_init();
@@ -88,7 +73,6 @@ const char* textureManager_getTextureSource(TextureManager* me, const Texture* t
 
 typedef struct TextureWindow TextureWindow;
 TextureWindow* textureWindow_init(WindowContainer* parent, TextureManager* manager);
-void textureWindow_free(TextureWindow* me);
 Window* textureWindow_asWindow(TextureWindow* me);
 
 #endif

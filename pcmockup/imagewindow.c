@@ -16,8 +16,9 @@ struct ImageWindow
 
 const Uint32 imageWindow_SDLPixelFormat = SDL_PIXELFORMAT_ABGR8888;
 
-void imageWindow_beforeUpdate(Window* me, void* userdata);
-void imageWindow_contentUpdate(Window* me, void* userdata);
+void imageWindow_free(void* userdata);
+void imageWindow_beforeUpdate(void* userdata);
+void imageWindow_contentUpdate(void* userdata);
 
 ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect initialBounds, bool_t isEssential)
 {
@@ -39,9 +40,11 @@ ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect 
         ImGuiWindowFlags_NoScrollbar |
         ImGuiWindowFlags_NoScrollWithMouse |
         ImGuiWindowFlags_NoCollapse);
-    window_setUpdateCallbacks(me->window, (WindowUpdateCallbacks) {
-        .before = imageWindow_beforeUpdate,
-        .content = imageWindow_contentUpdate,
+    window_addCallbacks(me->window, (WindowCallbacks) {
+        .tag = ImageWindow_Tag,
+        .destruct = imageWindow_free,
+        .beforeUpdate = imageWindow_beforeUpdate,
+        .contentUpdate = imageWindow_contentUpdate,
         .userdata = me
     });
 
@@ -66,10 +69,11 @@ ImageWindow* imageWindow_init(WindowContainer* parent, const char* title, GRect 
     return me;
 }
 
-void imageWindow_free(ImageWindow* me)
+void imageWindow_free(void* userdata)
 {
-    if (me == NULL)
-        return;
+    ImageWindow* me = (ImageWindow*)userdata;
+    if (me->window != NULL)
+        window_free(me->window);
     if (me->textureID != 0)
         glDeleteTextures(1, &me->textureID);
     free(me);
@@ -103,9 +107,8 @@ void imageWindow_constrainWindowSize(ImGuiSizeCallbackData* data)
     data->DesiredSize = byWidthArea > byHeightArea ? byWidth : byHeight;
 }
 
-void imageWindow_beforeUpdate(Window* window, void* userdata)
+void imageWindow_beforeUpdate(void* userdata)
 {
-    UNUSED(window);
     ImageWindow* me = (ImageWindow*)userdata;
     const ImVec2
         zero = { 0, 0 },
@@ -115,10 +118,10 @@ void imageWindow_beforeUpdate(Window* window, void* userdata)
     igPushStyleVarVec2(ImGuiStyleVar_WindowPadding, zero);  // space between image and window border
 }
 
-void imageWindow_contentUpdate(Window* window, void* userdata)
+void imageWindow_contentUpdate(void* userdata)
 {
     ImageWindow* me = (ImageWindow*)userdata;
-    const GSize windowSize = window_getBounds(window).size;
+    const GSize windowSize = window_getBounds(me->window).size;
     const ImVec2
         zero = { 0, 0 },
         one = { 1, 1 },

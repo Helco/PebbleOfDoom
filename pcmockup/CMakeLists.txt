@@ -16,8 +16,8 @@ set(sources_pcmockup
     pcmockup.h
     pcmockup.c
     pebblewindow.c
-    debugwindow.c
-    debugwindowset.c
+    debugwindow_sdl.c
+    debugwindow_imgui.c
     windowgrid.c
     safeframebuffer.c
     rendererinterface.c

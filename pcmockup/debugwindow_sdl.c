@@ -4,7 +4,7 @@
 
 #include <string.h>
 
-struct DebugWindow
+struct DebugWindowSDL
 {
     ImageWindow* window;
     SDL_Renderer* renderer;
@@ -28,58 +28,66 @@ SDL_Surface* createSDLSurface(int w, int h, Uint32 format)
     return surface;
 }
 
-void debugWindow_onDrag(Window* window, int button, ImVec2 delta, void* userdata);
-void debugWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata);
+void debugWindowSDL_free(void *userdata);
+void debugWindowSDL_contentUpdate(void* userdata);
+void debugWindowSDL_updateMenubar(void* userdata);
+void debugWindowSDL_onDrag(int button, ImVec2 delta, void* userdata);
+void debugWindowSDL_onKeyDown(SDL_Keysym sym, void* userdata);
 
-DebugWindow* debugWindow_init(WindowContainer* parent, SDL_Rect bounds, const DebugView* view, Renderer* podRenderer)
+DebugWindowSDL* debugWindowSDL_init(WindowContainer* parent, GRect bounds, const DebugView* view, Renderer* podRenderer)
 {
-    DebugWindow* me = (DebugWindow*)malloc(sizeof(DebugWindow));
+    DebugWindowSDL* me = (DebugWindowSDL*)malloc(sizeof(DebugWindowSDL));
     if (me == NULL)
         return NULL;
-    memset(me, 0, sizeof(DebugWindow));
+    memset(me, 0, sizeof(DebugWindowSDL));
 
-    GRect b = { { bounds.x, bounds.y }, { bounds.w, bounds.h} };
-    me->window = imageWindow_init(parent, view->name, b, false);
+    me->window = imageWindow_init(parent, view->name, bounds, false);
     if (me->window == NULL)
     {
-        debugWindow_free(me);
+        debugWindowSDL_free(me);
         return NULL;
     }
-    window_setDragCallback(imageWindow_asWindow(me->window), debugWindow_onDrag, me);
-    window_setKeyCallbacks(imageWindow_asWindow(me->window), (WindowKeyCallbacks) {
-        .down = debugWindow_onKeyDown,
+    window_setMenubarSection(imageWindow_asWindow(me->window), "Debug windows");
+    window_setOpenState(imageWindow_asWindow(me->window), view->startsOpened
+        ? WindowOpenState_Open : WindowOpenState_Closed);
+    window_addCallbacks(imageWindow_asWindow(me->window), (WindowCallbacks) {
+        .tag = DebugWindow_Tag,
+        .destruct = debugWindowSDL_free,
+        .drag = debugWindowSDL_onDrag,
+        .keyDown = debugWindowSDL_onKeyDown,
+        .contentUpdate = debugWindowSDL_contentUpdate,
+        .mainMenubar = debugWindowSDL_updateMenubar,
         .userdata = me
     });
 
-    me->surface = createSDLSurface(bounds.w, bounds.h, SDL_PIXELFORMAT_ABGR8888);
+    me->surface = createSDLSurface(bounds.size.w, bounds.size.h, SDL_PIXELFORMAT_ABGR8888);
     if (me->surface == NULL)
     {
         fprintf(stderr, "createSDLSurface: %s\n", SDL_GetError());
-        debugWindow_free(me);
+        debugWindowSDL_free(me);
         return NULL;
     }
 
     me->renderer = SDL_CreateSoftwareRenderer(me->surface);
     if (me->renderer == NULL)
     {
-        debugWindow_free(me);
+        debugWindowSDL_free(me);
         return NULL;
     }
 
     me->position = xz(real_zero, real_zero);
     me->zoom = real_one;
-    me->offset = xz(real_from_int(bounds.w / 2), real_from_int(bounds.h / 2));
+    me->offset = xz(real_from_int(bounds.size.w / 2), real_from_int(bounds.size.h / 2));
     me->podRenderer = podRenderer;
     me->view = view;
     return me;
 }
 
-void debugWindow_free(DebugWindow* me)
+void debugWindowSDL_free(void *userdata)
 {
-    if (me == NULL)
-        return;
+    DebugWindowSDL* me = (DebugWindowSDL*)userdata;
     if (me->window != NULL)
-        imageWindow_free(me->window);
+        window_free(imageWindow_asWindow(me->window));
     if (me->surface != NULL)
         SDL_FreeSurface(me->surface);
     if (me->renderer != NULL)
@@ -87,27 +95,28 @@ void debugWindow_free(DebugWindow* me)
     free(me);
 }
 
-void debugWindow_startUpdate(DebugWindow* me)
+void debugWindowSDL_contentUpdate(void* userdata)
 {
+    DebugWindowSDL* me = (DebugWindowSDL*)userdata;
     float scale = real_to_float(me->zoom);
     SDL_SetRenderDrawColor(me->renderer, 0, 0, 0, 255);
     SDL_RenderClear(me->renderer);
     SDL_RenderSetScale(me->renderer, scale, scale);
-}
 
-void debugWindow_endUpdate(DebugWindow* me)
-{
+    me->view->callback.sdl(me->podRenderer, me->renderer, me->offset, me->view->userdata);
+
     imageWindow_setImageData(me->window, GSize(me->surface->w, me->surface->h), (SDL_Color*)me->surface->pixels);
 }
 
-void debugWindow_update(DebugWindow* me)
+void debugWindowSDL_updateMenubar(void* userdata)
 {
-    debugWindow_startUpdate(me);
-    me->view->callback.sdl(me->podRenderer, me->renderer, me->offset, me->view->userdata);
-    debugWindow_endUpdate(me);
+    DebugWindowSDL* me = (DebugWindowSDL*)userdata;
+    bool isOpen = imageWindow_isOpen(me->window);
+    igMenuItemBoolPtr(me->view->name, NULL, &isOpen, true);
+    imageWindow_toggle(me->window, isOpen);
 }
 
-void debugWindow_updateOffset(DebugWindow* me)
+void debugWindowSDL_updateOffset(DebugWindowSDL* me)
 {
     xz_t halfSize = xz(real_from_int(me->surface->w / 2), real_from_int(me->surface->h / 2));
     me->offset = xz_sub(
@@ -116,20 +125,18 @@ void debugWindow_updateOffset(DebugWindow* me)
     );
 }
 
-void debugWindow_onDrag(Window* window, int button, ImVec2 delta, void* userdata)
+void debugWindowSDL_onDrag(int button, ImVec2 delta, void* userdata)
 {
-    UNUSED(window);
     if (button != 2) // middle mouse button
         return;
-    DebugWindow* me = (DebugWindow*)userdata;
+    DebugWindowSDL* me = (DebugWindowSDL*)userdata;
     xz_t move = xz_invScale((xz_t) { real_from_int(delta.x), real_from_int(delta.y) }, me->zoom);
     me->position = xz_sub(me->position, move);
-    debugWindow_updateOffset(me);
+    debugWindowSDL_updateOffset(me);
 }
 
-void debugWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata)
+void debugWindowSDL_onKeyDown(SDL_Keysym sym, void* userdata)
 {
-    UNUSED(window);
     static const float zoomSpeed = 0.1f;
     static const float moveSpeed = 8.0f;
     real_t zoomDelta = real_zero;
@@ -150,18 +157,18 @@ void debugWindow_onKeyDown(Window* window, SDL_Keysym sym, void* userdata)
         case (SDLK_RIGHT): moveDelta = xz(real_from_float(moveSpeed), real_zero); break;
         default: return;
     }
-    DebugWindow* me = (DebugWindow*)userdata;
+    DebugWindowSDL* me = (DebugWindowSDL*)userdata;
     me->position = xz_sub(me->position, xz_invScale(moveDelta, me->zoom));
     me->zoom = real_add(me->zoom, real_mul(me->zoom, zoomDelta));
-    debugWindow_updateOffset(me);
+    debugWindowSDL_updateOffset(me);
 }
 
-const DebugView* debugWindow_getDebugView(const DebugWindow* me)
+const DebugView* debugWindowSDL_getDebugView(const DebugWindowSDL* me)
 {
     return me->view;
 }
 
-ImageWindow* debugWindow_asImageWindow(DebugWindow* me)
+ImageWindow* debugWindowSDL_asImageWindow(DebugWindowSDL* me)
 {
     return me->window;
 }

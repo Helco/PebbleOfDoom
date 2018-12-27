@@ -27,13 +27,16 @@ void renderer_moveVertical(Renderer* renderer, xy_t direction);
 
 #ifdef DEBUG_WINDOWS
 struct SDL_Renderer; // no need to include SDL here
+typedef int ImGuiWindowFlags;
 
 typedef enum DebugViewType
 {
-    DebugViewType_SDL
+    DebugViewType_SDL,
+    DebugViewType_ImGui
 } DebugViewType;
 
 typedef void (*DebugViewCallback_SDL)(Renderer* me, struct SDL_Renderer* sdlRenderer, xz_t offset, const void* userdata);
+typedef void (*DebugViewCallback_ImGui)(Renderer* me, ImGuiWindowFlags* flags, const void* userdata);
 
 typedef struct DebugView
 {
@@ -41,7 +44,9 @@ typedef struct DebugView
     DebugViewType type;
     union {
         DebugViewCallback_SDL sdl;
+        DebugViewCallback_ImGui imgui;
     } callback;
+    bool_t startsOpened;
     const void* userdata; // given to the callbacks
 } DebugView;
 

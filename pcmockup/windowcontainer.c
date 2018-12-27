@@ -16,6 +16,14 @@ extern void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data);
 
 #define WINDOW_CONTAINER_CHUNK 16
 
+typedef struct MenubarHandler
+{
+    Window* window; // only when it *is* attached to a window
+    WindowUpdateCallback callback;
+    char* section;
+    void* userdata;
+} MenubarHandler;
+
 struct WindowContainer
 {
     SDL_Window* window;
@@ -24,6 +32,8 @@ struct WindowContainer
     Window** windows;
     Window* focusedWindow;
     int windowCount, windowCapacity;
+    MenubarHandler* menubarHandlers;
+    int menubarHandlerCount, menubarHandlerCapacity;
 };
 
 WindowContainer* windowContainer_init(GSize windowSize)
@@ -112,14 +122,78 @@ void windowContainer_free(WindowContainer* me)
         SDL_DestroyWindow(me->window);
     if (me->windows != NULL)
     {
-        for (int i = 0; i < me->windowCount; i++)
-            window_free(me->windows[i]);
+        while (me->windowCount > 0)
+            windowContainer_freeWindow(me, me->windows[0]);
         free(me->windows);
+    }
+    if (me->menubarHandlers != NULL)
+    {
+        for (int i = 0; i < me->menubarHandlerCount; i++) {
+            if (me->menubarHandlers[i].section != NULL)
+                free(me->menubarHandlers[i].section);
+        }
+        free(me->menubarHandlers);
     }
     free(me);
 }
 
-void windowContainer_startUpdate(WindowContainer* me)
+static bool findInStringArray(const char *const * array, const char* string)
+{
+    while (*array) {
+        if (strcmp(*array, string) == 0)
+            return true;
+        array++;
+    }
+    return false;
+}
+
+static const char** windowContainer_findUniqueMenubarSections(WindowContainer* me)
+{
+    const int sectionsByteSize = (me->menubarHandlerCount + 1) * sizeof(const char*);
+    const char** sectionNames = (const char**)malloc(sectionsByteSize);
+    assert(sectionNames != NULL);
+    memset(sectionNames, 0, sectionsByteSize);
+
+    const char** curSectionName = sectionNames;
+    for (int i = 0; i < me->menubarHandlerCount; i++) {
+        const char* curSection = me->menubarHandlers[i].section;
+        if (curSection != NULL && !findInStringArray(sectionNames, curSection))
+            *(curSectionName++) = curSection;
+    }
+    return sectionNames;
+}
+
+static void windowContainer_updateMainMenubarSection(WindowContainer* me, const char* section)
+{
+    for (int i = 0; i < me->menubarHandlerCount; i++) {
+        const MenubarHandler* handler = &me->menubarHandlers[i];
+        if ((section == NULL) == (handler->section == NULL) &&
+            (section == NULL || strcmp(section, handler->section) == 0))
+            handler->callback(handler->userdata);
+    }
+}
+
+static void windowContainer_updateMainMenubar(WindowContainer* me)
+{
+    if (!igBeginMainMenuBar())
+        return;
+
+    const char** sectionNames = windowContainer_findUniqueMenubarSections(me);
+    const char** curSectionName = sectionNames;
+    while (*curSectionName != NULL) {
+        if (igBeginMenu(*curSectionName, true)) {
+            windowContainer_updateMainMenubarSection(me, *curSectionName);
+            igEndMenu();
+        }
+        curSectionName++;
+    }
+    free(sectionNames);
+    windowContainer_updateMainMenubarSection(me, NULL);
+
+    igEndMainMenuBar();
+}
+
+void windowContainer_update(WindowContainer* me)
 {
     bool open = true;
     SDL_GL_MakeCurrent(me->window, me->glContext);
@@ -136,10 +210,8 @@ void windowContainer_startUpdate(WindowContainer* me)
         if (window_isFocused(me->windows[i]))
             me->focusedWindow = me->windows[i];
     }
-}
+    windowContainer_updateMainMenubar(me);
 
-void windowContainer_endUpdate(WindowContainer* me)
-{
     SDL_GL_MakeCurrent(me->window, me->glContext);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     igRender();
@@ -156,10 +228,51 @@ Window* windowContainer_newWindow(WindowContainer* me, const char* title)
         me->windows = (Window**)realloc(me->windows, sizeof(Window*) * me->windowCapacity);
         assert(me->windows != NULL);
     }
-    Window* newWindow = window_init();
+    Window* newWindow = window_init(me);
     window_setTitle(newWindow, title);
     me->windows[me->windowCount++] = newWindow;
     return newWindow;
+}
+
+static int windowContainer_findWindowIndex(WindowContainer* me, const Window* window)
+{
+    for (int i = 0; i < me->windowCount; i++) {
+        if (me->windows[i] == window)
+            return i;
+    }
+    return -1;
+}
+
+static int windowContainer_findMenubarHandlerIndex(WindowContainer* me, const Window* window)
+{
+    for (int i = 0; i < me->menubarHandlerCount; i++) {
+        if (me->menubarHandlers[i].window == window)
+            return i;
+    }
+    return -1;
+}
+
+void windowContainer_freeWindow(WindowContainer* me, Window* window)
+{
+    int index = windowContainer_findWindowIndex(me, window);
+    if (index < 0)
+        return;
+    int windowsAfter = me->windowCount - index - 1;
+    memmove(me->windows + index, me->windows + index + 1, windowsAfter * sizeof(Window*));
+    me->windowCount--;
+    window_internal_free(window);
+
+    int menubarIndex = windowContainer_findMenubarHandlerIndex(me, window);
+    if (menubarIndex >= 0) {
+        if (me->menubarHandlers[menubarIndex].section != NULL)
+            free(me->menubarHandlers[menubarIndex].section);
+        int handlersAfter = me->menubarHandlerCount - menubarIndex - 1;
+        memmove(
+            me->menubarHandlers + menubarIndex,
+            me->menubarHandlers + menubarIndex + 1,
+            handlersAfter * sizeof(MenubarHandler));
+        me->menubarHandlerCount--;
+    }
 }
 
 Window* windowContainer_getFocusedWindow(WindowContainer* me)
@@ -182,4 +295,48 @@ void windowContainer_handleEvent(WindowContainer* me, const SDL_Event* ev)
     if ((ev->type == SDL_KEYDOWN || ev->type == SDL_KEYUP) && !io->WantCaptureKeyboard)
         window_handleKeyEvent(me->focusedWindow, ev->key.keysym, (ev->type == SDL_KEYDOWN));
     window_handleDragEvent(me->focusedWindow);
+}
+
+void windowContainer_addMenubarHandler(WindowContainer* me, WindowUpdateCallback callback,
+    const char* section, void* userdata)
+{
+    windowContainer_addMenubarHandlerWithWindow(me, callback, NULL, section, userdata);
+}
+
+void windowContainer_addMenubarHandlerWithWindow(WindowContainer* me, WindowUpdateCallback callback,
+    Window* window, const char* section, void* userdata)
+{
+    if (me->menubarHandlerCount == me->menubarHandlerCapacity) {
+        int newCapacity = me->menubarHandlerCapacity + WINDOW_CONTAINER_CHUNK;
+        me->menubarHandlers = (MenubarHandler*)realloc(me->menubarHandlers, newCapacity * sizeof(MenubarHandler));
+        assert(me->menubarHandlers != NULL);
+        me->menubarHandlerCapacity = newCapacity;
+    }
+    int newIndex = me->menubarHandlerCount++;
+    me->menubarHandlers[newIndex] = (MenubarHandler) {
+        .window = window,
+        .callback = callback,
+        .userdata = userdata,
+        .section = (section != NULL && strcmp(section, "") != 0)
+            ? strdup(section)
+            : NULL
+    };
+}
+
+char** windowContainer_getMenubarSectionPtr(WindowContainer* me, const Window* window)
+{
+    int menubarIndex = windowContainer_findMenubarHandlerIndex(me, window);
+    assert(menubarIndex >= 0);
+    return &me->menubarHandlers[menubarIndex].section;
+}
+
+int windowContainer_getWindowCount(const WindowContainer* me)
+{
+    return me->windowCount;
+}
+
+Window* windowContainer_getWindowByIndex(WindowContainer* me, int index)
+{
+    assert(index >= 0 && index < me->windowCount);
+    return me->windows[index];
 }
