@@ -20,7 +20,7 @@ struct BlueList {
     char* typeName;
     RawBlueListDestructor destructor;
     void* destructorUserdata;
-    BlueListEntry* entries;
+    char* entries; // char to easily move in bytes
 };
 
 static int blueList_getNextCapacity(int oldCapacity) {
@@ -72,16 +72,22 @@ void raw_blueList_requireType(BlueList* list, const char* typeName)
     assert(strcmp(list->typeName, typeName) == 0);
 }
 
+static BlueListEntry* raw_blueList_getEntry(BlueList* list, int index)
+{
+    void* ptr = list->entries + index * (sizeof(BlueListEntry) + list->elementSize);
+    return (BlueListEntry*)ptr;
+}
+
 void* raw_blueList_get(BlueList* list, int index)
 {
     assert(list != NULL && index >= 0 && index < list->count);
-    return list->entries[index].data;
+    return raw_blueList_getEntry(list, index)->data;
 }
 
 const void* raw_blueList_constget(const BlueList* list, int index)
 {
     assert(list != NULL && index >= 0 && index < list->count);
-    return list->entries[index].data;
+    return raw_blueList_getEntry((BlueList*)list, index)->data;
 }
 
 int blueList_add(BlueList* list, const void* element)
@@ -89,22 +95,30 @@ int blueList_add(BlueList* list, const void* element)
     return blueList_addWithId(list, element, list->nextId++);
 }
 
+BlueListEntry* blueList_getNextEntry(BlueList* list)
+{
+    assert(list != NULL);
+    if (list->count == list->capacity) {
+        list->capacity = blueList_getNextCapacity(list->capacity);
+        const int memorySize = list->capacity * (sizeof(BlueListEntry) + list->elementSize);
+        list->entries = (char*)blueSafeRealloc(list->entries, memorySize);
+    }
+    return raw_blueList_getEntry(list, list->count);
+}
+
 int blueList_addWithId(BlueList* list, const void* element, BlueEntryID id)
 {
     assert(list != NULL && list->count <= list->capacity);
     assert(element != NULL);
-    if (list->count == list->capacity) {
-        list->capacity = blueList_getNextCapacity(list->capacity);
-        const int memorySize = list->capacity * (sizeof(BlueListEntry) + list->elementSize);
-        list->entries = (BlueListEntry*)blueSafeRealloc(list->entries, memorySize);
-    }
 
-    int index = list->count++;
-    list->entries[index].id = id;
-    memcpy(&list->entries[index], element, list->elementSize);
+    BlueListEntry* entry = blueList_getNextEntry(list);
+    entry->id = id;
+    memcpy(entry->data, element, list->elementSize);
     list->changeCount++;
-    return index;
+    return list->count++;
 }
+
+int blueList_addEmpty(BlueList* list);
 
 void blueList_swap(BlueList* list, int fromIndex, int toIndex)
 {
@@ -115,8 +129,8 @@ void blueList_swap(BlueList* list, int fromIndex, int toIndex)
         return;
 
     stb_swap(
-        &list->entries[fromIndex],
-        &list->entries[toIndex],
+        raw_blueList_getEntry(list, fromIndex),
+        raw_blueList_getEntry(list, toIndex),
         sizeof(BlueListEntry) + list->elementSize);
     list->changeCount++;
 }
@@ -167,9 +181,8 @@ int blueList_getChangeCount(const BlueList* list)
 
 BlueEntryID blueList_getIdByIndex(const BlueList* list, int index)
 {
-    assert(list != NULL);
-    assert(index >= 0 && index < list->count);
-    return list->entries[index].id;
+    assert(list != NULL && index >= 0 && index < list->count);
+    return raw_blueList_getEntry((BlueList*)list, index)->id;
 }
 
 BlueEntryID blueList_getIdByPtr(const BlueList* list, const void* element)
@@ -183,7 +196,7 @@ int blueList_findById(const BlueList* list, BlueEntryID id)
 {
     assert(list != NULL);
     for (int i = 0; i < list->count; i++) {
-        if (list->entries[i].id == id)
+        if (blueList_getIdByIndex(list, i) == id)
             return i;
     }
     return -1;
@@ -193,9 +206,10 @@ int blueList_findByPtr(const BlueList* list, const void* element)
 {
     assert(list != NULL && element != NULL);
     const int fullEntrySize = list->elementSize + sizeof(BlueListEntry);
-    const int index = ((char*)element - (char*)list->entries) / fullEntrySize;
+    const int index = ((const char*)element - list->entries) / fullEntrySize;
 #ifdef _DEBUG
-    const void* recalculated = ((char*)list->entries) + index * fullEntrySize;
+    const void* recalculated = raw_blueList_getEntry(list, index)->data;
+    assert(index >= 0 && index < list->count);
     asset(recalculated == element);
 #endif
     return index;

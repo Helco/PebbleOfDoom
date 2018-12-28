@@ -23,6 +23,7 @@ typedef struct BlueList BlueList;
 typedef int BlueEntryID;
 
 void blueList_free(BlueList* list);
+int blueList_addEmpty(BlueList* list);
 int blueList_add(BlueList* list, const void* element);
 int blueList_addWithId(BlueList* list, const void* element, BlueEntryID id);
 void blueList_swap(BlueList* list, int fromIndex, int toIndex);
@@ -47,7 +48,7 @@ typedef raw_blueList_destructor(RawBlueListDestructor, void);
         typedef raw_blueList_destructor(__dtorType, type); \
         const __dtorType __dtor = destructor; \
         raw_blueList_setDestructor(list, (RawBlueListDestructor)__dtor, userdata); \
-    while(false)
+    } while(false)
 
 #define raw_blueList_comparer(name,type) int (*name)(const type* a, const type* b, void* userdata)
 typedef raw_blueList_comparer(RawBlueListComparer, void);
