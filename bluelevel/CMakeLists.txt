@@ -3,6 +3,8 @@
 ###################################################################
 
 set(sources_bluelevel
+    blueutil.h
+    blueutil.c
     bluelist.h
     bluelist.c
 

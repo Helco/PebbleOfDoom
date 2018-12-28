@@ -1,4 +1,5 @@
 #include "bluelist.h"
+#include "blueutil.h"
 #include "stb.include.h"
 #include <stdlib.h>
 #include <string.h>
@@ -33,10 +34,8 @@ static int blueList_getNextCapacity(int oldCapacity) {
 
 BlueList* raw_blueList_new(const char* typeName, int elementSize)
 {
-    BlueList* list = (BlueList*)malloc(sizeof(BlueList));
-    assert(list != NULL);
-    list->typeName = strdup(typeName);
-    assert(list->typeName != NULL);
+    BlueList* list = (BlueList*)blueSafeAlloc(sizeof(BlueList));
+    list->typeName = blueSafeStrdup(typeName);
 
     list->count = list->capacity = 0;
     list->nextId = 1;
@@ -54,11 +53,10 @@ void blueList_free(BlueList* list)
         for (int i = 0; i < list->count; i++)
             list->destructor(raw_blueList_get(list, i), list->destructorUserdata);
     }
-    if (list->typeName != NULL)
-        free(list->typeName);
+    blueSafeFree(list->typeName);
     if (list->entries != NULL)
-        free(list->entries);
-    free(list);
+        blueSafeFree(list->entries);
+    blueSafeFree(list);
 }
 
 void raw_blueList_setDestructor(BlueList* list, RawBlueListDestructor destructor, void* userdata)
@@ -98,8 +96,7 @@ int blueList_addWithId(BlueList* list, const void* element, BlueEntryID id)
     if (list->count == list->capacity) {
         list->capacity = blueList_getNextCapacity(list->capacity);
         const int memorySize = list->capacity * (sizeof(BlueListEntry) + list->elementSize);
-        list->entries = (BlueListEntry*)realloc(list->entries, memorySize);
-        assert(list->entries != NULL);
+        list->entries = (BlueListEntry*)blueSafeRealloc(list->entries, memorySize);
     }
 
     int index = list->count++;

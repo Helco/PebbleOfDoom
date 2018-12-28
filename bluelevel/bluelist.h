@@ -18,6 +18,7 @@
  */
 
 #define BlueList(type) BlueList
+#define INVALID_BLUEENTRYID ((BlueEntryID)0)
 typedef struct BlueList BlueList;
 typedef int BlueEntryID;
 
@@ -57,9 +58,11 @@ typedef raw_blueList_comparer(RawBlueListComparer, void);
         raw_blueList_sort(list, (RawBlueListComparer)__comparer, userdata); \
     while(false)
 
-#define blueList_get(type,list,index) (raw_blueList_requireType(list, #type), _Generic(list, \
-    BlueList*: (type*)raw_blueList_get(list, (index)) \
-    const BlueList*: (const type*)raw_blueList_constget(list, (index))))
+#define blueList_get(type,list,index) (raw_blueList_requireType(list, #type), \
+    _Generic(list, \
+        BlueList*: (type*)raw_blueList_get(list, (index)), \
+        const BlueList*: (const type*)raw_blueList_constget(list, (index)) \
+    ))
 
 #define blueList_foreach(type,name,list) \
     raw_blueList_requireType(list, #type); \
