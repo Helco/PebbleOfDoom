@@ -1,5 +1,5 @@
 ###################################################################
-# BlueLevel (library for level editor)
+# BlueLevel (library for edited level <-> playable level)
 ###################################################################
 
 set(sources_bluelevel
@@ -7,6 +7,12 @@ set(sources_bluelevel
     blueutil.c
     bluelist.h
     bluelist.c
+    bluelevel.h
+    bluelevel_internal.h
+    bluepoint.c
+    bluesegment.c
+    bluesector.c
+    bluelevel.c
 
     bluelevel_internal.h
 )

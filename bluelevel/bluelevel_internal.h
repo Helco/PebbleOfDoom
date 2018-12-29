@@ -1,39 +1,53 @@
 #ifndef BLUELEVEL_INTERNAL_H
 #define BLUELEVEL_INTERNAL_H
-#include "algebra.h"
-#include "texture.h"
+#include "bluelevel.h"
 #include "bluelist.h"
 
-typedef enum BluePointStatus {
-    BluePointStatus_Ok,
-    BluePointStatus_NonConvex
-} BluePointStatus;
-
-typedef struct BluePoint
+struct BluePoint
 {
-    int refCount;
     xz_t position;
 
+    BlueLevel* level;
     BluePointStatus status;
-} BluePoint;
+    int refCount;
+};
 
-typedef struct BlueSegment
+struct BlueSegment
+{
+    BlueEntryID startPointId;
+    TextureId texture;
+    BlueTexCoords texCoords;
+    BlueEntryID portalTargetId;
+
+    BlueSector* sector;
+    BlueSegmentStatus status;
+};
+
+struct BlueSector
 {
     char* name;
-    BlueList(int)* pointIds;
+    BlueList(BlueSegment)* segments;
     real_t offset, height;
     TextureId floorTexture, ceilTexture;
-    //Matrix3x2 floorTexMatrix, ceilTexMatrix;
+    BlueSlabTexMatrix floorTexMatrix, ceilTexMatrix;
 
-    BlueList(BluePoint*)* pointCache;
-    int pointCacheTag;
-} BlueSegment;
+    BlueLevel* level;
+    BlueSectorStatus status;
+    int refCount;
+};
 
-typedef struct BlueLevel
+struct BlueLevel
 {
-    char* name, *filename;
+    char* name, *fileName;
     BlueList(BluePoint)* points;
-    BlueList(BlueSegment)* segments;
-} BlueLevel;
+    BlueList(BlueSector)* sectors;
+};
+
+BluePoint bluePoint_new(BlueLevel* level, xz_t pos);
+
+BlueSegment blueSegment_new(BlueSector* sector, BlueEntryID startPointId);
+
+void blueSector_init(BlueSector* sector, BlueLevel* level);
+void blueSector_deinit(BlueSector* sector, void* _);
 
 #endif
