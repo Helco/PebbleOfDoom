@@ -66,7 +66,7 @@ void raw_blueList_setDestructor(BlueList* list, RawBlueListDestructor destructor
     list->destructorUserdata = userdata;
 }
 
-void raw_blueList_requireType(BlueList* list, const char* typeName)
+void raw_blueList_requireType(const BlueList* list, const char* typeName)
 {
     assert(list != NULL && typeName != NULL);
     assert(strcmp(list->typeName, typeName) == 0);

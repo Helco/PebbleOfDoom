@@ -4,8 +4,8 @@
 
 /* A simple expandable list for any type, augmented with a few macros
  * for ease of use and a bit of type safety.
- * An ID is a weak identification, e.g. operations receiving one should
- * accept invalid IDs.
+ * An ID is a weak identification, e.g. operations receiving should
+ * accept invalid IDs and operations returning can return an invalid ID
  *
  * Implicit API (backed by macros):
  * typedef void BlueListDestructor(type* element, void* userdata);
@@ -57,24 +57,24 @@ typedef raw_blueList_comparer(RawBlueListComparer, void);
         typedef raw_blueList_comparer(__comparerType, type); \
         const __comparerType __comparer = comparer; \
         raw_blueList_sort(list, (RawBlueListComparer)__comparer, userdata); \
-    while(false)
+    } while(false)
 
 #define blueList_get(type,list,index) (raw_blueList_requireType(list, #type), \
     _Generic(list, \
-        BlueList*: (type*)raw_blueList_get(list, (index)), \
-        const BlueList*: (const type*)raw_blueList_constget(list, (index)) \
+        const BlueList*: (const type*)raw_blueList_constget(list, index), \
+        BlueList*: (type*)raw_blueList_get((BlueList*)list, index) \
     ))
 
 #define blueList_foreach(type,name,list) \
-    raw_blueList_requireType(list, #type); \
-    for ( \
-        int i##name = 0, const type* name = NULL; \
-        i##name < in->count && (name = blueList_get(type, in, i##name)); \
-        i##name++)
+    int index##__LINE__ = 0; \
+    for (const type* name = NULL; \
+         index##__LINE__ < blueList_getCount(list) && \
+         (name = blueList_get(type, list, index##__LINE__)); \
+         index##__LINE__++)
 
 BlueList* raw_blueList_new(const char* typeName, int elementSize);
 void raw_blueList_setDestructor(BlueList* list, RawBlueListDestructor destructor, void* userdata);
-void raw_blueList_requireType(BlueList* list, const char* typeName);
+void raw_blueList_requireType(const BlueList* list, const char* typeName);
 void* raw_blueList_get(BlueList* list, int index);
 const void* raw_blueList_constget(const BlueList* list, int index);
 void raw_blueList_sort(BlueList* list, RawBlueListComparer comparer, void* userdata);
