@@ -13,6 +13,8 @@ set(sources_bluelevel
     bluesegment.c
     bluesector.c
     bluelevel.c
+    bluegeometry.h
+    bluegeometry.c
 
     bluelevel_internal.h
 )

@@ -37,7 +37,7 @@ const BluePoint* blueSegment_getStartPoint(const BlueSegment* seg)
 {
     assert(seg != NULL);
     int index = blueList_findById(seg->sector->level->points, seg->startPointId);
-    return blueList_get(BluePoint, seg->sector->level->points, index);
+    return index < 0 ? NULL : blueList_get(BluePoint, seg->sector->level->points, index);
 }
 
 TextureId blueSegment_getTexture(const BlueSegment* seg)
@@ -50,4 +50,20 @@ BlueSegmentStatus blueSegment_getStatus(const BlueSegment* seg)
 {
     assert(seg != NULL);
     return seg->status;
+}
+
+const BlueSegment* blueSegment_getNext(const BlueSegment* seg)
+{
+    assert(seg != NULL);
+    int index = blueList_findByPtr(seg->sector->segments, seg);
+    index = (index + 1) % blueList_getCount(seg->sector->segments);
+    return blueList_get(BlueSegment, seg->sector->segments, index);
+}
+
+const BlueSegment* blueSegment_getPrev(const BlueSegment* seg)
+{
+    assert(seg != NULL);
+    int index = blueList_findByPtr(seg->sector->segments, seg);
+    index = index > 0 ? index - 1 : blueList_getCount(seg->sector->segments) - 1;
+    return blueList_get(BlueSegment, seg->sector->segments, index);
 }

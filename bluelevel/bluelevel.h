@@ -13,7 +13,8 @@ typedef enum BluePointStatus {
 typedef enum BlueSegmentStatus {
     BlueSegmentStatus_Ok,
     BlueSegmentStatus_NonConvex,
-    BlueSegmentStatus_MissingTexture
+    BlueSegmentStatus_MissingTexture,
+    BlueSegmentStatus_InvalidPortalTarget
 } BlueSegmentStatus;
 
 typedef enum BlueSectorStatus {
@@ -44,6 +45,8 @@ void blueSegment_setTexture(BlueSegment* seg, TextureId newTexture);
 const BluePoint* blueSegment_getStartPoint(const BlueSegment* seg);
 TextureId blueSegment_getTexture(const BlueSegment* seg);
 BlueSegmentStatus blueSegment_getStatus(const BlueSegment* seg);
+const BlueSegment* blueSegment_getNext(const BlueSegment* seg);
+const BlueSegment* blueSegment_getPrev(const BlueSegment* seg);
 
 typedef struct BlueSector BlueSector;
 void blueSector_setName(BlueSector* sector, const char* newName);
