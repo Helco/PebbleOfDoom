@@ -45,7 +45,7 @@ void renderer_setFieldOfView(Renderer* me, real_t fov)
     me->leftFovSeg.end.xz = xz(real_mul(minus_one, farPlane.x), farPlane.z);
     me->rightFovSeg.start.xz = nearPlane;
     me->rightFovSeg.end.xz = farPlane;
-    me->fovStuff = real_div(real_from_int(HALF_RENDERER_WIDTH), tanHalfFov);
+    me->horFovScale = real_div(real_from_int(HALF_RENDERER_WIDTH), tanHalfFov);
 }
 
 void renderer_setLevel(Renderer* renderer, const Level* level)
@@ -138,12 +138,12 @@ void renderer_project(const Renderer* me, const Sector* sector, const lineSeg_t*
     const xz_t endT = transformedSeg->end.xz;
 
 #define div_and_int(value, z) (real_to_int(real_div((value), (z))))
-    real_t projectedLeftX =   real_sub(real_div(real_mul(startT.x, me->fovStuff), startT.z), real_from_float(0.5f)); // -0.5 fixes rounding error
+    real_t projectedLeftX =   real_sub(real_div(real_mul(startT.x, me->horFovScale), startT.z), real_from_float(0.5f)); // -0.5 fixes rounding error
     projected->left.x =       real_to_int(projectedLeftX)                             + HALF_RENDERER_WIDTH;
     projected->left.yStart =  div_and_int(negScaledWallHeight, startT.z)              + HALF_RENDERER_HEIGHT;
     projected->left.yEnd =    div_and_int(scaledWallHeight, startT.z)                 + HALF_RENDERER_HEIGHT;
 
-    projected->right.x =      div_and_int(real_mul(endT.x, me->fovStuff), endT.z)     + HALF_RENDERER_WIDTH;
+    projected->right.x =      div_and_int(real_mul(endT.x, me->horFovScale), endT.z)  + HALF_RENDERER_WIDTH;
     projected->right.yStart = div_and_int(negScaledWallHeight, endT.z)                + HALF_RENDERER_HEIGHT;
     projected->right.yEnd =   div_and_int(scaledWallHeight, endT.z)                   + HALF_RENDERER_HEIGHT;
 #undef div_and_int

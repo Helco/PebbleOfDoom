@@ -20,7 +20,7 @@ struct Renderer
     const Level* level;
     Location location;
     real_t eyeHeight;
-    real_t fovStuff, fov;
+    real_t horFovScale, fov;
     lineSeg_t leftFovSeg, rightFovSeg;
     int yTop[RENDERER_WIDTH], yBottom[RENDERER_WIDTH];
     DrawRequestStack drawRequests;
