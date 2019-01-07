@@ -8,6 +8,7 @@ set(sources_test_podrenderer
     test_vector.cpp
     test_intersection.cpp
     test_integer.cpp
+    test_lineSeg.cpp
 )
 assign_source_group(${sources_test_podrenderer})
 

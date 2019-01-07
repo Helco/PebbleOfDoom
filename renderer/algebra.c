@@ -198,6 +198,13 @@ real_t xz_linePhase(lineSeg_t seg, xz_t intersection)
         : real_div(real_sub(seg.start.xz.z, intersection.z), segVector.z);
 }
 
+bool_t xz_isOnRight(xz_t point, lineSeg_t line)
+{
+    const xz_t dir = xz_sub(line.end.xz, line.start.xz);
+    const xz_t pointDir = xz_sub(point, line.start.xz);
+    return real_compare(xz_cross(pointDir, dir), real_zero) >= 0;
+}
+
 bool_t xy_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xy_t* result)
 {
     return xz_lineIntersect(seg1, seg2, (xz_t*)result);
@@ -206,4 +213,8 @@ bool_t xy_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xy_t* result)
 real_t xy_linePhase(lineSeg_t seg, xy_t intersection)
 {
     return xz_linePhase(seg, xy_to_xz(intersection));
+}
+bool_t xy_isOnRight(xy_t point, lineSeg_t line)
+{
+    return xz_isOnRight(xy_to_xz(point), line);
 }
