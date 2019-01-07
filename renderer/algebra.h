@@ -146,8 +146,10 @@ typedef struct lineSeg_t {
 
 bool_t xz_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xz_t* result);
 real_t xz_linePhase(lineSeg_t seg, xz_t intersection);
+bool_t xz_isOnRight(xz_t point, lineSeg_t line);
 bool_t xy_lineIntersect(lineSeg_t seg1, lineSeg_t seg2, xy_t* result);
 real_t xy_linePhase(lineSeg_t seg, xy_t intersection);
+bool_t xy_isOnRight(xy_t point, lineSeg_t line);
 
 
 #endif
