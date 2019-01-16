@@ -12,10 +12,10 @@
  * ```
  */
 #define UNUSED(...) do { \
-    _Pragma("GCC diagnostic push") \
-    _Pragma("GCC diagnostic ignored \"-Wunused-value\"") \
+    _Pragma("GCC diagnostic push"); \
+    _Pragma("GCC diagnostic ignored \"-Wunused-value\""); \
     (void)(__VA_ARGS__); \
-    _Pragma("GCC diagnostic pop") \
+    _Pragma("GCC diagnostic pop"); \
     } while(0)
 
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
