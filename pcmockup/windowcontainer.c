@@ -1,3 +1,4 @@
+#define _CRT_NONSTDC_NO_DEPRECATE
 #include "window_internal.h"
 #include <assert.h>
 #include <glad/glad.h>
