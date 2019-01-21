@@ -104,7 +104,7 @@ static void prv_pebbleWindow_convertPebbleToTexture(PebbleWindow* me)
         itTexPixel = (uint32_t*)texPixels;
         for (int x = 0; x < me->pebbleSize.w; x++)
         {
-            itPebblePixel = pebblePixels + x * me->pebbleSize.h + y;
+            itPebblePixel = pebblePixels + x * me->pebbleSize.h + (me->pebbleSize.h - y - 1);
             SDL_Color color = prv_convertGColorTo32Bit(*itPebblePixel);
             *itTexPixel = SDL_MapRGBA(me->texturePixelFormat,
                 color.r, color.g, color.b, color.a);

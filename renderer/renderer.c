@@ -129,7 +129,7 @@ bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg, TexCoord* texC
 void renderer_project(const Renderer* me, const Sector* sector, const lineSeg_t* transformedSeg, WallSection* projected)
 {
     //const real_t halfHeight = real_div(real_from_int(sector->height), real_from_int(2));
-    const real_t relHeightOffset = real_add(real_from_int(sector->heightOffset), real_sub(me->location.height, me->eyeHeight));
+    const real_t relHeightOffset = real_sub(real_from_int(sector->heightOffset), real_add(me->location.height, me->eyeHeight));
 #define scale_height(value) (real_mul(real_from_int(HALF_RENDERER_HEIGHT), (value)))
     const real_t scaledWallHeight =    scale_height(real_add(real_from_int(sector->height), relHeightOffset));
     const real_t negScaledWallHeight = scale_height(relHeightOffset);
@@ -147,6 +147,38 @@ void renderer_project(const Renderer* me, const Sector* sector, const lineSeg_t*
     projected->right.yStart = div_and_int(negScaledWallHeight, endT.z)                + HALF_RENDERER_HEIGHT;
     projected->right.yEnd =   div_and_int(scaledWallHeight, endT.z)                   + HALF_RENDERER_HEIGHT;
 #undef div_and_int
+}
+
+void renderer_renderFilledSpan(Renderer* me, GColor* framebufferColumn, int yWallLower, int yWallUpper, int yFillLower, int yFillUpper, real_t xNorm, TexCoord texCoord, const lineSeg_t* wallSeg, const Texture* texture)
+{
+    UNUSED(me);
+
+    // Calculate texture column
+    real_t invZLerped = real_lerp(xNorm, real_reciprocal(wallSeg->start.xz.z), real_reciprocal(wallSeg->end.xz.z));
+    real_t invTexLerped = real_lerp(xNorm,
+        real_div(texCoord.start.x, wallSeg->start.xz.z),
+        real_div(texCoord.end.x, wallSeg->end.xz.z)
+    );
+    real_t texLerped = real_div(invTexLerped, invZLerped);
+    int texCol = real_to_int(real_mul(texLerped, real_from_int(texture->size.w)));
+
+    // Calculate texture row (start and increment)
+    real_t yNormalized = real_div(real_from_int(yFillLower - yWallLower), real_from_int(yWallUpper - yWallLower));
+    real_t texRow = real_mul(real_lerp(yNormalized, texCoord.start.y, texCoord.end.y), real_from_int(texture->size.h));
+    real_t texRowIncr = real_div(
+        real_mul(real_sub(texCoord.end.y, texCoord.start.y), real_from_int(texture->size.h)),
+        real_from_int(yWallUpper - yWallLower + 1));
+
+    // Set pixels
+    GColor* curPixel = framebufferColumn + yFillLower;
+    for (int y = yFillLower; y <= yFillUpper; y++) {
+        int texRowI = real_to_int(texRow);
+        *(curPixel++) = texture->pixels[
+            (texRowI % texture->size.h) * texture->size.w +
+                (texCol % texture->size.w)
+        ];
+        texRow = real_add(texRow, texRowIncr);
+    }
 }
 
 void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* request, int wallIndex)
@@ -182,67 +214,53 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
     const Texture* const texture = texture_load(me->textureManager, wall->texture);
     const int renderLeft = max(request->left, p.left.x);
     const int renderRight = min(request->right, p.right.x);
-    for (int x = renderLeft; x <= renderRight; x++) {
+    BresenhamIterator upperIt, lowerIt;
+    bresenham_init(&lowerIt,
+        renderLeft, lerpi(renderLeft, p.left.x, p.right.x, p.left.yStart, p.right.yStart),
+        renderRight, lerpi(renderRight, p.left.x, p.right.x, p.left.yStart, p.right.yStart));
+    bresenham_init(&upperIt,
+        renderLeft, lerpi(renderLeft, p.left.x, p.right.x, p.left.yEnd, p.right.yEnd),
+        renderRight, lerpi(renderRight, p.left.x, p.right.x, p.left.yEnd, p.right.yEnd));
+    BresenhamStep upperStep, lowerStep;
+    UNUSED(portalNomEnd);
+    int x = renderLeft;
+    do {
         const int yBottom = me->yBottom[x];
         const int yTop = me->yTop[x];
-        GColor* curPixel = framebuffer + x * RENDERER_HEIGHT + yBottom;
-        int yCurStart = lerpi(x, p.left.x, p.right.x, p.left.yStart, p.right.yStart);
-        int yCurEnd = lerpi(x, p.left.x, p.right.x, p.left.yEnd, p.right.yEnd);
-        if (yCurEnd < yBottom || yCurStart > yTop || yCurStart >= yCurEnd)
-            continue;
 
-        int yPortalStart = yCurEnd, yPortalEnd = yTop + 1;
+        do {
+            upperStep = bresenham_step(&upperIt);
+            //if (upperIt.y0 > me->yBottom[x] && upperIt.y0 <= me->yTop[x])
+            //    framebuffer[x * RENDERER_HEIGHT + upperIt.y0] = GColorFromRGB(255, 255, 255);
+        } while (upperStep != BRESENHAMSTEP_X && upperStep != BRESENHAMSTEP_NONE);
+        do {
+            lowerStep = bresenham_step(&lowerIt);
+            //if (lowerIt.y0 > me->yBottom[x] && lowerIt.y0 <= me->yTop[x])
+            //    framebuffer[x * RENDERER_HEIGHT + lowerIt.y0] = GColorFromRGB(255, 255, 255);
+        } while (lowerStep != BRESENHAMSTEP_X && lowerStep != BRESENHAMSTEP_NONE);
+        assert(upperIt.x0 == lowerIt.x0);
+
+        int yPortalStart = upperIt.y0, yPortalEnd = me->yTop[x] + 1;
         if (wall->portalTo >= 0) {
-            me->yBottom[x] = yPortalStart = clampi(yBottom, lerpi(portalNomStart, 0, sector->height, yCurStart, yCurEnd), yTop);
-            me->yTop[x] = yPortalEnd = clampi(yBottom, lerpi(portalNomEnd, 0, sector->height, yCurStart, yCurEnd), yTop);
+            me->yBottom[x] = yPortalStart = clampi(yBottom, lerpi(portalNomStart, 0, sector->height, lowerIt.y0, upperIt.y0), yTop);
+            yPortalEnd = lerpi(portalNomEnd, 0, sector->height, lowerIt.y0, upperIt.y0);
+            me->yTop[x] = clampi(yBottom, yPortalEnd, yTop);
         }
 
         real_t xNorm = real_div(real_from_int(x - p.left.x), real_from_int(p.right.x - p.left.x));
-        real_t invZLerped = real_lerp(xNorm, real_reciprocal(wallSeg.start.xz.z), real_reciprocal(wallSeg.end.xz.z));
-        real_t invTexLerped = real_lerp(xNorm,
-            real_div(texCoord.start.x, wallSeg.start.xz.z),
-            real_div(texCoord.end.x, wallSeg.end.xz.z)
-        );
-        real_t texLerped = real_div(invTexLerped, invZLerped);
-        int texCol = real_to_int(real_mul(texLerped, real_from_int(texture->size.w)));
+        renderer_renderFilledSpan(me, framebuffer + x * RENDERER_HEIGHT,
+            lowerIt.y0, upperIt.y0, max(yBottom, lowerIt.y0), min(yTop, yPortalStart - 1),
+            xNorm, texCoord, &wallSeg, texture);
 
-        real_t yNormalized = yCurStart >= 0 ? real_zero
-            : real_div(real_from_int(-yCurStart), real_from_int(yCurEnd - yCurStart));
-        real_t texRow = real_mul(real_lerp(yNormalized, texCoord.start.y, texCoord.end.y), real_from_int(texture->size.h));
-        real_t texRowIncr = real_div(
-            real_mul(real_sub(texCoord.end.y, texCoord.start.y), real_from_int(texture->size.h)),
-            real_from_int(yCurEnd - yCurStart + 1));
-
-        int y;
-        for (y = yBottom; y < max(yBottom, yCurStart); y++)
-            *(curPixel++) = sector->floorColor;
-        for (; y <= min(yTop, yPortalStart - 1); y++)
-        {
-            int texRowI = real_to_int(texRow);
-            *(curPixel++) = texture->pixels[
-                (texRowI % texture->size.h) * texture->size.w +
-                (texCol % texture->size.w)
-            ];
-            texRow = real_add(texRow, texRowIncr);
-        }
         if (wall->portalTo >= 0) {
-            //for (; y <= min(yTop, yPortalEnd); y++)
-                //*(curPixel++) = ((y / 4) % 2) ? GColorFromRGB(255, 0, 255) : GColorFromRGB(0, 0, 0);
-            texRow = real_add(texRow, real_mul(texRowIncr, real_from_int(min(yTop, yPortalEnd) - y + 1)));
-            curPixel += yPortalEnd - y;
-            for (y = yPortalEnd; y <= min(yTop, yCurEnd); y++)
-            {
-                int texRowI = real_to_int(texRow);
-                *(curPixel++) = texture->pixels[
-                    (texRowI % texture->size.h) * texture->size.w +
-                    (texCol % texture->size.w)
-                ];
-                texRow = real_add(texRow, texRowIncr);
-            }
+            renderer_renderFilledSpan(me, framebuffer + x * RENDERER_HEIGHT,
+                lowerIt.y0, upperIt.y0, max(yBottom, yPortalEnd), min(yTop, upperIt.y0),
+                xNorm, texCoord, &wallSeg, texture);
         }
-        for (; y <= yTop; y++)
-            *(curPixel++) = sector->ceilColor;
-    }
+
+        x++;
+    } while(upperStep != BRESENHAMSTEP_NONE);
+    assert(lowerStep == BRESENHAMSTEP_NONE);
 
     texture_free(me->textureManager, texture);
 }
@@ -320,4 +338,40 @@ const DrawRequest* drawRequestStack_pop(DrawRequestStack* stack)
     const DrawRequest* result = &stack->requests[stack->start];
     stack->start = (stack->start + 1) % MAX_DRAW_DEPTH;
     return result;
+}
+
+void bresenham_init(BresenhamIterator* it, int x0, int y0, int x1, int y1)
+{
+    it->x0 = x0;
+    it->y0 = y0;
+    it->x1 = x1;
+    it->y1 = y1;
+    it->dx = abs(x1 - x0);
+    it->dy = -abs(y1 - y0);
+    it->sx = x0 < x1 ? 1 : -1;
+    it->sy = y0 < y1 ? 1 : -1;
+    it->err = it->dx + it->dy;
+    it->isFirstStep = true;
+}
+
+BresenhamStep bresenham_step(BresenhamIterator* it)
+{
+    if (it->isFirstStep) {
+        it->isFirstStep = false;
+        return BRESENHAMSTEP_INIT;
+    }
+    if (it->x0 == it->x1 && it->y0 == it->y1)
+        return BRESENHAMSTEP_NONE;
+    if (it->err * 2 > it->dy) {
+        it->err += it->dy;
+        it->x0 += it->sx;
+        return BRESENHAMSTEP_X;
+    }
+    if (it->err * 2 < it->dx) {
+        it->err += it->dx;
+        it->y0 += it->sy;
+        return BRESENHAMSTEP_Y;
+    }
+    assert(false && "This should never have happened");
+    return BRESENHAMSTEP_NONE;
 }

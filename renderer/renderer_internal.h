@@ -1,6 +1,7 @@
 #ifndef RENDERER_INTERNAL_H
 #define RENDERER_INTERNAL_H
 #include "renderer.h"
+#include <stdbool.h>
 
 #define MAX_DRAW_DEPTH 16
 
@@ -28,9 +29,26 @@ struct Renderer
     TextureManagerHandle textureManager;
 };
 
+typedef struct BresenhamIterator
+{
+    int x0, y0, x1, y1;
+    int dx, dy, sx, sy, err;
+    bool isFirstStep;
+} BresenhamIterator;
+typedef enum BresenhamStep
+{
+    BRESENHAMSTEP_INIT = 0,
+    BRESENHAMSTEP_X,
+    BRESENHAMSTEP_Y,
+    BRESENHAMSTEP_NONE
+} BresenhamStep;
+
 void drawRequestStack_reset(DrawRequestStack* stack);
 void drawRequestStack_push(DrawRequestStack* stack, const Sector* sector, int left, int right, const Sector* sourceSector);
 const DrawRequest* drawRequestStack_pop(DrawRequestStack* stack);
+
+void bresenham_init(BresenhamIterator* it, int x0, int y0, int x1, int y1);
+BresenhamStep bresenham_step(BresenhamIterator* it);
 
 void renderer_setFieldOfView(Renderer* me, real_t newFov);
 void renderer_transformLine(const Renderer* me, const lineSeg_t* line, lineSeg_t* result);
