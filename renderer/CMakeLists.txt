@@ -4,6 +4,7 @@
 
 set(sources_podrenderer
     renderer.h
+    renderer_internal.h
     renderer.c
     renderer_debug.c
     algebra_float.c

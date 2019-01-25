@@ -206,14 +206,15 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
     if (wall->portalTo >= 0 && targetSector != request->sourceSector) {
         portalNomStart = clampi(0, targetSector->heightOffset - sector->heightOffset, sector->height);
         portalNomEnd = clampi(0, portalNomStart + targetSector->height, sector->height);
-        drawRequestStack_push(&me->drawRequests, targetSector,
-            max(request->left, p.left.x), min(request->right, p.right.x), sector);
+        //drawRequestStack_push(&me->drawRequests, targetSector,
+            //max(request->left, p.left.x), min(request->right, p.right.x), sector);
     }
 
     // render wall
     const Texture* const texture = texture_load(me->textureManager, wall->texture);
     const int renderLeft = max(request->left, p.left.x);
     const int renderRight = min(request->right, p.right.x);
+    const bool_t isRightFacing = real_compare(wallSeg.start.xz.z, wallSeg.end.xz.z) > 0;
     BresenhamIterator upperIt, lowerIt;
     bresenham_init(&lowerIt,
         renderLeft, lerpi(renderLeft, p.left.x, p.right.x, p.left.yStart, p.right.yStart),
@@ -228,15 +229,32 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
         const int yBottom = me->yBottom[x];
         const int yTop = me->yTop[x];
 
+        /*
+         * Problem: the column at the corner is drawn by the walls
+         * we set the boundaries in yTopBottom to the portal of the left wall
+         * thus the right wall cannot draw itself properly as it is bounded by the left wall
+         *
+         * Possible Solutions: more slab memory to have slabs per wall
+         * Possible Solution: have two boundary array sets
+         * Possible Solution: somehow have only one wall own a column
+         */
+
         do {
             upperStep = bresenham_step(&upperIt);
-            //if (upperIt.y0 > me->yBottom[x] && upperIt.y0 <= me->yTop[x])
-            //    framebuffer[x * RENDERER_HEIGHT + upperIt.y0] = GColorFromRGB(255, 255, 255);
+            if (upperIt.y0 > me->yBottom[x] && upperIt.y0 <= me->yTop[x]) {
+                framebuffer[x * RENDERER_HEIGHT + upperIt.y0] = GColorFromRGB(255, 255, 255);
+                me->slabs[upperIt.y0].left = isRightFacing
+                    ? max(me->slabs[upperIt.y0].left, request->left)
+                    : x;
+                me->slabs[upperIt.y0].right = isRightFacing
+                    ? x
+                    : min(me->slabs[upperIt.y0].right, request->right);
+            }
         } while (upperStep != BRESENHAMSTEP_X && upperStep != BRESENHAMSTEP_NONE);
         do {
             lowerStep = bresenham_step(&lowerIt);
-            //if (lowerIt.y0 > me->yBottom[x] && lowerIt.y0 <= me->yTop[x])
-            //    framebuffer[x * RENDERER_HEIGHT + lowerIt.y0] = GColorFromRGB(255, 255, 255);
+            if (lowerIt.y0 > me->yBottom[x] && lowerIt.y0 <= me->yTop[x])
+                framebuffer[x * RENDERER_HEIGHT + lowerIt.y0] = GColorFromRGB(255, 255, 255);
         } while (lowerStep != BRESENHAMSTEP_X && lowerStep != BRESENHAMSTEP_NONE);
         assert(upperIt.x0 == lowerIt.x0);
 
@@ -247,7 +265,7 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
             me->yTop[x] = clampi(yBottom, yPortalEnd, yTop);
         }
 
-        real_t xNorm = real_div(real_from_int(x - p.left.x), real_from_int(p.right.x - p.left.x));
+        /*real_t xNorm = real_div(real_from_int(x - p.left.x), real_from_int(p.right.x - p.left.x));
         renderer_renderFilledSpan(me, framebuffer + x * RENDERER_HEIGHT,
             lowerIt.y0, upperIt.y0, max(yBottom, lowerIt.y0), min(yTop, yPortalStart - 1),
             xNorm, texCoord, &wallSeg, texture);
@@ -256,7 +274,7 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
             renderer_renderFilledSpan(me, framebuffer + x * RENDERER_HEIGHT,
                 lowerIt.y0, upperIt.y0, max(yBottom, yPortalEnd), min(yTop, upperIt.y0),
                 xNorm, texCoord, &wallSeg, texture);
-        }
+        }*/
 
         x++;
     } while(upperStep != BRESENHAMSTEP_NONE);
@@ -265,10 +283,30 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
     texture_free(me->textureManager, texture);
 }
 
+void renderer_renderSlabs(Renderer* renderer, GColor* framebuffer, const DrawRequest* request)
+{
+    for (int y = 0; y < RENDERER_HEIGHT; y++) {
+        const Slab* const slab = &renderer->slabs[y];
+        if (slab->left < 0 || slab->right >= RENDERER_WIDTH)
+            continue;
+        for (int x = slab->left; x <= slab->right; x++) {
+            GColor* curPixel = framebuffer + x * RENDERER_HEIGHT + y;
+            if (curPixel->argb == 0)
+                *curPixel = y < RENDERER_HEIGHT / 2
+                    ? request->sector->floorColor
+                    : request->sector->ceilColor;
+        }
+    }
+}
+
 void renderer_renderSector(Renderer* renderer, GColor* framebuffer, const DrawRequest* request)
 {
+    for (int i = 0; i < RENDERER_HEIGHT; i++)
+        renderer->slabs[i] = (Slab) { .left = -1, .right = RENDERER_WIDTH };
     for (int i = 0; i < request->sector->wallCount; i++)
         renderer_renderWall(renderer, framebuffer, request, i);
+    if (request->sector->wallCount == 4)
+        renderer_renderSlabs(renderer, framebuffer, request);
 }
 
 void renderer_render(Renderer* renderer, GColor* framebuffer)

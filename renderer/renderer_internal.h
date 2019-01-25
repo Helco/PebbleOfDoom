@@ -16,6 +16,10 @@ typedef struct DrawRequestStack {
     int start, end;
 } DrawRequestStack;
 
+typedef struct Slab {
+    int left, right;
+} Slab;
+
 struct Renderer
 {
     const Level* level;
@@ -24,6 +28,7 @@ struct Renderer
     real_t horFovScale, fov;
     lineSeg_t leftFovSeg, rightFovSeg;
     int yTop[RENDERER_WIDTH], yBottom[RENDERER_WIDTH];
+    Slab slabs[RENDERER_HEIGHT];
     DrawRequestStack drawRequests;
 
     TextureManagerHandle textureManager;
