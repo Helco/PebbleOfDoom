@@ -8,17 +8,17 @@
 typedef struct DrawRequest {
     const Sector* sector;
     const Sector* sourceSector;
-    int left, right;
+    int left, right, depth;
 } DrawRequest;
 
 typedef struct DrawRequestStack {
     DrawRequest requests[MAX_DRAW_DEPTH];
-    int start, end;
+    int start, end, depth;
 } DrawRequestStack;
 
-typedef struct Slab {
-    int left, right;
-} Slab;
+typedef struct BoundarySet {
+    short yTop[RENDERER_WIDTH], yBottom[RENDERER_WIDTH];
+} BoundarySet;
 
 struct Renderer
 {
@@ -27,8 +27,10 @@ struct Renderer
     real_t eyeHeight;
     real_t horFovScale, fov;
     lineSeg_t leftFovSeg, rightFovSeg;
-    int yTop[RENDERER_WIDTH], yBottom[RENDERER_WIDTH];
-    Slab slabs[RENDERER_HEIGHT];
+    BoundarySet boundarySets[2];
+    BoundarySet wallBoundaries;
+    short spanStart[RENDERER_HEIGHT];
+    int curBoundarySet;
     DrawRequestStack drawRequests;
 
     TextureManagerHandle textureManager;
@@ -50,6 +52,7 @@ typedef enum BresenhamStep
 
 void drawRequestStack_reset(DrawRequestStack* stack);
 void drawRequestStack_push(DrawRequestStack* stack, const Sector* sector, int left, int right, const Sector* sourceSector);
+void drawRequestStack_nextDepth(DrawRequestStack* stack);
 const DrawRequest* drawRequestStack_pop(DrawRequestStack* stack);
 
 void bresenham_init(BresenhamIterator* it, int x0, int y0, int x1, int y1);
