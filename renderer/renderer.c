@@ -274,21 +274,134 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
 
 void renderer_renderSlabs(Renderer* renderer, GColor* framebuffer, const DrawRequest* request)
 {
-    const BoundarySet* innerSet = &renderer->wallBoundaries;
+    BoundarySet* innerSet = &renderer->wallBoundaries;
     const BoundarySet* outerSet = &renderer->boundarySets[renderer->curBoundarySet];
+    int minY = 100000, maxY = -10000;
+    int minX = request->left, maxX = request->right;
+    bool didStart = false;
     for (int x = request->left; x <= request->right; x++)
     {
-        int upperColumnHeight = outerSet->yTop[x] - innerSet->yTop[x];
-        assert(upperColumnHeight >= 0);
-        memset(framebuffer + x * RENDERER_HEIGHT + innerSet->yTop[x], request->sector->ceilColor.argb, upperColumnHeight);
-        int lowerColumnHeight = innerSet->yBottom[x] - outerSet->yBottom[x];
-        assert(lowerColumnHeight >= 0);
-        memset(framebuffer + x * RENDERER_HEIGHT + outerSet->yBottom[x], request->sector->floorColor.argb, lowerColumnHeight);
+        innerSet->yBottom[x] = innerSet->yTop[x] + 1;
+        innerSet->yTop[x] = outerSet->yTop[x];
+        minY = min(minY, innerSet->yBottom[x]);
+        maxY = max(maxY, innerSet->yTop[x]);
+
+        if (innerSet->yBottom[x] <= innerSet->yTop[x]) {
+            if (!didStart) {
+                minX = x;
+                didStart = true;
+            }
+            maxX = x;
+        }
     }
+    if (!didStart)
+        return;
+
+    innerSet->yBottom[minX - 1] = 10000;
+    innerSet->yTop[minX - 1] = -10000;
+    innerSet->yBottom[maxX + 1] = 10000;
+    innerSet->yTop[maxX + 1] = -10000;
+
+    for (int x = minX; x <= maxX + 1; x++)
+    {
+        int top1 = innerSet->yTop[x - 1];
+        int top2 = innerSet->yTop[x];
+        int bottom1 = innerSet->yBottom[x - 1];
+        int bottom2 = innerSet->yBottom[x];
+
+        while (top1 < top2 && top2 >= bottom2)
+        {
+            renderer->spanStart[top2] = x;
+            top2--;
+        }
+        while (bottom1 > bottom2 && bottom2 <= top2)
+        {
+            renderer->spanStart[bottom2] = x;
+            bottom2++;
+        }
+        while (top1 > top2 && top1 >= bottom1)
+        {
+            assert(renderer->spanStart[top1] >= 0 && renderer->spanStart[top1] < RENDERER_WIDTH);
+            for (int i = renderer->spanStart[top1]; i < x; i++)
+                framebuffer[i * RENDERER_HEIGHT + top1] = request->sector->ceilColor;
+            top1--;
+        }
+        while (bottom1 < bottom2 && bottom1 <= top1)
+        {
+            assert(renderer->spanStart[bottom1] >= 0 && renderer->spanStart[bottom1] < RENDERER_WIDTH);
+            for (int i = renderer->spanStart[bottom1]; i < x; i++)
+                framebuffer[i * RENDERER_HEIGHT + bottom1] = request->sector->ceilColor;
+            bottom1++;
+        }
+
+    }
+
+    /*
+
+    innerSet->yTop[request->left - 1] = outerSet->yTop[request->right];
+    innerSet->yTop[request->right + 1] = outerSet->yTop[request->right];
+    outerSet->yTop[request->left - 1] = RENDERER_HEIGHT - 1;
+    outerSet->yTop[request->right + 1] = RENDERER_HEIGHT - 1;
+    for (int x = request->left - 1; x <= request->right; x++)
+    {
+        int upperColumnStart1 = innerSet->yTop[x];
+        int upperColumnStart2 = innerSet->yTop[x + 1];
+        int lowerColumnStart1 = outerSet->yTop[x];
+        int lowerColumnStart2 = outerSet->yTop[x + 1];
+
+        while (upperColumnStart1 > upperColumnStart2)
+        {
+            renderer->spanStart[upperColumnStart1] = x;
+            upperColumnStart1--;
+        }
+
+        while (upperColumnStart1 < upperColumnStart2)
+        {
+            //printf("Render slab at y = %d from %d to %d\n", upperColumnStart2, renderer->spanStart[upperColumnStart2], x);
+            if (renderer->spanStart[upperColumnStart2] < 0)
+                renderer->spanStart[upperColumnStart2] = request->left;
+            for (int i = renderer->spanStart[upperColumnStart2]; i <= x; i++)
+                framebuffer[i * RENDERER_HEIGHT + upperColumnStart2] = request->sector->ceilColor;
+            renderer->spanStart[upperColumnStart2] = -1;
+            upperColumnStart2--;
+        }
+
+        while (lowerColumnStart1 > lowerColumnStart2)
+        {
+            if (renderer->spanStart[lowerColumnStart1] < 0)
+                renderer->spanStart[lowerColumnStart1] = request->left;
+            for (int i = renderer->spanStart[lowerColumnStart1]; i <= x; i++)
+                framebuffer[i * RENDERER_HEIGHT + lowerColumnStart1] = request->sector->ceilColor;
+            renderer->spanStart[lowerColumnStart1] = -1;
+            lowerColumnStart1--;
+        }
+
+        while (lowerColumnStart1 < lowerColumnStart2)
+        {
+            renderer->spanStart[lowerColumnStart2] = x;
+            lowerColumnStart2--;
+        }
+    }*/
+
+    /*for (int y = 0; y < RENDERER_HEIGHT; y++)
+    {
+        if (renderer->spanStart[y] < -1)
+            continue;
+        if (renderer->spanStart[y] < 0)
+            renderer->spanStart[y] = request->left;
+        for (int x = renderer->spanStart[y]; x < request->right; x++)
+        {
+            framebuffer[x * RENDERER_HEIGHT + y] = (y < RENDERER_HEIGHT / 2)
+                ? request->sector->floorColor
+                : request->sector->ceilColor;
+        }
+    }*/
 }
 
 void renderer_renderSector(Renderer* renderer, GColor* framebuffer, const DrawRequest* request)
 {
+    for (int y = 0; y < RENDERER_HEIGHT; y++)
+        renderer->spanStart[y] = -1;
     for (int i = 0; i < request->sector->wallCount; i++)
         renderer_renderWall(renderer, framebuffer, request, i);
     renderer_renderSlabs(renderer, framebuffer, request);

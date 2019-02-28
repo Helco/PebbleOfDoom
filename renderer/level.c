@@ -97,7 +97,7 @@ Level *level_load(int levelId)
         .playerStart = {
             .sector = 1,
             .position = xz(real_from_int(20), real_from_int(70)),
-            .angle = real_degToRad(real_from_int(0)),
+            .angle = real_degToRad(real_from_int(40)),
             .height = real_zero
         },
         .sectors = NULL
