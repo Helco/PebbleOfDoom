@@ -333,69 +333,7 @@ void renderer_renderSlabs(Renderer* renderer, GColor* framebuffer, const DrawReq
                 framebuffer[i * RENDERER_HEIGHT + bottom1] = request->sector->ceilColor;
             bottom1++;
         }
-
     }
-
-    /*
-
-    innerSet->yTop[request->left - 1] = outerSet->yTop[request->right];
-    innerSet->yTop[request->right + 1] = outerSet->yTop[request->right];
-    outerSet->yTop[request->left - 1] = RENDERER_HEIGHT - 1;
-    outerSet->yTop[request->right + 1] = RENDERER_HEIGHT - 1;
-    for (int x = request->left - 1; x <= request->right; x++)
-    {
-        int upperColumnStart1 = innerSet->yTop[x];
-        int upperColumnStart2 = innerSet->yTop[x + 1];
-        int lowerColumnStart1 = outerSet->yTop[x];
-        int lowerColumnStart2 = outerSet->yTop[x + 1];
-
-        while (upperColumnStart1 > upperColumnStart2)
-        {
-            renderer->spanStart[upperColumnStart1] = x;
-            upperColumnStart1--;
-        }
-
-        while (upperColumnStart1 < upperColumnStart2)
-        {
-            //printf("Render slab at y = %d from %d to %d\n", upperColumnStart2, renderer->spanStart[upperColumnStart2], x);
-            if (renderer->spanStart[upperColumnStart2] < 0)
-                renderer->spanStart[upperColumnStart2] = request->left;
-            for (int i = renderer->spanStart[upperColumnStart2]; i <= x; i++)
-                framebuffer[i * RENDERER_HEIGHT + upperColumnStart2] = request->sector->ceilColor;
-            renderer->spanStart[upperColumnStart2] = -1;
-            upperColumnStart2--;
-        }
-
-        while (lowerColumnStart1 > lowerColumnStart2)
-        {
-            if (renderer->spanStart[lowerColumnStart1] < 0)
-                renderer->spanStart[lowerColumnStart1] = request->left;
-            for (int i = renderer->spanStart[lowerColumnStart1]; i <= x; i++)
-                framebuffer[i * RENDERER_HEIGHT + lowerColumnStart1] = request->sector->ceilColor;
-            renderer->spanStart[lowerColumnStart1] = -1;
-            lowerColumnStart1--;
-        }
-
-        while (lowerColumnStart1 < lowerColumnStart2)
-        {
-            renderer->spanStart[lowerColumnStart2] = x;
-            lowerColumnStart2--;
-        }
-    }*/
-
-    /*for (int y = 0; y < RENDERER_HEIGHT; y++)
-    {
-        if (renderer->spanStart[y] < -1)
-            continue;
-        if (renderer->spanStart[y] < 0)
-            renderer->spanStart[y] = request->left;
-        for (int x = renderer->spanStart[y]; x < request->right; x++)
-        {
-            framebuffer[x * RENDERER_HEIGHT + y] = (y < RENDERER_HEIGHT / 2)
-                ? request->sector->floorColor
-                : request->sector->ceilColor;
-        }
-    }*/
 }
 
 void renderer_renderSector(Renderer* renderer, GColor* framebuffer, const DrawRequest* request)
