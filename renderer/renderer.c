@@ -272,20 +272,20 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
     texture_free(me->textureManager, texture);
 }
 
-void renderer_renderSlabs(Renderer* renderer, GColor* framebuffer, const DrawRequest* request)
+void renderer_renderSlabColumns(Renderer* renderer, GColor* framebuffer, const DrawRequest* request, const short* bottomSet, const short* topSet, bool isCeil)
 {
-    const BoundarySet* innerSet = &renderer->wallBoundaries;
-    const BoundarySet* outerSet = &renderer->boundarySets[renderer->curBoundarySet];
     const int minX = request->left, maxX = request->right;
-
+    const GColor color = isCeil
+        ? request->sector->ceilColor
+        : request->sector->floorColor;
     int top1, top2, bottom1, bottom2;
     top1 = -10000;
     bottom1 = 10000;
 
     for (int x = minX; x <= maxX + 1; x++)
     {
-        top2 = x <= maxX ? outerSet->yTop[x] : -10000;
-        bottom2 = x <= maxX ? innerSet->yTop[x] : 10000;
+        top2 = x <= maxX ? topSet[x] : -10000;
+        bottom2 = x <= maxX ? bottomSet[x] : 10000;
 
         while (top1 < top2 && top2 >= bottom2)
         {
@@ -302,7 +302,7 @@ void renderer_renderSlabs(Renderer* renderer, GColor* framebuffer, const DrawReq
             assert(renderer->spanStart[top1] >= 0 && renderer->spanStart[top1] < RENDERER_WIDTH);
             assert(top1 >= 0 && top1 < RENDERER_HEIGHT);
             for (int i = renderer->spanStart[top1]; i < x; i++)
-                framebuffer[i * RENDERER_HEIGHT + top1] = request->sector->ceilColor;
+                framebuffer[i * RENDERER_HEIGHT + top1] = color;
             top1--;
         }
         while (bottom1 < bottom2 && bottom1 <= top1)
@@ -310,13 +310,25 @@ void renderer_renderSlabs(Renderer* renderer, GColor* framebuffer, const DrawReq
             assert(renderer->spanStart[bottom1] >= 0 && renderer->spanStart[bottom1] < RENDERER_WIDTH);
             assert(bottom1 >= 0 && bottom1 < RENDERER_HEIGHT);
             for (int i = renderer->spanStart[bottom1]; i < x; i++)
-                framebuffer[i * RENDERER_HEIGHT + bottom1] = request->sector->ceilColor;
+                framebuffer[i * RENDERER_HEIGHT + bottom1] = color;
             bottom1++;
         }
 
-        top1 = outerSet->yTop[x];
-        bottom1 = innerSet->yTop[x];
+        top1 = topSet[x];
+        bottom1 = bottomSet[x];
     }
+}
+
+void renderer_renderSlabs(Renderer* me, GColor* framebuffer, const DrawRequest* request)
+{
+    renderer_renderSlabColumns(me, framebuffer, request,
+        me->wallBoundaries.yTop,
+        me->boundarySets[me->curBoundarySet].yTop,
+        true);
+    renderer_renderSlabColumns(me, framebuffer, request,
+        me->boundarySets[me->curBoundarySet].yBottom,
+        me->wallBoundaries.yBottom,
+        false);
 }
 
 void renderer_renderSector(Renderer* renderer, GColor* framebuffer, const DrawRequest* request)
