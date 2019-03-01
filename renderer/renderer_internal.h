@@ -17,12 +17,8 @@ typedef struct DrawRequestStack {
 } DrawRequestStack;
 
 typedef struct BoundarySet {
-    short leftTopEdge;
     short yTop[RENDERER_WIDTH];
-    short rightTopEdge;
-    short leftBottomEdge;
     short yBottom[RENDERER_WIDTH];
-    short rightBottomEdge;
 } BoundarySet;
 
 struct Renderer
