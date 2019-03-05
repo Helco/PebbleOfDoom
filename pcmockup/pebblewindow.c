@@ -121,7 +121,10 @@ void pebbleWindow_contentUpdate(void* userdata)
 {
     PebbleWindow* me = (PebbleWindow*)userdata;
     safeFramebuffer_prepare(me->framebuffer);
-    renderer_render(me->renderer, pebbleWindow_getPebbleFramebuffer(me));
+    renderer_render(me->renderer, (RendererTarget) {
+        .framebuffer = pebbleWindow_getPebbleFramebuffer(me),
+        .colorFormat = RendererColorFormat_8BitColor
+    });
     safeFramebuffer_check(me->framebuffer);
     prv_pebbleWindow_convertPebbleToTexture(me);
     imageWindow_setImageData(me->window, me->pebbleSize, me->textureData);

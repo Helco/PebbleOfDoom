@@ -5,6 +5,15 @@
 #define NEAR_PLANE 1.0f
 #define FAR_PLANE 500
 
+int renderColorFormat_getStride(RendererColorFormat format)
+{
+    static const int RENDERER_STRIDE[] = {
+        [RendererColorFormat_8BitColor] = RENDERER_HEIGHT,
+        [RendererColorFormat_1BitBW] = (RENDERER_HEIGHT + 7) / 8
+    };
+    return RENDERER_STRIDE[format];
+}
+
 Renderer* renderer_init()
 {
     Renderer* me = (Renderer*)malloc(sizeof(Renderer));
@@ -149,9 +158,12 @@ void renderer_project(const Renderer* me, const Sector* sector, const lineSeg_t*
 #undef div_and_int
 }
 
-void renderer_renderFilledSpan(Renderer* me, GColor* framebufferColumn, int yWallLower, int yWallUpper, int yFillLower, int yFillUpper, real_t xNorm, TexCoord texCoord, const lineSeg_t* wallSeg, const Texture* texture)
+void renderer_renderFilledSpan(Renderer* me, RendererTarget target, int x, int yWallLower, int yWallUpper, int yFillLower, int yFillUpper, real_t xNorm, TexCoord texCoord, const lineSeg_t* wallSeg, const Texture* texture)
 {
     UNUSED(me);
+    if (target.colorFormat != RendererColorFormat_8BitColor)
+        return;
+    GColor* const framebufferColumn =  ((GColor*)target.framebuffer) + x * RENDERER_HEIGHT;
 
     // Calculate texture column
     real_t invZLerped = real_lerp(xNorm, real_reciprocal(wallSeg->start.xz.z), real_reciprocal(wallSeg->end.xz.z));
@@ -181,7 +193,12 @@ void renderer_renderFilledSpan(Renderer* me, GColor* framebufferColumn, int yWal
     }
 }
 
-void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* request, int wallIndex)
+void renderer_renderContourSpan(Renderer* me, RendererTarget target, int x, int yStart, int yEnd)
+{
+    UNUSED(me, target, x, yStart, yEnd);
+}
+
+void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest* request, int wallIndex)
 {
     const Sector* const sector = request->sector;
     const Wall* const wall = &sector->walls[wallIndex];
@@ -232,14 +249,13 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
 
         do {
             upperStep = bresenham_step(&upperIt);
-            if (upperIt.y0 > yBottom && upperIt.y0 <= yTop) {
-                framebuffer[x * RENDERER_HEIGHT + upperIt.y0] = GColorFromRGB(255, 255, 255);
-            }
+            if (upperIt.y0 > yBottom && upperIt.y0 <= yTop)
+                renderer_renderContourSpan(me, target, x, upperIt.y0, upperIt.y0);
         } while (upperStep != BRESENHAMSTEP_X && upperStep != BRESENHAMSTEP_NONE);
         do {
             lowerStep = bresenham_step(&lowerIt);
             if (lowerIt.y0 > yBottom && lowerIt.y0 <= yTop)
-                framebuffer[x * RENDERER_HEIGHT + lowerIt.y0] = GColorFromRGB(255, 255, 255);
+                renderer_renderContourSpan(me, target, x, lowerIt.y0, lowerIt.y0);
         } while (lowerStep != BRESENHAMSTEP_X && lowerStep != BRESENHAMSTEP_NONE);
         assert(upperIt.x0 == lowerIt.x0);
 
@@ -254,12 +270,12 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
         me->wallBoundaries.yTop[x] = min(yTop, upperIt.y0 - 1);
 
         real_t xNorm = real_div(real_from_int(x - p.left.x), real_from_int(p.right.x - p.left.x));
-        renderer_renderFilledSpan(me, framebuffer + x * RENDERER_HEIGHT,
+        renderer_renderFilledSpan(me, target, x,
             lowerIt.y0, upperIt.y0, max(yBottom, lowerIt.y0), min(yTop, yPortalStart - 1),
             xNorm, texCoord, &wallSeg, texture);
 
         if (wall->portalTo >= 0) {
-            renderer_renderFilledSpan(me, framebuffer + x * RENDERER_HEIGHT,
+            renderer_renderFilledSpan(me, target, x,
                 lowerIt.y0, upperIt.y0, max(yBottom, yPortalEnd), min(yTop, upperIt.y0),
                 xNorm, texCoord, &wallSeg, texture);
         }
@@ -271,8 +287,12 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
     texture_free(me->textureManager, texture);
 }
 
-void renderer_renderSlabColumns(Renderer* renderer, GColor* framebuffer, const DrawRequest* request, const short* bottomSet, const short* topSet, bool isCeil)
+void renderer_renderSlabColumns(Renderer* renderer, RendererTarget target, const DrawRequest* request, const short* bottomSet, const short* topSet, bool isCeil)
 {
+    if (target.colorFormat != RendererColorFormat_8BitColor)
+        return;
+    GColor* const framebuffer = (GColor*)target.framebuffer;
+
     const int minX = request->left, maxX = request->right;
     const GColor color = isCeil
         ? request->sector->ceilColor
@@ -318,32 +338,32 @@ void renderer_renderSlabColumns(Renderer* renderer, GColor* framebuffer, const D
     }
 }
 
-void renderer_renderSlabs(Renderer* me, GColor* framebuffer, const DrawRequest* request)
+void renderer_renderSlabs(Renderer* me, RendererTarget target, const DrawRequest* request)
 {
-    renderer_renderSlabColumns(me, framebuffer, request,
+    renderer_renderSlabColumns(me, target, request,
         me->wallBoundaries.yTop,
         me->boundarySets[me->curBoundarySet].yTop,
         true);
-    renderer_renderSlabColumns(me, framebuffer, request,
+    renderer_renderSlabColumns(me, target, request,
         me->boundarySets[me->curBoundarySet].yBottom,
         me->wallBoundaries.yBottom,
         false);
 }
 
-void renderer_renderSector(Renderer* renderer, GColor* framebuffer, const DrawRequest* request)
+void renderer_renderSector(Renderer* renderer, RendererTarget target, const DrawRequest* request)
 {
     for (int y = 0; y < RENDERER_HEIGHT; y++)
         renderer->spanStart[y] = -1;
     for (int i = 0; i < request->sector->wallCount; i++)
-        renderer_renderWall(renderer, framebuffer, request, i);
-    renderer_renderSlabs(renderer, framebuffer, request);
+        renderer_renderWall(renderer, target, request, i);
+    renderer_renderSlabs(renderer, target, request);
 }
 
-void renderer_render(Renderer* renderer, GColor* framebuffer)
+void renderer_render(Renderer* renderer, RendererTarget target)
 {
     if (renderer->level == NULL)
         return;
-    memset(framebuffer, 0, RENDERER_WIDTH * RENDERER_HEIGHT);
+    memset(target.framebuffer, 0, RENDERER_WIDTH * renderColorFormat_getStride(target.colorFormat));
     memset(renderer->boundarySets[0].yBottom, 0, sizeof(renderer->boundarySets[0].yBottom));
     memset(renderer->boundarySets[1].yBottom, 0, sizeof(renderer->boundarySets[1].yBottom));
     memset(renderer->wallBoundaries.yBottom, 0, sizeof(renderer->wallBoundaries.yBottom));
@@ -370,7 +390,7 @@ void renderer_render(Renderer* renderer, GColor* framebuffer)
             renderer->curBoundarySet = !renderer->curBoundarySet;
             drawRequestStack_nextDepth(&renderer->drawRequests);
         }
-        renderer_renderSector(renderer, framebuffer, curRequest);
+        renderer_renderSector(renderer, target, curRequest);
         curRequest = drawRequestStack_pop(&renderer->drawRequests);
     }
 };
