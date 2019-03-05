@@ -23,7 +23,7 @@ Level *level_load(int levelId)
         // northern trapez
         {.startCorner = xz(real_from_int(70), real_from_int(50)),
          .texture = 0,
-         .texCoord = { xy_zero, xy_one},//{ xy_zero, xy_one},
+         .texCoord = { xy_zero, xy_one},
          .portalTo = 2},
         {.startCorner = xz(real_from_int(50), real_from_int(80)),
          .texture = 0,

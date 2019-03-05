@@ -216,7 +216,6 @@ void renderer_renderWall(Renderer* me, GColor* framebuffer, const DrawRequest* r
     const Texture* const texture = texture_load(me->textureManager, wall->texture);
     const int renderLeft = max(request->left, p.left.x);
     const int renderRight = min(request->right, p.right.x);
-    //const bool_t isRightFacing = real_compare(wallSeg.start.xz.z, wallSeg.end.xz.z) > 0;
     BresenhamIterator upperIt, lowerIt;
     bresenham_init(&lowerIt,
         renderLeft, lerpi(renderLeft, p.left.x, p.right.x, p.left.yStart, p.right.yStart),
