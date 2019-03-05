@@ -15,7 +15,7 @@ typedef enum RendererColorFormat
     RendererColorFormat_8BitColor,
     RendererColorFormat_1BitBW
 } RendererColorFormat;
-int renderColorFormat_getStride(RendererColorFormat format);
+int rendererColorFormat_getStride(RendererColorFormat format);
 
 typedef struct RendererTarget
 {

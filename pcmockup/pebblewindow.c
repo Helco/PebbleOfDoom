@@ -13,13 +13,14 @@ struct PebbleWindow
     SafeFramebuffer* framebuffer;
     Renderer* renderer;
     GSize pebbleSize;
+    RendererColorFormat format;
 };
 
 void pebbleWindow_free(void* userdata);
 void pebbleWindow_contentUpdate(void* userdata);
 void pebbleWindow_onKeyDown(SDL_Keysym sym, void* userdata);
 
-PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GSize pebbleSize, Renderer* renderer)
+PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GSize pebbleSize, RendererColorFormat format, Renderer* renderer)
 {
     PebbleWindow* me = (PebbleWindow*)malloc(sizeof(PebbleWindow));
     if (me == NULL)
@@ -56,7 +57,7 @@ PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GS
         return NULL;
     }
 
-    me->framebuffer = safeFramebuffer_init(pebbleSize, CANARY_BUFFER_SIZE);
+    me->framebuffer = safeFramebuffer_init(pebbleSize, format, CANARY_BUFFER_SIZE);
     if (me->framebuffer == NULL)
     {
         pebbleWindow_free(me);
@@ -64,6 +65,7 @@ PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GS
     }
 
     me->pebbleSize = pebbleSize;
+    me->format = format;
     me->renderer = renderer;
     return me;
 }
@@ -82,6 +84,11 @@ void pebbleWindow_free(void* userdata)
     free(me);
 }
 
+void* pebbleWindow_getPebbleFramebuffer(PebbleWindow* window)
+{
+    return safeFramebuffer_getScreenBuffer(window->framebuffer);
+}
+
 static inline SDL_Color prv_convertGColorTo32Bit(GColor pebbleColor)
 {
     SDL_Color color;
@@ -94,27 +101,52 @@ static inline SDL_Color prv_convertGColorTo32Bit(GColor pebbleColor)
 
 static void prv_pebbleWindow_convertPebbleToTexture(PebbleWindow* me)
 {
-    const GColor* pebblePixels = pebbleWindow_getPebbleFramebuffer(me);
     SDL_Color* texPixels = me->textureData;
-
     uint32_t* itTexPixel;
-    const GColor* itPebblePixel;
-    for (int y = 0; y < me->pebbleSize.h; y++)
-    {
-        itTexPixel = (uint32_t*)texPixels;
-        for (int x = 0; x < me->pebbleSize.w; x++)
+
+    if (me->format == RendererColorFormat_8BitColor) {
+        const GColor* pebblePixels = (const GColor*)pebbleWindow_getPebbleFramebuffer(me);
+        const GColor* itPebblePixel;
+        for (int y = 0; y < me->pebbleSize.h; y++)
         {
-            itPebblePixel = pebblePixels + x * me->pebbleSize.h + (me->pebbleSize.h - y - 1);
-            SDL_Color color = prv_convertGColorTo32Bit(*itPebblePixel);
-            *itTexPixel = SDL_MapRGBA(me->texturePixelFormat,
-                color.r, color.g, color.b, color.a);
+            itTexPixel = (uint32_t*)texPixels;
+            for (int x = 0; x < me->pebbleSize.w; x++)
+            {
+                itPebblePixel = pebblePixels + x * me->pebbleSize.h + (me->pebbleSize.h - y - 1);
+                SDL_Color color = prv_convertGColorTo32Bit(*itPebblePixel);
+                *itTexPixel = SDL_MapRGBA(me->texturePixelFormat,
+                    color.r, color.g, color.b, color.a);
 
-            itTexPixel++;
+                itTexPixel++;
+            }
+
+            // Advance to next line
+            texPixels += me->pebbleSize.w;
         }
-
-        // Advance to next line
-        texPixels += me->pebbleSize.w;
     }
+    else if (me->format == RendererColorFormat_1BitBW) {
+        const uint8_t* pebblePixels = (const uint8_t*)pebbleWindow_getPebbleFramebuffer(me);
+        const int stride = rendererColorFormat_getStride(me->format);
+        for (int y = 0; y < me->pebbleSize.h; y++)
+        {
+            itTexPixel = (uint32_t*)texPixels;
+            for (int x = 0; x < me->pebbleSize.w; x++)
+            {
+                int pebbleY = (me->pebbleSize.h - y - 1);
+                const uint8_t* itPebblePixel = pebblePixels + x * stride + pebbleY / 8;
+                const bool bit = *itPebblePixel & (1 << (7 - (pebbleY % 8)));
+                *itTexPixel = SDL_MapRGBA(me->texturePixelFormat,
+                    bit * 255, bit * 255, bit * 255, 255);
+
+                itTexPixel++;
+            }
+
+            // Advance to next line
+            texPixels += me->pebbleSize.w;
+        }
+    }
+    else
+        assert(false && "Unknown RendererColorFormat for PebbleWindow");
 }
 
 void pebbleWindow_contentUpdate(void* userdata)
@@ -123,7 +155,7 @@ void pebbleWindow_contentUpdate(void* userdata)
     safeFramebuffer_prepare(me->framebuffer);
     renderer_render(me->renderer, (RendererTarget) {
         .framebuffer = pebbleWindow_getPebbleFramebuffer(me),
-        .colorFormat = RendererColorFormat_8BitColor
+        .colorFormat = me->format
     });
     safeFramebuffer_check(me->framebuffer);
     prv_pebbleWindow_convertPebbleToTexture(me);
@@ -154,11 +186,6 @@ void pebbleWindow_onKeyDown(SDL_Keysym sym, void* userdata)
             renderer_moveTo(me->renderer, playerLocation);
         }break;
     }
-}
-
-GColor* pebbleWindow_getPebbleFramebuffer(PebbleWindow* window)
-{
-    return safeFramebuffer_getScreenBuffer(window->framebuffer);
 }
 
 ImageWindow* pebbleWindow_asImageWindow(PebbleWindow* me)

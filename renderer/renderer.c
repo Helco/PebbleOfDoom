@@ -5,7 +5,7 @@
 #define NEAR_PLANE 1.0f
 #define FAR_PLANE 500
 
-int renderColorFormat_getStride(RendererColorFormat format)
+int rendererColorFormat_getStride(RendererColorFormat format)
 {
     static const int RENDERER_STRIDE[] = {
         [RendererColorFormat_8BitColor] = RENDERER_HEIGHT,
@@ -363,7 +363,7 @@ void renderer_render(Renderer* renderer, RendererTarget target)
 {
     if (renderer->level == NULL)
         return;
-    memset(target.framebuffer, 0, RENDERER_WIDTH * renderColorFormat_getStride(target.colorFormat));
+    memset(target.framebuffer, 0, RENDERER_WIDTH * rendererColorFormat_getStride(target.colorFormat));
     memset(renderer->boundarySets[0].yBottom, 0, sizeof(renderer->boundarySets[0].yBottom));
     memset(renderer->boundarySets[1].yBottom, 0, sizeof(renderer->boundarySets[1].yBottom));
     memset(renderer->wallBoundaries.yBottom, 0, sizeof(renderer->wallBoundaries.yBottom));
