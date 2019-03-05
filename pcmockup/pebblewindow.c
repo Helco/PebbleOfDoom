@@ -134,7 +134,7 @@ static void prv_pebbleWindow_convertPebbleToTexture(PebbleWindow* me)
             {
                 int pebbleY = (me->pebbleSize.h - y - 1);
                 const uint8_t* itPebblePixel = pebblePixels + x * stride + pebbleY / 8;
-                const bool bit = *itPebblePixel & (1 << (7 - (pebbleY % 8)));
+                const bool bit = *itPebblePixel & (1 << (pebbleY % 8));
                 *itTexPixel = SDL_MapRGBA(me->texturePixelFormat,
                     bit * 255, bit * 255, bit * 255, 255);
 

@@ -37,7 +37,7 @@ TextureId loadTextureFromResource(uint32_t resourceId)
     GBitmap* bitmap = gbitmap_create_with_resource(resourceId);
     if (bitmap == NULL)
     {
-        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not load texture resource %d", resourceId);
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not load texture resource %d", (int)resourceId);
         return INVALID_TEXTURE_ID;
     }
 
@@ -102,6 +102,38 @@ const Texture* texture_load(TextureManagerHandle manager, TextureId id)
         result = &texture->texture;
     }
     return result;
+}
+
+const Texture* texture_createEmpty(TextureManagerHandle manager, GSize size, GColor** contentPtr)
+{
+    UNUSED(manager);
+    int slot = findNextTextureSlot();
+    if (slot == INVALID_TEXTURE_ID)
+    {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Too many textures are being initialized");
+        return NULL;
+    }
+
+    GBitmap* bitmap = gbitmap_create_blank((GSize) { 1, 1 }, GBitmapFormat1Bit); // aplite won't allocate 8bit by its own
+    void* data = malloc(size.w * size.h);
+    if (bitmap == NULL)
+    {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not allocate empty texture with size: %d, %d", size.w, size.h);
+        return NULL;
+    }
+    gbitmap_set_data(bitmap, data, GBitmapFormat8Bit, size.w, true);
+    gbitmap_set_bounds(bitmap, (GRect) { .origin = { 0, 0 }, .size = size });
+
+    textures[slot] = (LoadedTexture) {
+        .referenceCount = 1,
+        .bitmap = bitmap,
+        .texture = {
+            .id = nextTextureId++,
+            .size = size,
+            .pixels = *contentPtr = (GColor*)data
+        }
+    };
+    return &textures[slot].texture;
 }
 
 void texture_free(TextureManagerHandle manager, const Texture* textureToBeFreed)

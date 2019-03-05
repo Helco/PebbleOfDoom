@@ -11,7 +11,8 @@
     "sdkVersion": "3",
     "enableMultiJS": true,
     "targetPlatforms": [
-      "basalt"
+      "basalt",
+      "aplite"
     ],
     "watchapp": {
       "watchface": false
@@ -19,12 +20,6 @@
     "messageKeys": [],
     "resources": {
       "media": [
-        {
-          "type": "bitmap",
-          "name": "TEXTURE_XOR64",
-          "file": "textures/xor64.png",
-          "memoryFormat": "8Bit"
-        }
       ]
     }
   }

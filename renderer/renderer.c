@@ -9,7 +9,7 @@ int rendererColorFormat_getStride(RendererColorFormat format)
 {
     static const int RENDERER_STRIDE[] = {
         [RendererColorFormat_8BitColor] = RENDERER_HEIGHT,
-        [RendererColorFormat_1BitBW] = (RENDERER_HEIGHT + 7) / 8
+        [RendererColorFormat_1BitBW] = ((RENDERER_HEIGHT + 7) / 8 + 3) / 4 * 4
     };
     return RENDERER_STRIDE[format];
 }
@@ -208,7 +208,7 @@ void renderer_renderContourSpan(Renderer* me, RendererTarget target, int x, int 
     for (int y = yStart; y <= yEnd; y++)
     {
         uint8_t* const pixelByte = framebufferColumn + y / 8;
-        *pixelByte |= 1 << (7 - (y % 8));
+        *pixelByte |= 1 << (y % 8);
     }
 }
 

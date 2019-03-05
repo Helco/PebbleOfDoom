@@ -32,10 +32,15 @@
 #undef assert
 #endif
 // unfortunately no other way than to immediately exit the pebble than to crash it
-#define assert(cond) (!!(cond) || ( \
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Assertion failed: %s\n", #cond), \
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Bring it dooooown %d", *((int*)-1)), \
-    false))
+#define assert(cond) do { \
+    _Pragma("GCC diagnostic push"); \
+    _Pragma("GCC diagnostic ignored \"-Wunused-value\""); \
+    if (!(cond)) { \
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Assertion failed: %s\n", #cond); \
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Bring it dooooown %d", *((int*)-1)); \
+    } \
+    _Pragma("GCC diagnostic pop"); \
+    } while(0)
 #else
 #include <assert.h>
 #endif
