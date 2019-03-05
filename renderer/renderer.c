@@ -195,7 +195,21 @@ void renderer_renderFilledSpan(Renderer* me, RendererTarget target, int x, int y
 
 void renderer_renderContourSpan(Renderer* me, RendererTarget target, int x, int yStart, int yEnd)
 {
-    UNUSED(me, target, x, yStart, yEnd);
+    UNUSED(me);
+    assert(x >= 0 && x < RENDERER_WIDTH);
+    if (target.colorFormat != RendererColorFormat_1BitBW)
+        return;
+    const int stride = rendererColorFormat_getStride(target.colorFormat);
+    uint8_t* const framebufferColumn = (uint8_t*)target.framebuffer + x * stride;
+    const BoundarySet* drawBoundary = &me->boundarySets[me->curBoundarySet];
+    yStart = max(yStart, drawBoundary->yBottom[x]);
+    yEnd = min(yEnd, drawBoundary->yTop[x]);
+
+    for (int y = yStart; y <= yEnd; y++)
+    {
+        uint8_t* const pixelByte = framebufferColumn + y / 8;
+        *pixelByte |= 1 << (7 - (y % 8));
+    }
 }
 
 void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest* request, int wallIndex)
@@ -206,7 +220,9 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
 
     lineSeg_t wallSeg;
     renderer_transformWall(me, sector, wallIndex, &wallSeg);
-    if (real_compare(wallSeg.start.xz.z, nearPlane) < 0 && real_compare(wallSeg.end.xz.z, nearPlane) < 0)
+    bool isWallStartBehind = real_compare(wallSeg.start.xz.z, nearPlane) < 0;
+    bool isWallEndBehind = real_compare(wallSeg.end.xz.z, nearPlane) < 0;
+    if (isWallStartBehind && isWallEndBehind)
         return;
 
     TexCoord texCoord = wall->texCoord;
@@ -240,8 +256,15 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
     bresenham_init(&upperIt,
         renderLeft, lerpi(renderLeft, p.left.x, p.right.x, p.left.yEnd, p.right.yEnd),
         renderRight, lerpi(renderRight, p.left.x, p.right.x, p.left.yEnd, p.right.yEnd));
+
+    // render wall side contours
+    if (renderLeft == p.left.x && !isWallStartBehind)
+        renderer_renderContourSpan(me, target, renderLeft, lowerIt.y0, upperIt.y0);
+    if (renderRight == p.right.x && !isWallEndBehind)
+        renderer_renderContourSpan(me, target, renderRight, lowerIt.y1, upperIt.y1);
+
+    // render wall spans
     BresenhamStep upperStep, lowerStep;
-    UNUSED(portalNomEnd);
     int x = renderLeft;
     do {
         const int yBottom = drawBoundary->yBottom[x];
@@ -249,13 +272,11 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
 
         do {
             upperStep = bresenham_step(&upperIt);
-            if (upperIt.y0 > yBottom && upperIt.y0 <= yTop)
-                renderer_renderContourSpan(me, target, x, upperIt.y0, upperIt.y0);
+            renderer_renderContourSpan(me, target, x, upperIt.y0, upperIt.y0);
         } while (upperStep != BRESENHAMSTEP_X && upperStep != BRESENHAMSTEP_NONE);
         do {
             lowerStep = bresenham_step(&lowerIt);
-            if (lowerIt.y0 > yBottom && lowerIt.y0 <= yTop)
-                renderer_renderContourSpan(me, target, x, lowerIt.y0, lowerIt.y0);
+            renderer_renderContourSpan(me, target, x, lowerIt.y0, lowerIt.y0);
         } while (lowerStep != BRESENHAMSTEP_X && lowerStep != BRESENHAMSTEP_NONE);
         assert(upperIt.x0 == lowerIt.x0);
 
