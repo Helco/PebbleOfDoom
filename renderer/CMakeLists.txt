@@ -4,6 +4,7 @@
 
 set(sources_podrenderer
     renderer.h
+    renderer_internal.h
     renderer.c
     renderer_debug.c
     algebra_float.c
@@ -37,4 +38,5 @@ target_compile_definitions(podrenderer
 target_link_libraries(podrenderer
     PUBLIC cimgui
 )
+
 enable_warnings(podrenderer)

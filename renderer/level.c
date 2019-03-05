@@ -27,7 +27,7 @@ Level *level_load(int levelId)
          .portalTo = 2},
         {.startCorner = xz(real_from_int(50), real_from_int(80)),
          .texture = 0,
-         .texCoord = { xy_zero, xy_one},
+         .texCoord = { { real_zero, real_one }, { real_one, real_zero } },
          .portalTo = -1},
         {.startCorner = xz(real_from_int(20), real_from_int(80)),
          .texture = 0,
@@ -35,7 +35,7 @@ Level *level_load(int levelId)
          .portalTo = 3},
         {.startCorner = xz(real_from_int(00), real_from_int(50)),
          .texture = 0,
-         .texCoord = { xy_zero, xy_one},
+         .texCoord = { { real_zero, real_one }, { real_one, real_zero } },
          .portalTo = 0},
 
         // right wing
@@ -97,7 +97,7 @@ Level *level_load(int levelId)
         .playerStart = {
             .sector = 1,
             .position = xz(real_from_int(20), real_from_int(70)),
-            .angle = real_degToRad(real_from_int(0)),
+            .angle = real_degToRad(real_from_int(40)),
             .height = real_zero
         },
         .sectors = NULL
