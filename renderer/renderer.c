@@ -285,6 +285,9 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
             nextBoundary->yBottom[x] = yPortalStart = clampi(yBottom, lerpi(portalNomStart, 0, sector->height, lowerIt.y0, upperIt.y0), yTop);
             yPortalEnd = lerpi(portalNomEnd, 0, sector->height, lowerIt.y0, upperIt.y0);
             nextBoundary->yTop[x] = clampi(yBottom, yPortalEnd, yTop);
+
+            renderer_renderContourSpan(me, target, x, yPortalStart, yPortalStart);
+            renderer_renderContourSpan(me, target, x, yPortalEnd, yPortalEnd);
         }
 
         me->wallBoundaries.yBottom[x] = max(yBottom, lowerIt.y0);
