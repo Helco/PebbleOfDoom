@@ -96,6 +96,7 @@ PCMockup *pcmockup_init()
         me->windowContainer,
         windowGrid_getSingleBounds(&windowGrid, 0),
         GSize(RENDERER_WIDTH, RENDERER_HEIGHT),
+        RendererColorFormat_1BitBW,
         me->renderer
     );
     if (pebbleWindow == NULL)

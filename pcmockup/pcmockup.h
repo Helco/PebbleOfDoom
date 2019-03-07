@@ -32,15 +32,14 @@ Window* imageWindow_asWindow(ImageWindow* me);
 #define ImageWindow_Tag FOURCC('I', 'M', 'G', 'W')
 
 typedef struct SafeFramebuffer SafeFramebuffer;
-SafeFramebuffer* safeFramebuffer_init(GSize size, int canarySize); // canarySize in framebuffer sizes
+SafeFramebuffer* safeFramebuffer_init(GSize size, RendererColorFormat format, int canarySize); // canarySize in framebuffer sizes
 void safeFramebuffer_free(SafeFramebuffer* me);
-GColor* safeFramebuffer_getScreenBuffer(SafeFramebuffer* me);
+void* safeFramebuffer_getScreenBuffer(SafeFramebuffer* me);
 void safeFramebuffer_prepare(SafeFramebuffer* me);
 void safeFramebuffer_check(SafeFramebuffer* me);
 
 typedef struct PebbleWindow PebbleWindow;
-PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GSize pebbleSize, Renderer* renderer);
-GColor* pebbleWindow_getPebbleFramebuffer(PebbleWindow* window);
+PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GSize pebbleSize, RendererColorFormat format, Renderer* renderer);
 ImageWindow* pebbleWindow_asImageWindow(PebbleWindow* window);
 #define PebbleWindow_Tag FOURCC('P', 'E', 'B', 'B')
 

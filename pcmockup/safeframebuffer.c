@@ -28,20 +28,21 @@ typedef enum SafeFramebufferId {
 
 struct SafeFramebuffer
 {
-    GColor* memoryStart;
+    void* memoryStart;
     GSize size;
+    RendererColorFormat format;
     int canarySize; // in framebuffer sizes
 };
 
-static int prv_safeFramebuffer_getByteSize(GSize size)
+static int prv_safeFramebuffer_getByteSize(GSize size, RendererColorFormat format)
 {
-    return sizeof(GColor) * size.w * size.h;
+    return rendererColorFormat_getStride(format) * size.w;
 }
 
-static GColor* prv_safeFramebuffer_getBuffer(SafeFramebuffer* me, SafeFramebufferId bufferId)
+static void* prv_safeFramebuffer_getBuffer(SafeFramebuffer* me, SafeFramebufferId bufferId)
 {
-    int framebufferSize = prv_safeFramebuffer_getByteSize(me->size);
-    GColor* buffer = me->memoryStart + (int)bufferId * framebufferSize * me->canarySize;
+    int framebufferSize = prv_safeFramebuffer_getByteSize(me->size, me->format);
+    char* buffer = (char*)me->memoryStart + (int)bufferId * framebufferSize * me->canarySize;
 
     // screen buffer is only one framebuffer size big
     if (bufferId > SF_SCREEN)
@@ -50,16 +51,16 @@ static GColor* prv_safeFramebuffer_getBuffer(SafeFramebuffer* me, SafeFramebuffe
     return buffer;
 }
 
-SafeFramebuffer* safeFramebuffer_init(GSize size, int canarySize)
+SafeFramebuffer* safeFramebuffer_init(GSize size, RendererColorFormat format, int canarySize)
 {
     SafeFramebuffer* me = (SafeFramebuffer*)malloc(sizeof(SafeFramebuffer));
     if (me == NULL)
         return NULL;
     memset(me, 0, sizeof(SafeFramebuffer));
 
-    int framebufferSize = prv_safeFramebuffer_getByteSize(size);
+    int framebufferSize = prv_safeFramebuffer_getByteSize(size, format);
     int totalSize = framebufferSize + 4 * canarySize * framebufferSize;
-    me->memoryStart = (GColor*)malloc(totalSize);
+    me->memoryStart = malloc(totalSize);
     if (me->memoryStart == NULL)
     {
         fprintf(stderr, "Could not allocate safe framebuffers\n");
@@ -69,6 +70,7 @@ SafeFramebuffer* safeFramebuffer_init(GSize size, int canarySize)
 
     me->canarySize = canarySize;
     me->size = size;
+    me->format = format;
     return me;
 }
 
@@ -81,7 +83,7 @@ void safeFramebuffer_free(SafeFramebuffer* me)
     free(me);
 }
 
-GColor* safeFramebuffer_getScreenBuffer(SafeFramebuffer* me)
+void* safeFramebuffer_getScreenBuffer(SafeFramebuffer* me)
 {
     return prv_safeFramebuffer_getBuffer(me, SF_SCREEN);
 }
@@ -95,9 +97,9 @@ static void prv_fillBufferRandom(void* buffer, int byteCount)
 
 static void prv_safeFramebuffer_prepareSide(SafeFramebuffer* me, SafeFramebufferId canaryId, SafeFramebufferId backupId)
 {
-    GColor* canary = prv_safeFramebuffer_getBuffer(me, canaryId);
-    GColor* backup = prv_safeFramebuffer_getBuffer(me, backupId);
-    int framebufferSize = prv_safeFramebuffer_getByteSize(me->size);
+    void* canary = prv_safeFramebuffer_getBuffer(me, canaryId);
+    void* backup = prv_safeFramebuffer_getBuffer(me, backupId);
+    int framebufferSize = prv_safeFramebuffer_getByteSize(me->size, me->format);
     prv_fillBufferRandom(canary, framebufferSize);
     memcpy(backup, canary, framebufferSize);
 }
@@ -110,9 +112,9 @@ void safeFramebuffer_prepare(SafeFramebuffer* me)
 
 static void prv_safeFramebuffer_checkSide(SafeFramebuffer* me, SafeFramebufferId canaryId, SafeFramebufferId backupId)
 {
-    GColor* canary = prv_safeFramebuffer_getBuffer(me, canaryId);
-    GColor* backup = prv_safeFramebuffer_getBuffer(me, backupId);
-    int canaryByteSize = prv_safeFramebuffer_getByteSize(me->size) * me->canarySize;
+    void* canary = prv_safeFramebuffer_getBuffer(me, canaryId);
+    void* backup = prv_safeFramebuffer_getBuffer(me, backupId);
+    int canaryByteSize = prv_safeFramebuffer_getByteSize(me->size, me->format) * me->canarySize;
     assert(memcmp(canary, backup, canaryByteSize) == 0);
 }
 

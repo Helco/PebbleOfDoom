@@ -1,6 +1,7 @@
 #include <pebble.h>
 #include "textureresources.h"
 #include "../renderer/renderer.h"
+#include "../renderer/texgen/texgen.h"
 
 Window* s_main_window;
 Layer* root_layer;
@@ -11,9 +12,15 @@ Level* level;
 void update_layer(Layer* layer, GContext* ctx)
 {
   GBitmap* framebuffer_bitmap = graphics_capture_frame_buffer(ctx);
-  GColor* framebuffer = (GColor*)gbitmap_get_data(framebuffer_bitmap);
+  void* framebuffer = gbitmap_get_data(framebuffer_bitmap);
 
-  renderer_render(renderer, framebuffer);
+  renderer_render(renderer, (RendererTarget) {
+      .framebuffer = framebuffer,
+      .colorFormat = PBL_IF_COLOR_ELSE(
+          RendererColorFormat_8BitColor,
+          RendererColorFormat_1BitBW
+      )
+  });
   renderer_rotate(renderer, rotationRight);
 
   graphics_release_frame_buffer(ctx, framebuffer_bitmap);
@@ -27,7 +34,7 @@ void update_animation(Animation *animation, const AnimationProgress progress)
 bool loadTextures()
 {
   static const uint32_t resourceIds[] = {
-    RESOURCE_ID_TEXTURE_XOR64
+
   };
   static const int countIds = sizeof(resourceIds) / sizeof(uint32_t);
   for (int i = 0; i < countIds; i++)
@@ -43,6 +50,9 @@ bool loadTextures()
 int main(void) {
   if (!loadTextures())
     return -1;
+  TexGenerationContext* texgenctx = texgen_init(NULL, TexGenerator_XOR, 64);
+  texgen_execute(texgenctx);
+
   level = level_load(0);
   if (!level)
     return -1;
