@@ -96,7 +96,7 @@ PCMockup *pcmockup_init()
         me->windowContainer,
         windowGrid_getSingleBounds(&windowGrid, 0),
         GSize(RENDERER_WIDTH, RENDERER_HEIGHT),
-        RendererColorFormat_1BitBW,
+        RendererColorFormat_8BitColor,
         me->renderer
     );
     if (pebbleWindow == NULL)
@@ -175,8 +175,19 @@ void pcmockup_update(PCMockup *me)
     }
 }
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+void pcmockup_emscripten_main_loop(void* userdata) {
+    PCMockup* me = (PCMockup*)userdata;
+    pcmockup_update(me);
+}
+#endif
+
 void pcmockup_mainLoop(PCMockup *me)
 {
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop_arg(pcmockup_emscripten_main_loop, me, MAX_FRAMERATE, 1);
+#else
     while (me->isRunning)
     {
         const uint32_t frameStart = SDL_GetTicks();
@@ -188,6 +199,7 @@ void pcmockup_mainLoop(PCMockup *me)
         if (delay > 0)
             SDL_Delay(delay);
     }
+#endif
 }
 
 #undef main

@@ -6,21 +6,29 @@ branches:
 
 jobs:
   include:
-    - stage: Build&Test
-      name: Linux PCMockup
-      script:
-        - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 90
-        - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
-        - bash ./travis/cmake_script.sh
-    - stage: Build&Test
-      name: Pebble
-      before_script: bash ./travis/pebble_before_script.sh
-      script: bash ./travis/pebble_script.sh
-      cache:
-        directories:
-          - $HOME/pebble-dev
-          - $HOME/.cache/pip
-          - $HOME/.pebble-sdk
+#    - stage: Build&Test
+#      name: Linux PCMockup
+#      script:
+#        - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 90
+#        - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
+#        - bash ./travis/cmake_script.sh
+#    - stage: Build&Test
+#      name: Pebble
+#      before_script: bash ./travis/pebble_before_script.sh
+#      script: bash ./travis/pebble_script.sh
+#      cache:
+#        directories:
+#          - $HOME/pebble-dev
+#          - $HOME/.cache/pip
+#          - $HOME/.pebble-sdk
+    - stage: Deploy
+      name: Emscripten
+      sudo: required
+      services:
+        - docker
+      before_install:
+        - docker run -dit --name emscripten -v `pwd`:`pwd` -w `pwd` trzeci/emscripten:sdk-incoming-64bit bash
+      script: bash ./travis/emscripten_script.sh
 
 addons:
   apt:

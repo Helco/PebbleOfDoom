@@ -110,7 +110,7 @@ TextureId textureManager_registerFile(TextureManager* me, const char* filename)
     uint8_t* rgbaPixels = stbi_load(pathBuffer, &width, &height, NULL, 4);
     if (rgbaPixels == NULL)
     {
-        fprintf(stderr, "Could not register texture file: %s\n", pathBuffer);
+        fprintf(stderr, "stbi_load(%s): %s\n", pathBuffer, stbi_failure_reason());
         return INVALID_TEXTURE_ID;
     }
 

@@ -15,6 +15,14 @@ extern void ImGui_ImplOpenGL3_Shutdown();
 extern void ImGui_ImplOpenGL3_NewFrame();
 extern void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data);
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#define POD_GL_LOAD_PROC emscripten_GetProcAddress
+extern void* emscripten_GetProcAddress(const char *name_);
+#else
+#define POD_GL_LOAD_PROC SDL_GL_GetProcAddress
+#endif
+
 #define WINDOW_CONTAINER_CHUNK 16
 
 typedef struct MenubarHandler
@@ -60,9 +68,9 @@ WindowContainer* windowContainer_init(GSize windowSize)
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    //SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    //SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    //SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetSwapInterval(0);
     me->glContext = SDL_GL_CreateContext(me->window);
@@ -74,7 +82,7 @@ WindowContainer* windowContainer_init(GSize windowSize)
     }
 
     SDL_GL_MakeCurrent(me->window, me->glContext);
-    if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
+    if (!gladLoadGLLoader(POD_GL_LOAD_PROC))
     {
         fprintf(stderr, "gladLoadGLLoader: %s\n", SDL_GetError());
         windowContainer_free(me);
