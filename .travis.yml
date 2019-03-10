@@ -28,10 +28,7 @@ jobs:
         - docker
       before_install:
         - docker run -dit --name emscripten -v `pwd`:`pwd` -w `pwd` trzeci/emscripten:sdk-incoming-64bit bash
-      script:
-        - mkdir -p build && cd build
-        - docker exec -it emscripten cmake ..
-        - cmake --build .
+      script: bash ./travis/emscripten_script.sh
 
 addons:
   apt:
