@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+cd PebbleOfDoom
 mkdir -p build
 cd build
 
