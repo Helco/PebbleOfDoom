@@ -139,27 +139,27 @@ bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg, TexCoord* texC
     return result;
 }
 
+int renderer_projectValue(real_t value, real_t depth, real_t fovScale, int halfSize)
+{
+    return real_to_int(
+        real_div(real_mul(value, fovScale), depth)
+    ) + halfSize;
+}
+
 void renderer_project(const Renderer* me, const Sector* sector, const lineSeg_t* transformedSeg, WallSection* projected)
 {
-    //const real_t halfHeight = real_div(real_from_int(sector->height), real_from_int(2));
-    const real_t relHeightOffset = real_sub(real_from_int(sector->heightOffset), real_add(me->location.height, me->eyeHeight));
-#define scale_height(value) (real_mul(me->verFovScale, (value)))
-    const real_t scaledWallHeight =    scale_height(real_add(real_from_int(sector->height), relHeightOffset));
-    const real_t negScaledWallHeight = scale_height(relHeightOffset);
-#undef scale_height
+    const real_t nominalYStart = real_sub(real_from_int(sector->heightOffset), real_add(me->location.height, me->eyeHeight));
+    const real_t nominalYEnd = real_add(nominalYStart, real_from_int(sector->height));
     const xz_t startT = transformedSeg->start.xz;
     const xz_t endT = transformedSeg->end.xz;
 
-#define div_and_int(value, z) (real_to_int(real_div((value), (z))))
-    real_t projectedLeftX =   real_sub(real_div(real_mul(startT.x, me->horFovScale), startT.z), real_from_float(0.5f)); // -0.5 fixes rounding error
-    projected->left.x =       real_to_int(projectedLeftX)                             + HALF_RENDERER_WIDTH;
-    projected->left.yStart =  div_and_int(negScaledWallHeight, startT.z)              + HALF_RENDERER_HEIGHT;
-    projected->left.yEnd =    div_and_int(scaledWallHeight, startT.z)                 + HALF_RENDERER_HEIGHT;
+    projected->left.x = renderer_projectValue(startT.x, startT.z, me->horFovScale, HALF_RENDERER_WIDTH);
+    projected->left.yStart = renderer_projectValue(nominalYStart, startT.z, me->verFovScale, HALF_RENDERER_HEIGHT);
+    projected->left.yEnd = renderer_projectValue(nominalYEnd, startT.z, me->verFovScale, HALF_RENDERER_HEIGHT);
 
-    projected->right.x =      div_and_int(real_mul(endT.x, me->horFovScale), endT.z)  + HALF_RENDERER_WIDTH;
-    projected->right.yStart = div_and_int(negScaledWallHeight, endT.z)                + HALF_RENDERER_HEIGHT;
-    projected->right.yEnd =   div_and_int(scaledWallHeight, endT.z)                   + HALF_RENDERER_HEIGHT;
-#undef div_and_int
+    projected->right.x = renderer_projectValue(endT.x, endT.z, me->horFovScale, HALF_RENDERER_WIDTH);
+    projected->right.yStart = renderer_projectValue(nominalYStart, endT.z, me->verFovScale, HALF_RENDERER_HEIGHT);
+    projected->right.yEnd = renderer_projectValue(nominalYEnd, endT.z, me->verFovScale, HALF_RENDERER_HEIGHT);
 }
 
 void renderer_renderFilledSpan(Renderer* me, RendererTarget target, int x, int yWallLower, int yWallUpper, int yFillLower, int yFillUpper, real_t xNorm, TexCoord texCoord, const lineSeg_t* wallSeg, const Texture* texture)
