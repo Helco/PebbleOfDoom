@@ -37,24 +37,28 @@ void renderer_free(Renderer* me)
     free(me);
 }
 
-void renderer_setFieldOfView(Renderer* me, real_t fov)
+void renderer_setFieldOfView(Renderer* me, real_t verFov)
 {
-    me->fov = fov;
-    const real_t halfFoV = real_div(fov, real_from_int(2));
+    me->fov = verFov;
+    const real_t horFov = real_mul(verFov, real_div(real_from_int(RENDERER_WIDTH), real_from_int(RENDERER_HEIGHT)));
+    const real_t halfHorFov = real_div(horFov, real_from_int(2));
+    const real_t halfVerFov = real_div(verFov, real_from_int(2));
 
     xz_t nearPlane, farPlane;
     nearPlane.z = real_from_float(NEAR_PLANE);
     farPlane.z = real_from_int(FAR_PLANE);
 
-    const real_t tanHalfFov = real_tan(halfFoV);
+    const real_t tanHalfHorFov = real_tan(halfHorFov);
+    const real_t tanHalfVerFov = real_tan(halfVerFov);
     const real_t minus_one = real_from_int(-1);
-    nearPlane.x = real_mul(tanHalfFov, nearPlane.z);
-    farPlane.x = real_mul(tanHalfFov, farPlane.z);
+    nearPlane.x = real_mul(tanHalfHorFov, nearPlane.z);
+    farPlane.x = real_mul(tanHalfHorFov, farPlane.z);
     me->leftFovSeg.start.xz = xz(real_mul(minus_one, nearPlane.x), nearPlane.z);
     me->leftFovSeg.end.xz = xz(real_mul(minus_one, farPlane.x), farPlane.z);
     me->rightFovSeg.start.xz = nearPlane;
     me->rightFovSeg.end.xz = farPlane;
-    me->horFovScale = real_div(real_from_int(HALF_RENDERER_WIDTH), tanHalfFov);
+    me->horFovScale = real_div(real_from_int(HALF_RENDERER_WIDTH), tanHalfHorFov);
+    me->verFovScale = real_div(real_from_int(HALF_RENDERER_HEIGHT), tanHalfVerFov);
 }
 
 void renderer_setLevel(Renderer* renderer, const Level* level)
@@ -139,7 +143,7 @@ void renderer_project(const Renderer* me, const Sector* sector, const lineSeg_t*
 {
     //const real_t halfHeight = real_div(real_from_int(sector->height), real_from_int(2));
     const real_t relHeightOffset = real_sub(real_from_int(sector->heightOffset), real_add(me->location.height, me->eyeHeight));
-#define scale_height(value) (real_mul(real_from_int(HALF_RENDERER_HEIGHT), (value)))
+#define scale_height(value) (real_mul(me->verFovScale, (value)))
     const real_t scaledWallHeight =    scale_height(real_add(real_from_int(sector->height), relHeightOffset));
     const real_t negScaledWallHeight = scale_height(relHeightOffset);
 #undef scale_height

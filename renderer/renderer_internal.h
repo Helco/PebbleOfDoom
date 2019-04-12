@@ -26,7 +26,7 @@ struct Renderer
     const Level* level;
     Location location;
     real_t eyeHeight;
-    real_t horFovScale, fov;
+    real_t horFovScale, verFovScale, fov;
     lineSeg_t leftFovSeg, rightFovSeg;
     BoundarySet boundarySets[2];
     BoundarySet wallBoundaries;
