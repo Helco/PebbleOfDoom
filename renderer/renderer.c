@@ -26,6 +26,7 @@ Renderer* renderer_init()
 
     renderer_setFieldOfView(me, real_degToRad(real_from_int(60)));
     me->eyeHeight = real_from_int(12);
+    me->textureMappingMode = TextureMappingMode_Perspective;
 
     return me;
 }
@@ -170,12 +171,23 @@ void renderer_renderFilledSpan(Renderer* me, RendererTarget target, int x, int y
     GColor* const framebufferColumn =  ((GColor*)target.framebuffer) + x * RENDERER_HEIGHT;
 
     // Calculate texture column
-    real_t invZLerped = real_lerp(xNorm, real_reciprocal(wallSeg->start.xz.z), real_reciprocal(wallSeg->end.xz.z));
-    real_t invTexLerped = real_lerp(xNorm,
-        real_div(texCoord.start.x, wallSeg->start.xz.z),
-        real_div(texCoord.end.x, wallSeg->end.xz.z)
-    );
-    real_t texLerped = real_div(invTexLerped, invZLerped);
+    real_t texLerped;
+    if (me->textureMappingMode == TextureMappingMode_Perspective)
+    {
+        real_t invZLerped = real_lerp(xNorm, real_reciprocal(wallSeg->start.xz.z), real_reciprocal(wallSeg->end.xz.z));
+        real_t invTexLerped = real_lerp(xNorm,
+            real_div(texCoord.start.x, wallSeg->start.xz.z),
+            real_div(texCoord.end.x, wallSeg->end.xz.z)
+        );
+        texLerped = real_div(invTexLerped, invZLerped);
+    }
+    else if (me->textureMappingMode == TextureMappingMode_Affine)
+        texLerped = xNorm;
+    else
+    {
+        assert(false && "Unimplemented texture mapping mode");
+        return;
+    }
     int texCol = real_to_int(real_mul(texLerped, real_from_int(texture->size.w)));
 
     // Calculate texture row (start and increment)

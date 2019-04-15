@@ -35,6 +35,7 @@ struct Renderer
     DrawRequestStack drawRequests;
 
     TextureManagerHandle textureManager;
+    TextureMappingMode textureMappingMode;
 };
 
 typedef struct BresenhamIterator

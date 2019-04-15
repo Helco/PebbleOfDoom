@@ -168,6 +168,14 @@ void renderer_debug_cameraOptions(Renderer* me, ImGuiWindowFlags* flags, const v
     if (igcSliderReal("Field of View", &fovDeg, 1.0f, 179.0f))
         renderer_setFieldOfView(me, real_degToRad(fovDeg));
 
+    static const char* const textureMappingLabels[] = {
+        "Perspective",
+        "Affine"
+    };
+    int curTexMapMode = (TextureMappingMode)me->textureMappingMode;
+    if (igCombo("Texture Mapping", &curTexMapMode, textureMappingLabels, sizeof(textureMappingLabels) / sizeof(const char*), 5))
+        me->textureMappingMode = (TextureMappingMode)curTexMapMode;
+
     igSeparator();
     igText("Camera location");
     igcLocation(&me->location);

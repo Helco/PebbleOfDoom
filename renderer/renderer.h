@@ -17,6 +17,12 @@ typedef enum RendererColorFormat
 } RendererColorFormat;
 int rendererColorFormat_getStride(RendererColorFormat format);
 
+typedef enum TextureMappingMode
+{
+    TextureMappingMode_Perspective = 0,
+    TextureMappingMode_Affine
+} TextureMappingMode;
+
 typedef struct RendererTarget
 {
     void* framebuffer;
@@ -28,6 +34,7 @@ Renderer* renderer_init();
 void renderer_free(Renderer* renderer);
 void renderer_setLevel(Renderer* renderer, const Level* level);
 void renderer_setTextureManager(Renderer* renderer, TextureManagerHandle handle);
+void renderer_setTextureMappingMode(Renderer* renderer, TextureMappingMode mode);
 /*
  * framebuffer - *column-stored* framebuffer pointer
  */
