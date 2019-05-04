@@ -176,7 +176,7 @@ void renderer_renderFilledSpan(Renderer* me, RendererTarget target, int x, int y
         real_div(texCoord.end.x, wallSeg->end.xz.z)
     );
     real_t texLerped = real_div(invTexLerped, invZLerped);
-    int texCol = real_to_int(real_mul(texLerped, real_from_int(texture->size.w)));
+    int texCol = real_to_int(real_mul(texLerped, real_from_int(texture->size.w - 1)));
 
     // Calculate texture row (start and increment)
     real_t yNormalized = real_div(real_from_int(yFillLower - yWallLower), real_from_int(yWallUpper - yWallLower));
