@@ -77,14 +77,11 @@ const sectors = {
         walls: [
             [15, 18, textures.wall],
             [19, 22, textures.wall],
-            [33, 31, textures.wall],
-            [31, 23, textures.wall]
         ]
     },
     c: {
         walls: [
             [6, 7, textures.wall],
-            [7, 33, textures.wall],
             [22, 21, textures.wall]
         ]
     },
@@ -109,7 +106,6 @@ const sectors = {
     },
     f: {
         walls: [
-            [24, 32, textures.wall],
             [12, 13, textures.wall]
         ]
     },
@@ -123,7 +119,6 @@ const sectors = {
     },
     h: {
         walls: [
-            [32, 8, textures.wall],
             [8, 9, textures.wall],
             [9, 10, textures.wall],
             [10, 11, textures.wall],
@@ -135,65 +130,47 @@ const sectors = {
     i: {
         h: [STEP * 1, 120],
         walls: [
-            [23, 25, textures.wall],
-            [26, 24, textures.wall]
         ]
     },
     j: {
         h: [STEP * 2, 120],
         walls: [
-            [25, 27, textures.wall],
-            [28, 26, textures.wall],
         ]
     },
     k: {
         h: [STEP * 3, 120],
         walls: [
-            [27, 29, textures.wall],
-            [30, 28, textures.wall],
         ]
     },
     l: {
         h: [STEP * 4, 120],
         walls: [
-            [29, 31, textures.wall],
-            [32, 30, textures.wall],
         ]
     },
     m: {
         h: [STEP * 5, 120],
         walls: [
-            [31, 33, textures.wall],
-            [34, 32, textures.wall],
         ]
     },
     n: {
         h: [STEP * 6, 120],
         walls: [
-            [33, 35, textures.wall],
-            [36, 34, textures.wall],
         ]
     },
     o: {
         h: [STEP * 7, 120],
         walls: [
-            [35, 37, textures.wall],
-            [38, 36, textures.wall],
         ]
     },
     p: {
         h: [STEP * 8, 120],
         walls: [
-            [37, 39, textures.wall],
-            [40, 38, textures.wall],
         ]
     },
     q: {
         h: [STEP * 9, 120],
         walls: [
-            [39, 7, textures.wall],
             [7, 8, textures.wall],
-            [8, 40, textures.wall],
         ]
     }
 };
@@ -220,6 +197,28 @@ const portals = [
     [35, 36, sectors.n, sectors.o],
     [37, 38, sectors.o, sectors.p],
     [39, 40, sectors.p, sectors.q],
+
+    // Left side of stair/lobby portals
+    [23, 25, sectors.i, sectors.b],
+    [25, 27, sectors.j, sectors.b],
+    [27, 29, sectors.k, sectors.b],
+    [29, 31, sectors.l, sectors.b],
+    [31, 33, sectors.m, sectors.b],
+    [33, 35, sectors.n, sectors.c],
+    [35, 37, sectors.o, sectors.c],
+    [37, 39, sectors.p, sectors.c],
+    [39, 7, sectors.q, sectors.c],
+
+    // Right side of stair/lobby portals
+    [26, 24, sectors.i, sectors.f],
+    [28, 26, sectors.j, sectors.f],
+    [30, 28, sectors.k, sectors.f],
+    [32, 30, sectors.l, sectors.f],
+    [34, 32, sectors.m, sectors.h],
+    [36, 34, sectors.n, sectors.h],
+    [38, 36, sectors.o, sectors.h],
+    [40, 38, sectors.p, sectors.h],
+    [8, 40, sectors.q, sectors.h],
 ];
 
 const player = {
