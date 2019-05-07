@@ -60,117 +60,134 @@ const vertices = createIncremental([
 ]);
 
 const textures = {
-    wall: "wall"
+    wall: "solid_white.png",
+    stairs: "solid_grey.png",
+    column: "solid_yellow.png",
+    infodesk: "info_desk.png",
+    cantina: "cantina.png",
+    elevator: "elevators.png",
+    blackboard: "blackboard.png",
+    entry: "entry.png",
+    notfound: "404.png"
 };
 
 const STEP = 7;
 const defaultHeight = [0, 120];
-const defaultFloor = [1,1,1];
-const defaultCeil = [2, 2, 2];
+const defaultFloor = [2, 2, 2];
+const defaultCeil = [3, 3, 3];
 const sectors = {
     a: {
         walls: [
-            [13, 14, textures.wall]
+            [13, 14, textures.entry, [0, 0], [2, 1]]
         ]
     },
     b: {
         walls: [
-            [15, 18, textures.wall],
-            [19, 22, textures.wall],
+            [15, 18, textures.column],
+            [19, 22, textures.column],
         ]
     },
     c: {
         walls: [
-            [6, 7, textures.wall],
-            [22, 21, textures.wall]
+            [6, 7, textures.cantina, [0, 0], [1.333, 1]],
+            [22, 21, textures.column]
         ]
     },
     d: {
         walls: [
-            [14, 0, textures.wall],
-            [16, 15, textures.wall]
+            [14, 0, textures.entry, [0, 0], [0.5, 1]],
+            [16, 15, textures.column]
         ]
     },
     e: {
         walls: [
-            [0, 2, textures.wall],
-            [21, 20, textures.wall],
-            [17, 16, textures.wall],
+            [0, 2, textures.blackboard],
+            [21, 20, textures.column],
+            [17, 16, textures.column],
         ]
     },
     er: {
         walls: [
-            [20, 19, textures.wall],
-            [18, 17, textures.wall]
+            [20, 19, textures.column],
+            [18, 17, textures.column]
         ]
     },
     f: {
         walls: [
-            [12, 13, textures.wall]
+            [12, 13, textures.infodesk]
         ]
     },
     g: {
         walls: [
             [2, 3, textures.wall],
-            [3, 4, textures.wall],
+            [3, 4, textures.elevator],
             [4, 5, textures.wall],
-            [5, 6, textures.wall]
+            [5, 6, textures.cantina, [0, 0], [0.3333, 1]]
         ]
     },
     h: {
         walls: [
-            [8, 9, textures.wall],
+            [8, 9, textures.cantina, [0, 0], [0.3333, 1]],
             [9, 10, textures.wall],
-            [10, 11, textures.wall],
+            [10, 11, textures.elevator],
             [11, 12, textures.wall]
         ]
     },
 
     // Start of stairs
     i: {
+        floor: [1, 1, 1],
         h: [STEP * 1, 120],
         walls: [
         ]
     },
     j: {
+        floor: [1, 1, 1],
         h: [STEP * 2, 120],
         walls: [
         ]
     },
     k: {
+        floor: [1, 1, 1],
         h: [STEP * 3, 120],
         walls: [
         ]
     },
     l: {
+        floor: [1, 1, 1],
         h: [STEP * 4, 120],
         walls: [
         ]
     },
     m: {
+        floor: [1, 1, 1],
         h: [STEP * 5, 120],
         walls: [
         ]
     },
     n: {
+        floor: [1, 1, 1],
         h: [STEP * 6, 120],
         walls: [
         ]
     },
     o: {
+        floor: [1, 1, 1],
         h: [STEP * 7, 120],
         walls: [
         ]
     },
     p: {
+        floor: [1, 1, 1],
         h: [STEP * 8, 120],
         walls: [
         ]
     },
     q: {
+        floor: [1, 1, 1],
         h: [STEP * 9, 120],
         walls: [
-            [7, 8, textures.wall],
+            [7, 8, textures.notfound],
         ]
     }
 };
@@ -188,44 +205,44 @@ const portals = [
     [32, 12, sectors.f, sectors.h],
 
     // Start of stairs
-    [23, 24, sectors.a, sectors.i],
-    [25, 26, sectors.i, sectors.j],
-    [27, 28, sectors.j, sectors.k],
-    [29, 30, sectors.k, sectors.l],
-    [31, 32, sectors.l, sectors.m],
-    [33, 34, sectors.m, sectors.n],
-    [35, 36, sectors.n, sectors.o],
-    [37, 38, sectors.o, sectors.p],
-    [39, 40, sectors.p, sectors.q],
+    [23, 24, sectors.a, sectors.i, textures.stairs],
+    [25, 26, sectors.i, sectors.j, textures.stairs],
+    [27, 28, sectors.j, sectors.k, textures.stairs],
+    [29, 30, sectors.k, sectors.l, textures.stairs],
+    [31, 32, sectors.l, sectors.m, textures.stairs],
+    [33, 34, sectors.m, sectors.n, textures.stairs],
+    [35, 36, sectors.n, sectors.o, textures.stairs],
+    [37, 38, sectors.o, sectors.p, textures.stairs],
+    [39, 40, sectors.p, sectors.q, textures.stairs],
 
     // Left side of stair/lobby portals
-    [23, 25, sectors.i, sectors.b],
-    [25, 27, sectors.j, sectors.b],
-    [27, 29, sectors.k, sectors.b],
-    [29, 31, sectors.l, sectors.b],
-    [31, 33, sectors.m, sectors.b],
-    [33, 35, sectors.n, sectors.c],
-    [35, 37, sectors.o, sectors.c],
-    [37, 39, sectors.p, sectors.c],
-    [39, 7, sectors.q, sectors.c],
+    [23, 25, sectors.i, sectors.b, textures.stairs],
+    [25, 27, sectors.j, sectors.b, textures.stairs],
+    [27, 29, sectors.k, sectors.b, textures.stairs],
+    [29, 31, sectors.l, sectors.b, textures.stairs],
+    [31, 33, sectors.m, sectors.b, textures.stairs],
+    [33, 35, sectors.n, sectors.c, textures.stairs],
+    [35, 37, sectors.o, sectors.c, textures.stairs],
+    [37, 39, sectors.p, sectors.c, textures.stairs],
+    [39, 7, sectors.q, sectors.c, textures.stairs],
 
     // Right side of stair/lobby portals
-    [26, 24, sectors.i, sectors.f],
-    [28, 26, sectors.j, sectors.f],
-    [30, 28, sectors.k, sectors.f],
-    [32, 30, sectors.l, sectors.f],
-    [34, 32, sectors.m, sectors.h],
-    [36, 34, sectors.n, sectors.h],
-    [38, 36, sectors.o, sectors.h],
-    [40, 38, sectors.p, sectors.h],
-    [8, 40, sectors.q, sectors.h],
+    [26, 24, sectors.i, sectors.f, textures.stairs],
+    [28, 26, sectors.j, sectors.f, textures.stairs],
+    [30, 28, sectors.k, sectors.f, textures.stairs],
+    [32, 30, sectors.l, sectors.f, textures.stairs],
+    [34, 32, sectors.m, sectors.h, textures.stairs],
+    [36, 34, sectors.n, sectors.h, textures.stairs],
+    [38, 36, sectors.o, sectors.h, textures.stairs],
+    [40, 38, sectors.p, sectors.h, textures.stairs],
+    [8, 40, sectors.q, sectors.h, textures.stairs],
 ];
 
 const player = {
-    sector: sectors.a,
-    startPos: [ 20, 4],
+    sector: sectors.m,
+    startPos: [ 23, 10],
     angle: 0,
-    height: 5
+    height: 6 * STEP
 };
 
 //
@@ -237,9 +254,9 @@ const textureIndices = {};
 {
     let i = 0;
     for (let tex of Object.keys(textures)) {
-        textureIndices[
-            (typeof textures[tex] !== "string") ? tex : textures[tex]
-        ] = i++;
+        const name = (typeof textures[tex] !== "string") ? tex : textures[tex];
+        textureIndices[name] = i++;
+        console.log(`${i}: ${name}`);
     }
 }
 

@@ -69,7 +69,16 @@ PCMockup *pcmockup_init()
     }
 
     renderer_setTextureManager(me->renderer, me->textureManager);
-    if (textureManager_registerFile(me->textureManager, "xor64.png") == INVALID_TEXTURE_ID)
+    if (
+        textureManager_registerFile(me->textureManager, "solid_white.png") == INVALID_TEXTURE_ID ||
+        textureManager_registerFile(me->textureManager, "solid_gray.png") == INVALID_TEXTURE_ID ||
+        textureManager_registerFile(me->textureManager, "solid_yellow.png") == INVALID_TEXTURE_ID ||
+        textureManager_registerFile(me->textureManager, "info_desk.png") == INVALID_TEXTURE_ID ||
+        textureManager_registerFile(me->textureManager, "cantina.png") == INVALID_TEXTURE_ID ||
+        textureManager_registerFile(me->textureManager, "elevators.png") == INVALID_TEXTURE_ID ||
+        textureManager_registerFile(me->textureManager, "blackboard.png") == INVALID_TEXTURE_ID ||
+        textureManager_registerFile(me->textureManager, "entry.png") == INVALID_TEXTURE_ID ||
+        textureManager_registerFile(me->textureManager, "404.png") == INVALID_TEXTURE_ID)
     {
         pcmockup_free(me);
         return NULL;
