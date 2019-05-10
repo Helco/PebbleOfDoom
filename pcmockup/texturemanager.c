@@ -87,17 +87,17 @@ static LoadedTexture* prv_textureManager_nextEntry(TextureManager* me)
 
 void prv_convertRGBAtoPebbleImage(const uint8_t* rgbaPixels, GColor* pebblePixels, int width, int height)
 {
+    int pixelCount = width * height;
     const uint8_t* itRGBAPixel = rgbaPixels;
     GColor* itPebblePixel = pebblePixels;
-    for (int y = height - 1; y >= 0; y--) {
-        for (int x = 0; x < width; x++) {
-            itPebblePixel = pebblePixels + y * width + x;
-            itPebblePixel->r = itRGBAPixel[0] / (255 / 3);
-            itPebblePixel->g = itRGBAPixel[1] / (255 / 3);
-            itPebblePixel->b = itRGBAPixel[2] / (255 / 3);
-            itPebblePixel->a = itRGBAPixel[3] / (255 / 3);
-            itRGBAPixel += 4;
-        }
+    while (pixelCount--)
+    {
+        itPebblePixel->r = itRGBAPixel[0] / (255 / 3);
+        itPebblePixel->g = itRGBAPixel[1] / (255 / 3);
+        itPebblePixel->b = itRGBAPixel[2] / (255 / 3);
+        itPebblePixel->a = itRGBAPixel[3] / (255 / 3);
+        itPebblePixel++;
+        itRGBAPixel += 4;
     }
 }
 

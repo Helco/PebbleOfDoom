@@ -59,7 +59,16 @@ void update_animation(Animation *animation, const AnimationProgress progress)
 bool loadTextures()
 {
   static const uint32_t resourceIds[] = {
-
+      RESOURCE_ID_TEXTURE_WHITE,
+      RESOURCE_ID_TEXTURE_GRAY,
+      RESOURCE_ID_TEXTURE_YELLOW,
+      RESOURCE_ID_TEXTURE_INFODESK,
+      RESOURCE_ID_TEXTURE_CANTINA,
+      RESOURCE_ID_TEXTURE_ELEVATORS,
+      RESOURCE_ID_TEXTURE_BLACKBOARD,
+      RESOURCE_ID_TEXTURE_ENTRY,
+      RESOURCE_ID_TEXTURE_WHITE//,
+      //RESOURCE_ID_TEXTURE_404
   };
   static const int countIds = sizeof(resourceIds) / sizeof(uint32_t);
   for (int i = 0; i < countIds; i++)
@@ -75,8 +84,8 @@ bool loadTextures()
 int main(void) {
   if (!loadTextures())
     return -1;
-  TexGenerationContext* texgenctx = texgen_init(NULL, TexGenerator_XOR, PBL_IF_COLOR_ELSE(64, 1));
-  texgen_execute(texgenctx);
+  //TexGenerationContext* texgenctx = texgen_init(NULL, TexGenerator_XOR, PBL_IF_COLOR_ELSE(64, 1));
+  //texgen_execute(texgenctx);
 
   LevelId levelId = loadLevelFromResource(RESOURCE_ID_LEVEL_TEST);
   if (levelId == INVALID_LEVEL_ID)

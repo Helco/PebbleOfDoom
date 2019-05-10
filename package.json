@@ -11,8 +11,7 @@
     "sdkVersion": "3",
     "enableMultiJS": true,
     "targetPlatforms": [
-      "basalt",
-      "aplite"
+      "basalt"
     ],
     "watchapp": {
       "watchface": false
@@ -24,7 +23,55 @@
               "type": "raw",
               "name": "LEVEL_TEST",
               "file": "levels/test.bin"
-          }
+          },
+        {
+            "type": "bitmap",
+            "name": "TEXTURE_BLACKBOARD",
+            "file": "textures/blackboard.png",
+            "memoryFormat": "8Bit"
+        },
+        {
+            "type": "bitmap",
+            "name": "TEXTURE_CANTINA",
+            "file": "textures/cantina.png",
+            "memoryFormat": "8Bit"
+        },
+        {
+            "type": "bitmap",
+            "name": "TEXTURE_ELEVATORS",
+            "file": "textures/elevators.png",
+            "memoryFormat": "8Bit"
+        },
+        {
+            "type": "bitmap",
+            "name": "TEXTURE_ENTRY",
+            "file": "textures/entry.png",
+            "memoryFormat": "8Bit"
+        },
+        {
+            "type": "bitmap",
+            "name": "TEXTURE_INFODESK",
+            "file": "textures/info_desk.png",
+            "memoryFormat": "8Bit"
+        },
+        {
+            "type": "bitmap",
+            "name": "TEXTURE_GRAY",
+            "file": "textures/solid_gray.png",
+            "memoryFormat": "8Bit"
+        },
+        {
+            "type": "bitmap",
+            "name": "TEXTURE_WHITE",
+            "file": "textures/solid_white.png",
+            "memoryFormat": "8Bit"
+        },
+        {
+            "type": "bitmap",
+            "name": "TEXTURE_YELLOW",
+            "file": "textures/solid_yellow.png",
+            "memoryFormat": "8Bit"
+        }
       ]
     }
   }
