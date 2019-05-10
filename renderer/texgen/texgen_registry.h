@@ -7,9 +7,11 @@
 extern TEXGENERATOR_HEADER(XOR);
 extern TEXGENERATOR_HEADER(Rand);
 extern TEXGENERATOR_HEADER(Bricks);
+extern TEXGENERATOR_HEADER(SolidColor);
 
 static const TexGeneratorInitializer rawtexgen_registry[] = {
     TEXGENERATOR_SYMBOL(XOR),
     TEXGENERATOR_SYMBOL(Rand),
-    TEXGENERATOR_SYMBOL(Bricks)
+    TEXGENERATOR_SYMBOL(Bricks),
+    TEXGENERATOR_SYMBOL(SolidColor)
 };

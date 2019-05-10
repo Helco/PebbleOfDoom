@@ -90,4 +90,7 @@ const Texture* texgen_getTexture(TexGenerationContext* ctx);
 #define TexGenParam_Bricks_BorderColor (TexGenParamID('B', 'O', 'R', 'C'))
 #define TexGenParam_Bricks_BorderNoise (TexGenParamID('B', 'O', 'R', 'N'))
 
+#define TexGenerator_SolidColor (TexGeneratorID('S', 'C', 'O', 'L'))
+#define TexGenParam_SolidColor_Color (TexGenParamID('C', 'O', 'L', '\0'))
+
 #endif
