@@ -9,6 +9,17 @@ Animation* animation;
 Renderer* renderer;
 Level* level;
 
+time_t lastSecond;
+uint16_t lastSecondMs;
+int curFPS = 0;
+
+int time_difference_ms(time_t a, uint16_t aMs, time_t b, uint16_t bMs)
+{
+    return
+        (a > b ? a - b : -(b - a)) * 1000 +
+        (int)(aMs) - bMs;
+}
+
 void update_layer(Layer* layer, GContext* ctx)
 {
   GBitmap* framebuffer_bitmap = graphics_capture_frame_buffer(ctx);
@@ -24,6 +35,19 @@ void update_layer(Layer* layer, GContext* ctx)
   renderer_rotate(renderer, rotationRight);
 
   graphics_release_frame_buffer(ctx, framebuffer_bitmap);
+
+  // Update FPS counter
+  time_t curTime;
+  uint16_t curTimeMs;
+  time_ms(&curTime, &curTimeMs);
+  if (time_difference_ms(curTime, curTimeMs, lastSecond, lastSecondMs) >= 1000)
+  {
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Framerate: %d", curFPS);
+      curFPS = 0;
+      lastSecond = curTime;
+      lastSecondMs = curTimeMs;
+  }
+  curFPS++;
 }
 
 void update_animation(Animation *animation, const AnimationProgress progress)
@@ -50,7 +74,7 @@ bool loadTextures()
 int main(void) {
   if (!loadTextures())
     return -1;
-  TexGenerationContext* texgenctx = texgen_init(NULL, TexGenerator_XOR, 64);
+  TexGenerationContext* texgenctx = texgen_init(NULL, TexGenerator_XOR, 128);
   texgen_execute(texgenctx);
 
   level = level_load(0);
@@ -75,6 +99,8 @@ int main(void) {
   };
   animation_set_implementation(animation, &impl);
   animation_schedule(animation);
+
+  time_ms(&lastSecond, &lastSecondMs);
 
   window_stack_push(s_main_window, true);
   app_event_loop();
