@@ -240,8 +240,8 @@ const portals = [
 
 const player = {
     sector: sectors.m,
-    startPos: [ 23, 10],
-    angle: 0,
+    startPos: [ 24.5, 13],
+    angle: 260,
     height: 6 * STEP
 };
 
@@ -425,6 +425,7 @@ function printColor(color) {
         (color[2] * F) + ")";
 }
 
+// Output header
 let OUTPUT =
 `#include <pebble.h>
 #include "platform.h"
@@ -433,42 +434,51 @@ let OUTPUT =
 Level *level_load(int levelId)
 {
     UNUSED(levelId);
+    Level* level = (Level*)malloc(sizeof(Level));
+    Sector* sectors = (Sector*)malloc(sizeof(Sector) * ${sectorObjects.length});
+    Wall* walls = (Wall*)malloc(sizeof(Wall ) * ${sectorObjects.reduce((prev, cur) => prev + cur.wallChain.length, 0)});
+    if (level == NULL || sectors == NULL || walls == NULL) {
+        return NULL;
+    }
+
 `;
 
 // Output walls_template
-OUTPUT += "\tWall walls_template[] = {\n";
+let i = 0;
 for (let sectorObject of sectorObjects)
 {
-    OUTPUT += `\t\t// ${sectorObject.index}: ${sectorObject.name}\n`;
+    OUTPUT += `\t// ${sectorObject.index}: ${sectorObject.name}\n`;
     for (let wall of sectorObject.wallChain)
     {
         OUTPUT +=
-            `\t\t{.startCorner = ${printXZ(vertices[wall.from])},\n` +
-            `\t\t .texture = ${wall.textureI},\n` +
-            `\t\t .texCoord = { ${printXY(wall.texStart)}, ${printXY(wall.texEnd)} },\n` +
-            `\t\t .portalTo = ${wall.portalTo}},\n`;
+            `\twalls[${i}].startCorner = ${printXZ(vertices[wall.from])};\n` +
+            `\twalls[${i}].texture = ${wall.textureI};\n` +
+            `\twalls[${i}].texCoord = (TexCoord){ ${printXY(wall.texStart)}, ${printXY(wall.texEnd)} };\n` +
+            `\twalls[${i}].portalTo = ${wall.portalTo};\n`;
+        i++;
     }
     OUTPUT += "\n";
 }
-OUTPUT += "\t};\n\n";
 
 // Output sectors
-OUTPUT += "\tSector sectors_template[] = {\n";
+i = 0;
+let wallOffset = 0;
 for (let sectorObject of sectorObjects)
 {
     OUTPUT +=
-        `\t\t{.wallCount = ${sectorObject.wallChain.length},\n` +
-        `\t\t .height = ${sectorObject.height[1] - sectorObject.height[0]},\n` +
-        `\t\t .heightOffset = ${sectorObject.height[0]},\n` +
-        `\t\t .floorColor = ${printColor(sectorObject.floor)},\n` +
-        `\t\t .ceilColor = ${printColor(sectorObject.ceil)},\n` +
-        `\t\t .walls = NULL},\n`;
+        `\tsectors[${i}].wallCount = ${sectorObject.wallChain.length};\n` +
+        `\tsectors[${i}].height = ${sectorObject.height[1] - sectorObject.height[0]};\n` +
+        `\tsectors[${i}].heightOffset = ${sectorObject.height[0]};\n` +
+        `\tsectors[${i}].floorColor = ${printColor(sectorObject.floor)};\n` +
+        `\tsectors[${i}].ceilColor = ${printColor(sectorObject.ceil)};\n` +
+        `\tsectors[${i}].walls = walls + ${wallOffset};\n`;
+    i++;
+    wallOffset += sectorObject.wallChain.length;
 }
-OUTPUT += "\t};\n\n";
 
 // Output level
 OUTPUT +=
-    `\tLevel level_template = {\n` +
+    `\t*level = (Level){\n` +
     `\t\t.sectorCount = ${sectorObjects.length},\n` +
     `\t\t.playerStart = {\n` +
     `\t\t\t.sector = ${player.sector.index},\n` +
@@ -476,33 +486,11 @@ OUTPUT +=
     `\t\t\t.angle = real_degToRad(${printReal(player.angle)}),\n` +
     `\t\t\t.height = ${printReal(player.height)}\n` +
     `\t\t},\n` +
-    `\t\t.sectors = NULL\n` +
+    `\t\t.sectors = sectors\n` +
     `\t};\n\n`;
 
-// Output intermission
 OUTPUT +=
-`\tchar* memory = (char*)malloc(sizeof(Level) + sizeof(sectors_template) + sizeof(walls_template));
-\tif (memory == NULL)
-\t\treturn NULL;
-\tLevel* level = (Level*)memory;
-\tSector* sectors = (Sector*)(memory + sizeof(Level));
-\tWall* walls = (Wall*)(memory + sizeof(Level) + sizeof(sectors_template));
-\tmemcpy(level, &level_template, sizeof(Level));
-\tmemcpy(sectors, sectors_template, sizeof(sectors_template));
-\tmemcpy(walls, walls_template, sizeof(walls_template));
-\tlevel->sectors = sectors;
-`
-
-// Output sector wall offsets
-let wallOffset = 0;
-for (let sectorObject of sectorObjects)
-{
-    OUTPUT += `\tsectors[${sectorObject.index}].walls = walls + ${wallOffset};\n`;
-    wallOffset += sectorObject.wallChain.length;
-}
-
-OUTPUT +=
-`return level;
+`   return level;
 }
 
 void level_free(Level *me)
