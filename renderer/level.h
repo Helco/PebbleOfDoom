@@ -2,6 +2,7 @@
 #define LEVEL_H
 
 #include "algebra.h"
+#include <stdbool.h>
 
 typedef int TextureId;
 
@@ -39,5 +40,11 @@ typedef struct Level {
 
 Level* level_load(int levelId);
 void level_free(Level* me);
+int level_findSectorAt(const Level* level, xz_t point);
+
+bool sector_isInside(const Sector* sector, xz_t point);
+
+// returns true if sector was changed
+bool location_updateSector(Location* location, const Level* level);
 
 #endif

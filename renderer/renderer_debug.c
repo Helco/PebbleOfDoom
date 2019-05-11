@@ -170,7 +170,8 @@ void renderer_debug_cameraOptions(Renderer* me, ImGuiWindowFlags* flags, const v
 
     igSeparator();
     igText("Camera location");
-    igcLocation(&me->location);
+    if (igcLocation(&me->location))
+        location_updateSector(&me->location, me->level);
 }
 
 static const DebugView debugViews[] = {

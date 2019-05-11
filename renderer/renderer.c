@@ -65,6 +65,7 @@ void renderer_setLevel(Renderer* renderer, const Level* level)
 {
     renderer->level = level;
     renderer->location = level->playerStart;
+    location_updateSector(&renderer->location, level);
 }
 
 void renderer_setTextureManager(Renderer* me, TextureManagerHandle handle)
@@ -220,12 +221,11 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
 {
     const Sector* const sector = request->sector;
     const Wall* const wall = &sector->walls[wallIndex];
-    const real_t nearPlane = me->leftFovSeg.start.xz.z;
 
     lineSeg_t wallSeg;
     renderer_transformWall(me, sector, wallIndex, &wallSeg);
-    bool isWallStartBehind = real_compare(wallSeg.start.xz.z, nearPlane) < 0;
-    bool isWallEndBehind = real_compare(wallSeg.end.xz.z, nearPlane) < 0;
+    bool isWallStartBehind = real_compare(wallSeg.start.xz.z, real_zero) < 0;
+    bool isWallEndBehind = real_compare(wallSeg.end.xz.z, real_zero) < 0;
     if (isWallStartBehind && isWallEndBehind)
         return;
 
@@ -389,9 +389,10 @@ void renderer_renderSector(Renderer* renderer, RendererTarget target, const Draw
 
 void renderer_render(Renderer* renderer, RendererTarget target)
 {
-    if (renderer->level == NULL)
-        return;
     memset(target.framebuffer, 0, RENDERER_WIDTH * rendererColorFormat_getStride(target.colorFormat));
+
+    if (renderer->level == NULL || renderer->location.sector < 0)
+        return;
     memset(renderer->boundarySets[0].yBottom, 0, sizeof(renderer->boundarySets[0].yBottom));
     memset(renderer->boundarySets[1].yBottom, 0, sizeof(renderer->boundarySets[1].yBottom));
     memset(renderer->wallBoundaries.yBottom, 0, sizeof(renderer->wallBoundaries.yBottom));
@@ -432,6 +433,7 @@ void renderer_move(Renderer* renderer, xz_t directions)
 {
     directions = xz_rotate(directions, real_neg(renderer->location.angle)); // angle needs the be negated because xz_rotate is considering a righthand rotation to be in the positiv and left negativ (world space)
     renderer->location.position = xz_add(renderer->location.position, directions);
+    location_updateSector(&renderer->location, renderer->level);
 }
 
 void renderer_moveVertical(Renderer* renderer, xy_t directions)
