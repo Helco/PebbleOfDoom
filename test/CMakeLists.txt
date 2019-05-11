@@ -21,3 +21,4 @@ target_include_directories(test_podrenderer PUBLIC
     "../renderer/"
 )
 add_googletest(test_podrenderer "def.")
+add_sanitizers(test_podrenderer)
