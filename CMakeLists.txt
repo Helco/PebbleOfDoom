@@ -38,8 +38,10 @@ endfunction(enable_warnings)
 ###################################################################
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/" ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/sanitizers-cmake/cmake" ${CMAKE_MODULE_PATH})
 
 find_package(SDL2 REQUIRED)
+find_package(Sanitizers)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)
 

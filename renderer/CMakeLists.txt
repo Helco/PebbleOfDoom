@@ -41,3 +41,4 @@ target_link_libraries(podrenderer
 )
 
 enable_warnings(podrenderer)
+add_sanitizers(podrenderer)
