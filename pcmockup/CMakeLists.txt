@@ -42,3 +42,4 @@ set_target_properties(pcmockup PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
 )
 enable_warnings(pcmockup)
+add_sanitizers(pcmockup)

@@ -10,3 +10,4 @@ target_link_libraries(texgencli PUBLIC
     stb
 )
 enable_warnings(texgencli)
+add_sanitizers(texgencli)
