@@ -1,5 +1,6 @@
 #include <pebble.h>
 #include "textureresources.h"
+#include "levelresources.h"
 #include "../renderer/renderer.h"
 #include "../renderer/texgen/texgen.h"
 
@@ -7,7 +8,7 @@ Window* s_main_window;
 Layer* root_layer;
 Animation* animation;
 Renderer* renderer;
-Level* level;
+const Level* level;
 
 time_t lastSecond;
 uint16_t lastSecondMs;
@@ -74,10 +75,14 @@ bool loadTextures()
 int main(void) {
   if (!loadTextures())
     return -1;
-  TexGenerationContext* texgenctx = texgen_init(NULL, TexGenerator_XOR, 128);
+  TexGenerationContext* texgenctx = texgen_init(NULL, TexGenerator_XOR, PBL_IF_COLOR_ELSE(64, 1));
   texgen_execute(texgenctx);
 
-  level = level_load(0);
+  LevelId levelId = loadLevelFromResource(RESOURCE_ID_LEVEL_TEST);
+  if (levelId == INVALID_LEVEL_ID)
+    return -1;
+
+  level = level_load(NULL, levelId);
   if (!level)
     return -1;
 
@@ -106,6 +111,6 @@ int main(void) {
   app_event_loop();
 
   renderer_free(renderer);
-  level_free(level);
+  level_free(NULL, level);
   freeTextures();
 }

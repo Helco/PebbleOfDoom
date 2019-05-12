@@ -1,6 +1,6 @@
 #ifndef LEVELSTORAGE_H
 #define LEVELSTORAGE_H
-#include "platform.h"
+#include "../renderer/platform.h"
 
 #define LEVEL_STORAGE_VERSION 1
 
