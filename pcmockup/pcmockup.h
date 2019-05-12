@@ -8,7 +8,9 @@
 #include "platform.h"
 #include <glad/glad.h>
 
-#define TEXTURE_PATH "resources/textures/"
+#define RESOURCES_PATH "resources/"
+#define TEXTURE_PATH RESOURCES_PATH "textures/"
+#define LEVEL_PATH RESOURCES_PATH "levels/"
 
 GRect findBestFit(GRect target, float aspect);
 GRect padRect(GRect rect, GSize amount);
@@ -73,5 +75,12 @@ const char* textureManager_getTextureSource(TextureManager* me, const Texture* t
 typedef struct TextureWindow TextureWindow;
 TextureWindow* textureWindow_init(WindowContainer* parent, TextureManager* manager);
 Window* textureWindow_asWindow(TextureWindow* me);
+
+typedef struct LevelManager LevelManager;
+LevelManager* levelManager_init();
+void levelManager_free(LevelManager* me);
+LevelId levelManager_registerFile(LevelManager* me, const char* filename); // relative to level folder
+int levelManager_getLevelCount(LevelManager* me);
+const Level* levelManager_getLevelByIndex(LevelManager* me, int index);
 
 #endif

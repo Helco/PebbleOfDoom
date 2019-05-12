@@ -11,8 +11,9 @@ static const int MAX_FRAMERATE = 60;
 struct PCMockup
 {
     Renderer *renderer;
-    Level* level;
+    const Level* level;
     TextureManager* textureManager;
+    LevelManager* levelManager;
     WindowContainer* windowContainer;
     bool_t isRunning;
 };
@@ -53,20 +54,20 @@ PCMockup *pcmockup_init()
         return NULL;
     }
 
-    me->level = level_load(0);
-    if (me->level == NULL)
-    {
-        pcmockup_free(me);
-        return NULL;
-    }
-
     me->textureManager = textureManager_init();
     if (me->textureManager == NULL)
     {
         pcmockup_free(me);
         return NULL;
     }
-    renderer_setLevel(me->renderer, me->level);
+
+    me->levelManager = levelManager_init();
+    if (me->levelManager == NULL)
+    {
+        pcmockup_free(me);
+        return NULL;
+    }
+
     renderer_setTextureManager(me->renderer, me->textureManager);
     if (textureManager_registerFile(me->textureManager, "xor64.png") == INVALID_TEXTURE_ID)
     {
@@ -78,6 +79,14 @@ PCMockup *pcmockup_init()
     texgen_setGenerator(texgenctx, TexGenerator_Rand);
     texgen_setSize(texgenctx, 64);
     texgen_execute(texgenctx);
+
+    if (levelManager_registerFile(me->levelManager, "test.json") == INVALID_LEVEL_ID)
+    {
+        pcmockup_free(me);
+        return NULL;
+    }
+    me->level = levelManager_getLevelByIndex(me->levelManager, 0);
+    renderer_setLevel(me->renderer, me->level);
 
     me->windowContainer = windowContainer_init(WINDOW_START_SIZE);
     if (me->windowContainer == NULL)
@@ -137,7 +146,9 @@ void pcmockup_free(PCMockup *me)
     if (me->windowContainer != NULL)
         windowContainer_free(me->windowContainer);
     if (me->level != NULL)
-        level_free(me->level);
+        me->level = NULL;
+    if (me->levelManager != NULL)
+        levelManager_free(me->levelManager);
     if (me->textureManager != NULL)
         textureManager_free(me->textureManager);
     if (me->renderer != NULL)

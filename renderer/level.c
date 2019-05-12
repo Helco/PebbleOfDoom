@@ -2,7 +2,7 @@
 #include "platform.h"
 #include "level.h"
 
-Level *level_load(int levelId)
+/*Level *level_load(int levelId)
 {
     UNUSED(levelId);
     Wall walls_template[] = {
@@ -125,7 +125,7 @@ void level_free(Level *me)
     if (me == NULL)
         return;
     free(me);
-}
+}*/
 
 int level_findSectorAt(const Level* level, xz_t point)
 {
