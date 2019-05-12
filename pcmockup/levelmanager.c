@@ -1,5 +1,5 @@
 #define _CRT_NONSTDC_NO_DEPRECATE
-#include "pcmockup.h"
+#include "levelmanager.h"
 #include <stdlib.h>
 #include <assert.h>
 #include <parson.h>
@@ -14,11 +14,12 @@ typedef struct LoadedLevel
 
 struct LevelManager
 {
+    char* baseDirectory;
     int count, capacity;
     LoadedLevel* levels;
 };
 
-LevelManager* levelManager_init()
+LevelManager* levelManager_init(const char* baseDirectory)
 {
     LevelManager* me = (LevelManager*)malloc(sizeof(LevelManager));
     if (me == NULL)
@@ -29,6 +30,7 @@ LevelManager* levelManager_init()
         return NULL;
     }
 
+    me->baseDirectory = strdup(baseDirectory);
     me->count = 0;
     me->capacity = LEVEL_MANAGER_CHUNK;
     return me;
@@ -53,6 +55,7 @@ void levelManager_free(LevelManager* me)
         free(me->levels[i].source);
     }
     free(me->levels);
+    free(me->baseDirectory);
     free(me);
 }
 
@@ -237,7 +240,7 @@ LevelId levelManager_registerFile(LevelManager* me, const char* filename)
 {
     assert(me != NULL && filename != NULL);
     char filenameBuffer[512];
-    snprintf(filenameBuffer, 512, "%s%s", LEVEL_PATH, filename);
+    snprintf(filenameBuffer, 512, "%s%s", me->baseDirectory, filename);
     JSON_Value* root = json_parse_file_with_comments(filenameBuffer);
     if (root == NULL)
         return INVALID_LEVEL_ID;

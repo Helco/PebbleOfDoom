@@ -6,6 +6,7 @@
 #include "texgen/texgen.h"
 #include "window.h"
 #include "platform.h"
+#include "levelmanager.h"
 #include <glad/glad.h>
 
 #define RESOURCES_PATH "resources/"
@@ -75,12 +76,5 @@ const char* textureManager_getTextureSource(TextureManager* me, const Texture* t
 typedef struct TextureWindow TextureWindow;
 TextureWindow* textureWindow_init(WindowContainer* parent, TextureManager* manager);
 Window* textureWindow_asWindow(TextureWindow* me);
-
-typedef struct LevelManager LevelManager;
-LevelManager* levelManager_init();
-void levelManager_free(LevelManager* me);
-LevelId levelManager_registerFile(LevelManager* me, const char* filename); // relative to level folder
-int levelManager_getLevelCount(LevelManager* me);
-const Level* levelManager_getLevelByIndex(LevelManager* me, int index);
 
 #endif

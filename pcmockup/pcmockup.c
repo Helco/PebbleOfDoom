@@ -61,7 +61,7 @@ PCMockup *pcmockup_init()
         return NULL;
     }
 
-    me->levelManager = levelManager_init();
+    me->levelManager = levelManager_init(LEVEL_PATH);
     if (me->levelManager == NULL)
     {
         pcmockup_free(me);

@@ -22,6 +22,7 @@ set(sources_pcmockup
     safeframebuffer.c
     rendererinterface.c
     texturemanager.c
+    levelmanager.h
     levelmanager.c
     windowcontainer.c
     imagewindow.c

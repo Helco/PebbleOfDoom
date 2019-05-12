@@ -12,3 +12,4 @@ compile_commands.json
 CTestTestfile.cmake
 test_detail.xml
 .lock*
+resources/levels/*.bin
