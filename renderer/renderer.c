@@ -126,6 +126,11 @@ typedef struct
 
 bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg, TexCoord* texCoord)
 {
+    int compareStartZ = real_compare(wallSeg->start.xz.z, me->leftFovSeg.start.xz.z);
+    int compareEndZ = real_compare(wallSeg->end.xz.z, me->leftFovSeg.start.xz.z);
+    if (compareStartZ > 0 && compareEndZ > 0)
+        return true;
+
     xz_t leftIntersection, rightIntersection;
     bool_t intersectsLeft = xz_lineIntersect(*wallSeg, me->leftFovSeg, &leftIntersection);
     bool_t intersectsRight = xz_lineIntersect(*wallSeg, me->rightFovSeg, &rightIntersection);
@@ -137,7 +142,7 @@ bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg, TexCoord* texC
     real_t texCoordStart = real_min(texCoord->start.x, texCoord->end.x);
     bool_t result = true;
 
-    if (real_compare(wallSeg->start.xz.z, me->leftFovSeg.start.xz.z) <= 0)
+    if (compareStartZ <= 0)
     {
         bool_t useLeftIntersection = (real_compare(leftIntersection.z, real_zero) > 0 && inWallSegLeft);
         wallSeg->start.xz = useLeftIntersection
@@ -147,7 +152,7 @@ bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg, TexCoord* texC
             texCoord->start.x = real_add(real_mul(wallPhaseLeft, texCoordAmpl), texCoordStart);
     }
 
-    if (real_compare(wallSeg->end.xz.z, me->leftFovSeg.start.xz.z) <= 0)
+    if (compareEndZ <= 0)
     {
         bool_t useRightIntersection = (real_compare(rightIntersection.z, real_zero) > 0 && inWallSegRight);
         wallSeg->end.xz = useRightIntersection
