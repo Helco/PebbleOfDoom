@@ -1,0 +1,2046 @@
+{
+    "playerStart": {
+        "position": [
+            490,
+            260
+        ],
+        "angle": 260,
+        "height": 42
+    },
+    "sectors": [
+        {
+            "comment": "a",
+            "heightOffset": 0,
+            "height": 120,
+            "floorColor": [
+                2,
+                2,
+                2
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        160,
+                        0
+                    ],
+                    "texture": 7,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            2,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        480,
+                        0
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 6
+                },
+                {
+                    "startCorner": [
+                        480,
+                        170
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 9
+                },
+                {
+                    "startCorner": [
+                        400,
+                        230
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 1
+                }
+            ]
+        },
+        {
+            "comment": "b",
+            "heightOffset": 0,
+            "height": 120,
+            "floorColor": [
+                2,
+                2,
+                2
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        160,
+                        80
+                    ],
+                    "texture": 2,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        160,
+                        40
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 3
+                },
+                {
+                    "startCorner": [
+                        160,
+                        0
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 0
+                },
+                {
+                    "startCorner": [
+                        400,
+                        230
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 9
+                },
+                {
+                    "startCorner": [
+                        410,
+                        240
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 10
+                },
+                {
+                    "startCorner": [
+                        420,
+                        250
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 11
+                },
+                {
+                    "startCorner": [
+                        430,
+                        260
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 12
+                },
+                {
+                    "startCorner": [
+                        440,
+                        270
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 13
+                },
+                {
+                    "startCorner": [
+                        440,
+                        280
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 2
+                },
+                {
+                    "startCorner": [
+                        160,
+                        240
+                    ],
+                    "texture": 2,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        160,
+                        200
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 5
+                }
+            ]
+        },
+        {
+            "comment": "c",
+            "heightOffset": 0,
+            "height": 120,
+            "floorColor": [
+                2,
+                2,
+                2
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        440,
+                        320
+                    ],
+                    "texture": 4,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1.333,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        120,
+                        320
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 7
+                },
+                {
+                    "startCorner": [
+                        120,
+                        240
+                    ],
+                    "texture": 2,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        160,
+                        240
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 1
+                },
+                {
+                    "startCorner": [
+                        440,
+                        280
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 14
+                },
+                {
+                    "startCorner": [
+                        440,
+                        290
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 15
+                },
+                {
+                    "startCorner": [
+                        440,
+                        300
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 16
+                },
+                {
+                    "startCorner": [
+                        440,
+                        310
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 17
+                }
+            ]
+        },
+        {
+            "comment": "d",
+            "heightOffset": 0,
+            "height": 120,
+            "floorColor": [
+                2,
+                2,
+                2
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        0,
+                        0
+                    ],
+                    "texture": 7,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            0.5,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        160,
+                        0
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 1
+                },
+                {
+                    "startCorner": [
+                        160,
+                        40
+                    ],
+                    "texture": 2,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        120,
+                        40
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 4
+                }
+            ]
+        },
+        {
+            "comment": "e",
+            "heightOffset": 0,
+            "height": 120,
+            "floorColor": [
+                2,
+                2,
+                2
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        0,
+                        160
+                    ],
+                    "texture": 6,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        0,
+                        0
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 3
+                },
+                {
+                    "startCorner": [
+                        120,
+                        40
+                    ],
+                    "texture": 2,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        120,
+                        80
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 5
+                },
+                {
+                    "startCorner": [
+                        120,
+                        200
+                    ],
+                    "texture": 2,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        120,
+                        240
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 7
+                }
+            ]
+        },
+        {
+            "comment": "er",
+            "heightOffset": 0,
+            "height": 120,
+            "floorColor": [
+                2,
+                2,
+                2
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        160,
+                        200
+                    ],
+                    "texture": 2,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        120,
+                        200
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 4
+                },
+                {
+                    "startCorner": [
+                        120,
+                        80
+                    ],
+                    "texture": 2,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        160,
+                        80
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 1
+                }
+            ]
+        },
+        {
+            "comment": "f",
+            "heightOffset": 0,
+            "height": 120,
+            "floorColor": [
+                2,
+                2,
+                2
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        480,
+                        0
+                    ],
+                    "texture": 3,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        600,
+                        160
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 8
+                },
+                {
+                    "startCorner": [
+                        520,
+                        210
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 12
+                },
+                {
+                    "startCorner": [
+                        510,
+                        200
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 11
+                },
+                {
+                    "startCorner": [
+                        500,
+                        190
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 10
+                },
+                {
+                    "startCorner": [
+                        490,
+                        180
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 9
+                },
+                {
+                    "startCorner": [
+                        480,
+                        170
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 0
+                }
+            ]
+        },
+        {
+            "comment": "g",
+            "heightOffset": 0,
+            "height": 120,
+            "floorColor": [
+                2,
+                2,
+                2
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        -240,
+                        160
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        0,
+                        160
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 4
+                },
+                {
+                    "startCorner": [
+                        120,
+                        240
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 2
+                },
+                {
+                    "startCorner": [
+                        120,
+                        320
+                    ],
+                    "texture": 4,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            0.3333,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        40,
+                        400
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        -240,
+                        400
+                    ],
+                    "texture": 5,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                }
+            ]
+        },
+        {
+            "comment": "h",
+            "heightOffset": 0,
+            "height": 120,
+            "floorColor": [
+                2,
+                2,
+                2
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        600,
+                        400
+                    ],
+                    "texture": 4,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            0.3333,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        520,
+                        320
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 17
+                },
+                {
+                    "startCorner": [
+                        520,
+                        310
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 16
+                },
+                {
+                    "startCorner": [
+                        520,
+                        300
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 15
+                },
+                {
+                    "startCorner": [
+                        520,
+                        290
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 14
+                },
+                {
+                    "startCorner": [
+                        520,
+                        280
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 13
+                },
+                {
+                    "startCorner": [
+                        520,
+                        210
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 6
+                },
+                {
+                    "startCorner": [
+                        600,
+                        160
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        800,
+                        160
+                    ],
+                    "texture": 5,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        800,
+                        400
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                }
+            ]
+        },
+        {
+            "comment": "i",
+            "heightOffset": 7,
+            "height": 113,
+            "floorColor": [
+                1,
+                1,
+                1
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        400,
+                        230
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 0
+                },
+                {
+                    "startCorner": [
+                        480,
+                        170
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 6
+                },
+                {
+                    "startCorner": [
+                        490,
+                        180
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 10
+                },
+                {
+                    "startCorner": [
+                        410,
+                        240
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 1
+                }
+            ]
+        },
+        {
+            "comment": "j",
+            "heightOffset": 14,
+            "height": 106,
+            "floorColor": [
+                1,
+                1,
+                1
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        410,
+                        240
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 9
+                },
+                {
+                    "startCorner": [
+                        490,
+                        180
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 6
+                },
+                {
+                    "startCorner": [
+                        500,
+                        190
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 11
+                },
+                {
+                    "startCorner": [
+                        420,
+                        250
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 1
+                }
+            ]
+        },
+        {
+            "comment": "k",
+            "heightOffset": 21,
+            "height": 99,
+            "floorColor": [
+                1,
+                1,
+                1
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        420,
+                        250
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 10
+                },
+                {
+                    "startCorner": [
+                        500,
+                        190
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 6
+                },
+                {
+                    "startCorner": [
+                        510,
+                        200
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 12
+                },
+                {
+                    "startCorner": [
+                        430,
+                        260
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 1
+                }
+            ]
+        },
+        {
+            "comment": "l",
+            "heightOffset": 28,
+            "height": 92,
+            "floorColor": [
+                1,
+                1,
+                1
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        430,
+                        260
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 11
+                },
+                {
+                    "startCorner": [
+                        510,
+                        200
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 6
+                },
+                {
+                    "startCorner": [
+                        520,
+                        210
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 13
+                },
+                {
+                    "startCorner": [
+                        440,
+                        270
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 1
+                }
+            ]
+        },
+        {
+            "comment": "m",
+            "heightOffset": 35,
+            "height": 85,
+            "floorColor": [
+                1,
+                1,
+                1
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        440,
+                        270
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 12
+                },
+                {
+                    "startCorner": [
+                        520,
+                        210
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 8
+                },
+                {
+                    "startCorner": [
+                        520,
+                        280
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 14
+                },
+                {
+                    "startCorner": [
+                        440,
+                        280
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 1
+                }
+            ]
+        },
+        {
+            "comment": "n",
+            "heightOffset": 42,
+            "height": 78,
+            "floorColor": [
+                1,
+                1,
+                1
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        440,
+                        280
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 13
+                },
+                {
+                    "startCorner": [
+                        520,
+                        280
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 8
+                },
+                {
+                    "startCorner": [
+                        520,
+                        290
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 15
+                },
+                {
+                    "startCorner": [
+                        440,
+                        290
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 2
+                }
+            ]
+        },
+        {
+            "comment": "o",
+            "heightOffset": 49,
+            "height": 71,
+            "floorColor": [
+                1,
+                1,
+                1
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        440,
+                        290
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 14
+                },
+                {
+                    "startCorner": [
+                        520,
+                        290
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 8
+                },
+                {
+                    "startCorner": [
+                        520,
+                        300
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 16
+                },
+                {
+                    "startCorner": [
+                        440,
+                        300
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 2
+                }
+            ]
+        },
+        {
+            "comment": "p",
+            "heightOffset": 56,
+            "height": 64,
+            "floorColor": [
+                1,
+                1,
+                1
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        440,
+                        300
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 15
+                },
+                {
+                    "startCorner": [
+                        520,
+                        300
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 8
+                },
+                {
+                    "startCorner": [
+                        520,
+                        310
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 17
+                },
+                {
+                    "startCorner": [
+                        440,
+                        310
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 2
+                }
+            ]
+        },
+        {
+            "comment": "q",
+            "heightOffset": 63,
+            "height": 57,
+            "floorColor": [
+                1,
+                1,
+                1
+            ],
+            "ceilColor": [
+                3,
+                3,
+                3
+            ],
+            "walls": [
+                {
+                    "startCorner": [
+                        520,
+                        320
+                    ],
+                    "texture": 8,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        440,
+                        320
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 2
+                },
+                {
+                    "startCorner": [
+                        440,
+                        310
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 16
+                },
+                {
+                    "startCorner": [
+                        520,
+                        310
+                    ],
+                    "texture": 1,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 8
+                }
+            ]
+        }
+    ]
+}

@@ -89,7 +89,7 @@ PCMockup *pcmockup_init()
     texgen_setSize(texgenctx, 64);
     texgen_execute(texgenctx);
 
-    if (levelManager_registerFile(me->levelManager, "test.json") == INVALID_LEVEL_ID)
+    if (levelManager_registerFile(me->levelManager, "lobby.json") == INVALID_LEVEL_ID)
     {
         pcmockup_free(me);
         return NULL;

@@ -191,7 +191,7 @@ void renderer_renderFilledSpan(Renderer* me, RendererTarget target, int x, int y
     for (int y = yFillLower; y <= yFillUpper; y++) {
         int texRowI = real_to_int(texRow);
         *(curPixel++) = texture->pixels[
-            (texRowI % texture->size.h) * texture->size.w +
+            (texture->size.h - 1 - (texRowI % texture->size.h)) * texture->size.w +
                 (texCol % texture->size.w)
         ];
         texRow = real_add(texRow, texRowIncr);

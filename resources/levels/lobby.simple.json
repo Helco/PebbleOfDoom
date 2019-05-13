@@ -1,0 +1,224 @@
+{
+    "textures": {
+        "wall": "solid_white.png",
+        "stairs": "solid_grey.png",
+        "column": "solid_yellow.png",
+        "infodesk": "info_desk.png",
+        "cantina": "cantina.png",
+        "elevator": "elevators.png",
+        "blackboard": "blackboard.png",
+        "entry": "entry.png",
+        "notfound": "404.png"
+    },
+    "playerStart": {
+        "position": [ 24.5, 13],
+        "angle": 260,
+        "height": 42
+    },
+    "xzFactor": 20.0,
+    "verticesIncremental": [
+        [0, 0],
+        [0, 2],
+        [0, 6],
+        [-12, 0],
+        [0, 12],
+        [14, 0],
+        [4, -4],
+        [16, 0],
+        [4, 0],
+        [4, 4],
+        [10, 0],
+        [0, -12],
+        [-10, 0],
+        [-6, -8],
+        [-16, 0],
+        [0, 2],
+        [-2, 0],
+        [0, 2],
+        [2, 0],
+        [0, 6],
+        [-2, 0],
+        [0, 2],
+        [2, 0],
+        [12, -0.5],
+
+        [4, -3],
+        [-3.5, 3.5],
+        [4, -3],
+        [-3.5, 3.5],
+        [4, -3],
+        [-3.5, 3.5],
+        [4, -3],
+        [-3.5, 3.5],
+        [4, -3],
+
+        [-4, 3.5],
+        [4, 0],
+        [-4, 0.5],
+        [4, 0],
+        [-4, 0.5],
+        [4, 0],
+        [-4, 0.5],
+        [4, 0]
+    ],
+    "defaultHeight": [0, 120],
+    "defaultFloorColor": [2, 2, 2],
+    "defaultCeilColor": [3, 3, 3],
+    "sectors": {
+        "a": {
+            "walls": [
+                [14, 13, "entry", [0, 0], [2, 1]]
+            ]
+        },
+        "b": {
+            "walls": [
+                [18, 15, "column"],
+                [22, 19, "column"]
+            ]
+        },
+        "c": {
+            "walls": [
+                [7, 6, "cantina", [0, 0], [1.333, 1]],
+                [21, 22, "column"]
+            ]
+        },
+        "d": {
+            "walls": [
+                [0, 14, "entry", [0, 0], [0.5, 1]],
+                [15, 16, "column"]
+            ]
+        },
+        "e": {
+            "walls": [
+                [2, 0, "blackboard"],
+                [20, 21, "column"],
+                [16, 17, "column"]
+            ]
+        },
+        "er": {
+            "walls": [
+                [19, 20, "column"],
+                [17, 18, "column"]
+            ]
+        },
+        "f": {
+            "walls": [
+                [13, 12, "infodesk"]
+            ]
+        },
+        "g": {
+            "walls": [
+                [3, 2, "wall"],
+                [4, 3, "elevator"],
+                [5, 4, "wall"],
+                [6, 5, "cantina", [0, 0], [0.3333, 1]]
+            ]
+        },
+        "h": {
+            "walls": [
+                [9, 8, "cantina", [0, 0], [0.3333, 1]],
+                [10, 9, "wall"],
+                [11, 10, "elevator"],
+                [12, 11, "wall"]
+            ]
+        },
+
+        "i": {
+            "floorColor": [1, 1, 1],
+            "height": [7, 113],
+            "walls": [
+            ]
+        },
+        "j": {
+            "floorColor": [1, 1, 1],
+            "height": [14, 106],
+            "walls": [
+            ]
+        },
+        "k": {
+            "floorColor": [1, 1, 1],
+            "height": [21, 99],
+            "walls": [
+            ]
+        },
+        "l": {
+            "floorColor": [1, 1, 1],
+            "height": [28, 92],
+            "walls": [
+            ]
+        },
+        "m": {
+            "floorColor": [1, 1, 1],
+            "height": [35, 85],
+            "walls": [
+            ]
+        },
+        "n": {
+            "floorColor": [1, 1, 1],
+            "height": [42, 78],
+            "walls": [
+            ]
+        },
+        "o": {
+            "floorColor": [1, 1, 1],
+            "height": [49, 71],
+            "walls": [
+            ]
+        },
+        "p": {
+            "floorColor": [1, 1, 1],
+            "height": [56, 64],
+            "walls": [
+            ]
+        },
+        "q": {
+            "floorColor": [1, 1, 1],
+            "height": [63, 57],
+            "walls": [
+                [8, 7, "notfound"]
+            ]
+        }
+    },
+    "portals": [
+        [21, 6, "g", "c"],
+        [2, 21, "g", "e"],
+        [17, 20, "e", "er"],
+        [0, 16, "e", "d"],
+        [22, 33, "c", "b"],
+        [19, 18, "b", "er"],
+        [15, 14, "b", "d"],
+        [14, 23, "b", "a"],
+        [13, 24, "a", "f"],
+        [12, 32, "f", "h"],
+
+        [24, 23, "a", "i", "stairs"],
+        [26, 25, "i", "j", "stairs"],
+        [28, 27, "j", "k", "stairs"],
+        [30, 29, "k", "l", "stairs"],
+        [32, 31, "l", "m", "stairs"],
+        [34, 33, "m", "n", "stairs"],
+        [36, 35, "n", "o", "stairs"],
+        [38, 37, "o", "p", "stairs"],
+        [40, 39, "p", "q", "stairs"],
+
+        [25, 23, "i", "b", "stairs"],
+        [27, 25, "j", "b", "stairs"],
+        [29, 27, "k", "b", "stairs"],
+        [31, 29, "l", "b", "stairs"],
+        [33, 31, "m", "b", "stairs"],
+        [35, 33, "n", "c", "stairs"],
+        [37, 35, "o", "c", "stairs"],
+        [39, 37, "p", "c", "stairs"],
+        [7, 39, "q", "c", "stairs"],
+
+        [24, 26, "i", "f", "stairs"],
+        [26, 28, "j", "f", "stairs"],
+        [28, 30, "k", "f", "stairs"],
+        [30, 32, "l", "f", "stairs"],
+        [32, 34, "m", "h", "stairs"],
+        [34, 36, "n", "h", "stairs"],
+        [36, 38, "o", "h", "stairs"],
+        [38, 40, "p", "h", "stairs"],
+        [40, 8, "q", "h", "stairs"]
+    ]
+}
