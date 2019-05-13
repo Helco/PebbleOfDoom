@@ -1,160 +1,312 @@
 {
     "playerStart": {
-        "position": [20, 70],
+        "position": [
+            20,
+            70
+        ],
         "height": 0,
         "angle": 40
     },
     "sectors": [
         {
-            "comment": "START TRIANGLE",
-            "height": 25,
+            "comment": "startTriangle",
             "heightOffset": 0,
-            "floorColor": [0, 0, 3],
-            "ceilColor": [3, 0, 0],
+            "height": 25,
+            "floorColor": [
+                0,
+                0,
+                3
+            ],
+            "ceilColor": [
+                3,
+                0,
+                0
+            ],
             "walls": [
                 {
-                    "startCorner": [70, 50],
+                    "startCorner": [
+                        0,
+                        50
+                    ],
                     "texture": 0,
                     "texCoord": {
-                        "start": [0, 0],
-                        "end": [1, 1]
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        0,
+                        -30
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        70,
+                        50
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
                     },
                     "portalTo": 1
-                },
-                {
-                    "startCorner": [0, 50],
-                    "texture": 0,
-                    "texCoord": {
-                        "start": [0, 0],
-                        "end": [1, 1]
-                    },
-                    "portalTo": -1
-                },
-                {
-                    "startCorner": [0, -30],
-                    "texture": 0,
-                    "texCoord": {
-                        "start": [0, 0],
-                        "end": [1, 1]
-                    },
-                    "portalTo": -1
                 }
             ]
         },
         {
-            "comment": "NORTHERN TRAPEZ",
-            "height": 35,
+            "comment": "northernTrapez",
             "heightOffset": -5,
-            "floorColor": [0, 2, 3],
-            "ceilColor": [2, 2, 3],
+            "height": 30,
+            "floorColor": [
+                0,
+                2,
+                3
+            ],
+            "ceilColor": [
+                2,
+                2,
+                3
+            ],
             "walls": [
                 {
-                    "startCorner": [70, 50],
+                    "startCorner": [
+                        50,
+                        80
+                    ],
                     "texture": 0,
                     "texCoord": {
-                        "start": [0, 0],
-                        "end": [1, 1]
-                    },
-                    "portalTo": 2
-                },
-                {
-                    "startCorner": [50, 80],
-                    "texture": 0,
-                    "texCoord": {
-                        "start": [0, 1],
-                        "end": [1, 0]
+                        "start": [
+                            0,
+                            1
+                        ],
+                        "end": [
+                            1,
+                            0
+                        ]
                     },
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [20, 80],
+                    "startCorner": [
+                        20,
+                        80
+                    ],
                     "texture": 0,
                     "texCoord": {
-                        "start": [0, 0],
-                        "end": [1, 1]
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
                     },
                     "portalTo": 3
                 },
                 {
-                    "startCorner": [0, 50],
+                    "startCorner": [
+                        0,
+                        50
+                    ],
                     "texture": 0,
                     "texCoord": {
-                        "start": [0, 1],
-                        "end": [1, 0]
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
                     },
                     "portalTo": 0
+                },
+                {
+                    "startCorner": [
+                        70,
+                        50
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": 2
                 }
             ]
         },
         {
-            "comment": "RIGHT WING",
-            "height": 25,
+            "comment": "rightWing",
             "heightOffset": 0,
-            "floorColor": [3, 3, 2],
-            "ceilColor": [3, 3, 0],
+            "height": 25,
+            "floorColor": [
+                3,
+                3,
+                2
+            ],
+            "ceilColor": [
+                3,
+                3,
+                0
+            ],
             "walls": [
                 {
-                    "startCorner": [70, 50],
+                    "startCorner": [
+                        70,
+                        50
+                    ],
                     "texture": 0,
                     "texCoord": {
-                        "start": [0, 0],
-                        "end": [1, 1]
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
                     },
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [90, 65],
+                    "startCorner": [
+                        90,
+                        65
+                    ],
                     "texture": 0,
                     "texCoord": {
-                        "start": [0, 0],
-                        "end": [1, 1]
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
                     },
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [50, 80],
+                    "startCorner": [
+                        50,
+                        80
+                    ],
                     "texture": 0,
                     "texCoord": {
-                        "start": [0, 0],
-                        "end": [1, 1]
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
                     },
                     "portalTo": 1
                 }
             ]
         },
         {
-            "comment": "LEFT WING",
-            "height": 25,
+            "comment": "leftWing",
             "heightOffset": 0,
-            "floorColor": [0, 3, 2],
-            "ceilColor": [0, 3, 2],
+            "height": 25,
+            "floorColor": [
+                0,
+                3,
+                2
+            ],
+            "ceilColor": [
+                0,
+                3,
+                2
+            ],
             "walls": [
                 {
-                    "startCorner": [0, 50],
+                    "startCorner": [
+                        20,
+                        80
+                    ],
                     "texture": 0,
                     "texCoord": {
-                        "start": [0, 0],
-                        "end": [1, 1]
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        -20,
+                        65
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
+                    },
+                    "portalTo": -1
+                },
+                {
+                    "startCorner": [
+                        0,
+                        50
+                    ],
+                    "texture": 0,
+                    "texCoord": {
+                        "start": [
+                            0,
+                            0
+                        ],
+                        "end": [
+                            1,
+                            1
+                        ]
                     },
                     "portalTo": 1
-                },
-                {
-                    "startCorner": [20, 80],
-                    "texture": 0,
-                    "texCoord": {
-                        "start": [0, 0],
-                        "end": [1, 1]
-                    },
-                    "portalTo": -1
-                },
-                {
-                    "startCorner": [-20, 65],
-                    "texture": 0,
-                    "texCoord": {
-                        "start": [0, 0],
-                        "end": [1, 1]
-                    },
-                    "portalTo": -1
                 }
             ]
         }
