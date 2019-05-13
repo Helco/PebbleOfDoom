@@ -92,8 +92,8 @@ void renderer_transformLine(const Renderer* me, const lineSeg_t* line, lineSeg_t
 void renderer_transformWall(const Renderer* me, const Sector* sector, int wallIndex, lineSeg_t* result)
 {
     lineSeg_t lineSeg;
-    lineSeg.end.xz = sector->walls[wallIndex].startCorner;
-    lineSeg.start.xz = sector->walls[(wallIndex + 1) % sector->wallCount].startCorner;
+    lineSeg.end.xz = me->level->vertices[sector->walls[wallIndex].startCorner];
+    lineSeg.start.xz = me->level->vertices[sector->walls[(wallIndex + 1) % sector->wallCount].startCorner];
     renderer_transformLine(me, &lineSeg, result);
 }
 

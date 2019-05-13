@@ -7,6 +7,172 @@
         "angle": 260,
         "height": 42
     },
+    "vertices": [
+        [
+            0,
+            0
+        ],
+        [
+            0,
+            40
+        ],
+        [
+            0,
+            160
+        ],
+        [
+            -240,
+            160
+        ],
+        [
+            -240,
+            400
+        ],
+        [
+            40,
+            400
+        ],
+        [
+            120,
+            320
+        ],
+        [
+            440,
+            320
+        ],
+        [
+            520,
+            320
+        ],
+        [
+            600,
+            400
+        ],
+        [
+            800,
+            400
+        ],
+        [
+            800,
+            160
+        ],
+        [
+            600,
+            160
+        ],
+        [
+            480,
+            0
+        ],
+        [
+            160,
+            0
+        ],
+        [
+            160,
+            40
+        ],
+        [
+            120,
+            40
+        ],
+        [
+            120,
+            80
+        ],
+        [
+            160,
+            80
+        ],
+        [
+            160,
+            200
+        ],
+        [
+            120,
+            200
+        ],
+        [
+            120,
+            240
+        ],
+        [
+            160,
+            240
+        ],
+        [
+            400,
+            230
+        ],
+        [
+            480,
+            170
+        ],
+        [
+            410,
+            240
+        ],
+        [
+            490,
+            180
+        ],
+        [
+            420,
+            250
+        ],
+        [
+            500,
+            190
+        ],
+        [
+            430,
+            260
+        ],
+        [
+            510,
+            200
+        ],
+        [
+            440,
+            270
+        ],
+        [
+            520,
+            210
+        ],
+        [
+            440,
+            280
+        ],
+        [
+            520,
+            280
+        ],
+        [
+            440,
+            290
+        ],
+        [
+            520,
+            290
+        ],
+        [
+            440,
+            300
+        ],
+        [
+            520,
+            300
+        ],
+        [
+            440,
+            310
+        ],
+        [
+            520,
+            310
+        ]
+    ],
     "sectors": [
         {
             "comment": "a",
@@ -24,10 +190,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        160,
-                        0
-                    ],
+                    "startCorner": 14,
                     "texture": 7,
                     "texCoord": {
                         "start": [
@@ -42,10 +205,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        480,
-                        0
-                    ],
+                    "startCorner": 13,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -60,10 +220,7 @@
                     "portalTo": 6
                 },
                 {
-                    "startCorner": [
-                        480,
-                        170
-                    ],
+                    "startCorner": 24,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -78,10 +235,7 @@
                     "portalTo": 9
                 },
                 {
-                    "startCorner": [
-                        400,
-                        230
-                    ],
+                    "startCorner": 23,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -113,10 +267,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        160,
-                        80
-                    ],
+                    "startCorner": 18,
                     "texture": 2,
                     "texCoord": {
                         "start": [
@@ -131,10 +282,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        160,
-                        40
-                    ],
+                    "startCorner": 15,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -149,10 +297,7 @@
                     "portalTo": 3
                 },
                 {
-                    "startCorner": [
-                        160,
-                        0
-                    ],
+                    "startCorner": 14,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -167,10 +312,7 @@
                     "portalTo": 0
                 },
                 {
-                    "startCorner": [
-                        400,
-                        230
-                    ],
+                    "startCorner": 23,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -185,10 +327,7 @@
                     "portalTo": 9
                 },
                 {
-                    "startCorner": [
-                        410,
-                        240
-                    ],
+                    "startCorner": 25,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -203,10 +342,7 @@
                     "portalTo": 10
                 },
                 {
-                    "startCorner": [
-                        420,
-                        250
-                    ],
+                    "startCorner": 27,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -221,10 +357,7 @@
                     "portalTo": 11
                 },
                 {
-                    "startCorner": [
-                        430,
-                        260
-                    ],
+                    "startCorner": 29,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -239,10 +372,7 @@
                     "portalTo": 12
                 },
                 {
-                    "startCorner": [
-                        440,
-                        270
-                    ],
+                    "startCorner": 31,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -257,10 +387,7 @@
                     "portalTo": 13
                 },
                 {
-                    "startCorner": [
-                        440,
-                        280
-                    ],
+                    "startCorner": 33,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -275,10 +402,7 @@
                     "portalTo": 2
                 },
                 {
-                    "startCorner": [
-                        160,
-                        240
-                    ],
+                    "startCorner": 22,
                     "texture": 2,
                     "texCoord": {
                         "start": [
@@ -293,10 +417,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        160,
-                        200
-                    ],
+                    "startCorner": 19,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -328,10 +449,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        440,
-                        320
-                    ],
+                    "startCorner": 7,
                     "texture": 4,
                     "texCoord": {
                         "start": [
@@ -346,10 +464,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        120,
-                        320
-                    ],
+                    "startCorner": 6,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -364,10 +479,7 @@
                     "portalTo": 7
                 },
                 {
-                    "startCorner": [
-                        120,
-                        240
-                    ],
+                    "startCorner": 21,
                     "texture": 2,
                     "texCoord": {
                         "start": [
@@ -382,10 +494,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        160,
-                        240
-                    ],
+                    "startCorner": 22,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -400,10 +509,7 @@
                     "portalTo": 1
                 },
                 {
-                    "startCorner": [
-                        440,
-                        280
-                    ],
+                    "startCorner": 33,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -418,10 +524,7 @@
                     "portalTo": 14
                 },
                 {
-                    "startCorner": [
-                        440,
-                        290
-                    ],
+                    "startCorner": 35,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -436,10 +539,7 @@
                     "portalTo": 15
                 },
                 {
-                    "startCorner": [
-                        440,
-                        300
-                    ],
+                    "startCorner": 37,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -454,10 +554,7 @@
                     "portalTo": 16
                 },
                 {
-                    "startCorner": [
-                        440,
-                        310
-                    ],
+                    "startCorner": 39,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -489,10 +586,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        0,
-                        0
-                    ],
+                    "startCorner": 0,
                     "texture": 7,
                     "texCoord": {
                         "start": [
@@ -507,10 +601,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        160,
-                        0
-                    ],
+                    "startCorner": 14,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -525,10 +616,7 @@
                     "portalTo": 1
                 },
                 {
-                    "startCorner": [
-                        160,
-                        40
-                    ],
+                    "startCorner": 15,
                     "texture": 2,
                     "texCoord": {
                         "start": [
@@ -543,10 +631,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        120,
-                        40
-                    ],
+                    "startCorner": 16,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -578,10 +663,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        0,
-                        160
-                    ],
+                    "startCorner": 2,
                     "texture": 6,
                     "texCoord": {
                         "start": [
@@ -596,10 +678,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        0,
-                        0
-                    ],
+                    "startCorner": 0,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -614,10 +693,7 @@
                     "portalTo": 3
                 },
                 {
-                    "startCorner": [
-                        120,
-                        40
-                    ],
+                    "startCorner": 16,
                     "texture": 2,
                     "texCoord": {
                         "start": [
@@ -632,10 +708,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        120,
-                        80
-                    ],
+                    "startCorner": 17,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -650,10 +723,7 @@
                     "portalTo": 5
                 },
                 {
-                    "startCorner": [
-                        120,
-                        200
-                    ],
+                    "startCorner": 20,
                     "texture": 2,
                     "texCoord": {
                         "start": [
@@ -668,10 +738,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        120,
-                        240
-                    ],
+                    "startCorner": 21,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -703,10 +770,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        160,
-                        200
-                    ],
+                    "startCorner": 19,
                     "texture": 2,
                     "texCoord": {
                         "start": [
@@ -721,10 +785,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        120,
-                        200
-                    ],
+                    "startCorner": 20,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -739,10 +800,7 @@
                     "portalTo": 4
                 },
                 {
-                    "startCorner": [
-                        120,
-                        80
-                    ],
+                    "startCorner": 17,
                     "texture": 2,
                     "texCoord": {
                         "start": [
@@ -757,10 +815,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        160,
-                        80
-                    ],
+                    "startCorner": 18,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -792,10 +847,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        480,
-                        0
-                    ],
+                    "startCorner": 13,
                     "texture": 3,
                     "texCoord": {
                         "start": [
@@ -810,10 +862,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        600,
-                        160
-                    ],
+                    "startCorner": 12,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -828,10 +877,7 @@
                     "portalTo": 8
                 },
                 {
-                    "startCorner": [
-                        520,
-                        210
-                    ],
+                    "startCorner": 32,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -846,10 +892,7 @@
                     "portalTo": 12
                 },
                 {
-                    "startCorner": [
-                        510,
-                        200
-                    ],
+                    "startCorner": 30,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -864,10 +907,7 @@
                     "portalTo": 11
                 },
                 {
-                    "startCorner": [
-                        500,
-                        190
-                    ],
+                    "startCorner": 28,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -882,10 +922,7 @@
                     "portalTo": 10
                 },
                 {
-                    "startCorner": [
-                        490,
-                        180
-                    ],
+                    "startCorner": 26,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -900,10 +937,7 @@
                     "portalTo": 9
                 },
                 {
-                    "startCorner": [
-                        480,
-                        170
-                    ],
+                    "startCorner": 24,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -935,10 +969,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        -240,
-                        160
-                    ],
+                    "startCorner": 3,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -953,10 +984,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        0,
-                        160
-                    ],
+                    "startCorner": 2,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -971,10 +999,7 @@
                     "portalTo": 4
                 },
                 {
-                    "startCorner": [
-                        120,
-                        240
-                    ],
+                    "startCorner": 21,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -989,10 +1014,7 @@
                     "portalTo": 2
                 },
                 {
-                    "startCorner": [
-                        120,
-                        320
-                    ],
+                    "startCorner": 6,
                     "texture": 4,
                     "texCoord": {
                         "start": [
@@ -1007,10 +1029,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        40,
-                        400
-                    ],
+                    "startCorner": 5,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -1025,10 +1044,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        -240,
-                        400
-                    ],
+                    "startCorner": 4,
                     "texture": 5,
                     "texCoord": {
                         "start": [
@@ -1060,10 +1076,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        600,
-                        400
-                    ],
+                    "startCorner": 9,
                     "texture": 4,
                     "texCoord": {
                         "start": [
@@ -1078,10 +1091,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        520,
-                        320
-                    ],
+                    "startCorner": 8,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1096,10 +1106,7 @@
                     "portalTo": 17
                 },
                 {
-                    "startCorner": [
-                        520,
-                        310
-                    ],
+                    "startCorner": 40,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1114,10 +1121,7 @@
                     "portalTo": 16
                 },
                 {
-                    "startCorner": [
-                        520,
-                        300
-                    ],
+                    "startCorner": 38,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1132,10 +1136,7 @@
                     "portalTo": 15
                 },
                 {
-                    "startCorner": [
-                        520,
-                        290
-                    ],
+                    "startCorner": 36,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1150,10 +1151,7 @@
                     "portalTo": 14
                 },
                 {
-                    "startCorner": [
-                        520,
-                        280
-                    ],
+                    "startCorner": 34,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1168,10 +1166,7 @@
                     "portalTo": 13
                 },
                 {
-                    "startCorner": [
-                        520,
-                        210
-                    ],
+                    "startCorner": 32,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -1186,10 +1181,7 @@
                     "portalTo": 6
                 },
                 {
-                    "startCorner": [
-                        600,
-                        160
-                    ],
+                    "startCorner": 12,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -1204,10 +1196,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        800,
-                        160
-                    ],
+                    "startCorner": 11,
                     "texture": 5,
                     "texCoord": {
                         "start": [
@@ -1222,10 +1211,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        800,
-                        400
-                    ],
+                    "startCorner": 10,
                     "texture": 0,
                     "texCoord": {
                         "start": [
@@ -1257,10 +1243,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        400,
-                        230
-                    ],
+                    "startCorner": 23,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1275,10 +1258,7 @@
                     "portalTo": 0
                 },
                 {
-                    "startCorner": [
-                        480,
-                        170
-                    ],
+                    "startCorner": 24,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1293,10 +1273,7 @@
                     "portalTo": 6
                 },
                 {
-                    "startCorner": [
-                        490,
-                        180
-                    ],
+                    "startCorner": 26,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1311,10 +1288,7 @@
                     "portalTo": 10
                 },
                 {
-                    "startCorner": [
-                        410,
-                        240
-                    ],
+                    "startCorner": 25,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1346,10 +1320,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        410,
-                        240
-                    ],
+                    "startCorner": 25,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1364,10 +1335,7 @@
                     "portalTo": 9
                 },
                 {
-                    "startCorner": [
-                        490,
-                        180
-                    ],
+                    "startCorner": 26,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1382,10 +1350,7 @@
                     "portalTo": 6
                 },
                 {
-                    "startCorner": [
-                        500,
-                        190
-                    ],
+                    "startCorner": 28,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1400,10 +1365,7 @@
                     "portalTo": 11
                 },
                 {
-                    "startCorner": [
-                        420,
-                        250
-                    ],
+                    "startCorner": 27,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1435,10 +1397,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        420,
-                        250
-                    ],
+                    "startCorner": 27,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1453,10 +1412,7 @@
                     "portalTo": 10
                 },
                 {
-                    "startCorner": [
-                        500,
-                        190
-                    ],
+                    "startCorner": 28,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1471,10 +1427,7 @@
                     "portalTo": 6
                 },
                 {
-                    "startCorner": [
-                        510,
-                        200
-                    ],
+                    "startCorner": 30,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1489,10 +1442,7 @@
                     "portalTo": 12
                 },
                 {
-                    "startCorner": [
-                        430,
-                        260
-                    ],
+                    "startCorner": 29,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1524,10 +1474,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        430,
-                        260
-                    ],
+                    "startCorner": 29,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1542,10 +1489,7 @@
                     "portalTo": 11
                 },
                 {
-                    "startCorner": [
-                        510,
-                        200
-                    ],
+                    "startCorner": 30,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1560,10 +1504,7 @@
                     "portalTo": 6
                 },
                 {
-                    "startCorner": [
-                        520,
-                        210
-                    ],
+                    "startCorner": 32,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1578,10 +1519,7 @@
                     "portalTo": 13
                 },
                 {
-                    "startCorner": [
-                        440,
-                        270
-                    ],
+                    "startCorner": 31,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1613,10 +1551,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        440,
-                        270
-                    ],
+                    "startCorner": 31,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1631,10 +1566,7 @@
                     "portalTo": 12
                 },
                 {
-                    "startCorner": [
-                        520,
-                        210
-                    ],
+                    "startCorner": 32,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1649,10 +1581,7 @@
                     "portalTo": 8
                 },
                 {
-                    "startCorner": [
-                        520,
-                        280
-                    ],
+                    "startCorner": 34,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1667,10 +1596,7 @@
                     "portalTo": 14
                 },
                 {
-                    "startCorner": [
-                        440,
-                        280
-                    ],
+                    "startCorner": 33,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1702,10 +1628,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        440,
-                        280
-                    ],
+                    "startCorner": 33,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1720,10 +1643,7 @@
                     "portalTo": 13
                 },
                 {
-                    "startCorner": [
-                        520,
-                        280
-                    ],
+                    "startCorner": 34,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1738,10 +1658,7 @@
                     "portalTo": 8
                 },
                 {
-                    "startCorner": [
-                        520,
-                        290
-                    ],
+                    "startCorner": 36,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1756,10 +1673,7 @@
                     "portalTo": 15
                 },
                 {
-                    "startCorner": [
-                        440,
-                        290
-                    ],
+                    "startCorner": 35,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1791,10 +1705,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        440,
-                        290
-                    ],
+                    "startCorner": 35,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1809,10 +1720,7 @@
                     "portalTo": 14
                 },
                 {
-                    "startCorner": [
-                        520,
-                        290
-                    ],
+                    "startCorner": 36,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1827,10 +1735,7 @@
                     "portalTo": 8
                 },
                 {
-                    "startCorner": [
-                        520,
-                        300
-                    ],
+                    "startCorner": 38,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1845,10 +1750,7 @@
                     "portalTo": 16
                 },
                 {
-                    "startCorner": [
-                        440,
-                        300
-                    ],
+                    "startCorner": 37,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1880,10 +1782,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        440,
-                        300
-                    ],
+                    "startCorner": 37,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1898,10 +1797,7 @@
                     "portalTo": 15
                 },
                 {
-                    "startCorner": [
-                        520,
-                        300
-                    ],
+                    "startCorner": 38,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1916,10 +1812,7 @@
                     "portalTo": 8
                 },
                 {
-                    "startCorner": [
-                        520,
-                        310
-                    ],
+                    "startCorner": 40,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1934,10 +1827,7 @@
                     "portalTo": 17
                 },
                 {
-                    "startCorner": [
-                        440,
-                        310
-                    ],
+                    "startCorner": 39,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -1969,10 +1859,7 @@
             ],
             "walls": [
                 {
-                    "startCorner": [
-                        520,
-                        320
-                    ],
+                    "startCorner": 8,
                     "texture": 8,
                     "texCoord": {
                         "start": [
@@ -1987,10 +1874,7 @@
                     "portalTo": -1
                 },
                 {
-                    "startCorner": [
-                        440,
-                        320
-                    ],
+                    "startCorner": 7,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -2005,10 +1889,7 @@
                     "portalTo": 2
                 },
                 {
-                    "startCorner": [
-                        440,
-                        310
-                    ],
+                    "startCorner": 39,
                     "texture": 1,
                     "texCoord": {
                         "start": [
@@ -2023,10 +1904,7 @@
                     "portalTo": 16
                 },
                 {
-                    "startCorner": [
-                        520,
-                        310
-                    ],
+                    "startCorner": 40,
                     "texture": 1,
                     "texCoord": {
                         "start": [

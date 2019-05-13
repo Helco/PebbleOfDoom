@@ -231,6 +231,7 @@ if ("sector" in playerStart)
 // Create output object
 const OUTPUT = {
     playerStart: playerStart,
+    vertices: vertices.map(v => [v[0] * XZ_FACTOR, v[1] * XZ_FACTOR]),
     sectors: sectorObjects.map(obj => ({
         comment: obj.name,
         heightOffset: obj.height[0],
@@ -238,10 +239,7 @@ const OUTPUT = {
         floorColor: obj.floorColor,
         ceilColor: obj.ceilColor,
         walls: obj.wallChain.map(wall => ({
-            startCorner: [
-                vertices[wall.from][0] * XZ_FACTOR,
-                vertices[wall.from][1] * XZ_FACTOR
-            ],
+            startCorner: wall.from,
             texture: wall.textureI,
             texCoord: {
                 start: wall.texStart,

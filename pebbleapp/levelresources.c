@@ -6,6 +6,7 @@ static LevelId loadedLevelId = INVALID_LEVEL_ID;
 static Level loadedLevel;
 static Sector* sectors = NULL;
 static Wall* walls = NULL;
+static xz_t* vertices = NULL;
 
 GColor prv_convert_color(StoredGColor g)
 {
@@ -40,6 +41,18 @@ Location prv_convert_location(StoredLocation location)
     };
 }
 
+size_t prv_convert_vertex(xz_t* vertex, ResHandle handle, size_t offset)
+{
+    StoredVector storedVector;
+    if (resource_load_byte_range(handle, offset, (uint8_t*)&storedVector, sizeof(StoredVector)) != sizeof(StoredVector)) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not read level vertex");
+        return offset + sizeof(StoredVector);
+    }
+
+    *vertex = prv_convert_xz(storedVector);
+    return offset + sizeof(StoredVector);
+}
+
 size_t prv_convert_wall(Wall* wall, ResHandle handle, size_t offset)
 {
     StoredWall storedWall;
@@ -49,7 +62,7 @@ size_t prv_convert_wall(Wall* wall, ResHandle handle, size_t offset)
     }
 
     wall->portalTo = storedWall.portalTo;
-    wall->startCorner = prv_convert_xz(storedWall.startCorner);
+    wall->startCorner = storedWall.startCorner;
     wall->texture = storedWall.texture;
     wall->texCoord = prv_convert_texCoord(storedWall.texCoord);
     return offset + sizeof(StoredWall);
@@ -109,8 +122,9 @@ const Level* level_load(LevelManagerHandle lvlManager, LevelId id)
 
     sectors = (Sector*)malloc(sizeof(Sector) * storedLevel.sectorCount);
     walls = (Wall*)malloc(sizeof(Wall) * storedLevel.totalWallCount);
-    if (sectors == NULL || walls == NULL) {
-        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not allocate %d sectors and %d walls", storedLevel.sectorCount, storedLevel.totalWallCount);
+    vertices = (xz_t*)malloc(sizeof(xz_t) * storedLevel.vertexCount);
+    if (sectors == NULL || walls == NULL || vertices == NULL) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not allocate %d sectors, %d walls and %d vertices", storedLevel.sectorCount, storedLevel.totalWallCount, storedLevel.vertexCount);
         return NULL;
     }
 
@@ -118,6 +132,11 @@ const Level* level_load(LevelManagerHandle lvlManager, LevelId id)
     loadedLevel.sectorCount = storedLevel.sectorCount;
     loadedLevel.sectors = sectors;
     loadedLevel.playerStart = prv_convert_location(storedLevel.playerStart);
+    loadedLevel.vertexCount = storedLevel.vertexCount;
+    loadedLevel.vertices = vertices;
+
+    for (int i = 0; i < storedLevel.vertexCount; i++)
+        offset = prv_convert_vertex(vertices + i, handle, offset);
 
     for (int i = 0; i < storedLevel.sectorCount; i++)
         offset = prv_convert_sector(sectors + i, handle, offset);

@@ -64,7 +64,7 @@ StoredLocation pbllevelconvert_convertLocation(Location loc)
 void pbllevelconvert_writeWall(const Wall* wall, FILE* output)
 {
     StoredWall storedWall = {
-        .startCorner = pbllevelconvert_convertXZ(wall->startCorner),
+        .startCorner = wall->startCorner,
         .portalTo = wall->portalTo,
         .texture = wall->texture,
         .texCoord = pbllevelconvert_convertTexCoord(wall->texCoord)
@@ -133,6 +133,7 @@ void pbllevelconvert_writeLevel(const Level* level, FILE* output)
     StoredLevel storedLevel = {
         .storageVersion = LEVEL_STORAGE_VERSION,
         .sectorCount = level->sectorCount,
+        .vertexCount = level->vertexCount,
         .playerStart = pbllevelconvert_convertLocation(level->playerStart),
         .totalWallCount = 0
     };
@@ -140,6 +141,10 @@ void pbllevelconvert_writeLevel(const Level* level, FILE* output)
         storedLevel.totalWallCount += level->sectors[i].wallCount;
 
     fwrite(&storedLevel, sizeof(StoredLevel), 1, output);
+    for (int i = 0; i < level->vertexCount; i++) {
+        StoredVector vertex = pbllevelconvert_convertXZ(level->vertices[i]);
+        fwrite(&vertex, sizeof(StoredVector), 1, output);
+    }
     int wallOffset = 0;
     for (int i = 0; i < level->sectorCount; i++) {
         pbllevelconvert_writeSector(&level->sectors[i], wallOffset, output);

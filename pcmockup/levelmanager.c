@@ -161,10 +161,11 @@ bool levelManager_parseWall(Wall* wall, JSON_Value* value)
         return false;
     JSON_Object* object = json_value_get_object(value);
     if (!json_object_has_value_of_type(object, "texture", JSONNumber) ||
-        !levelManager_parseXZ(&wall->startCorner, json_object_get_value(object, "startCorner")) ||
+        !json_object_has_value_of_type(object, "startCorner", JSONNumber) ||
         !levelManager_parseTexCoord(&wall->texCoord, json_object_get_value(object, "texCoord")))
         return false;
 
+    wall->startCorner = (int)json_object_get_number(object, "startCorner");
     wall->texture = (TextureId)json_object_get_number(object, "texture");
     if (wall->texture < 0)
         return false;
@@ -213,18 +214,29 @@ bool levelManager_parseLevel(Level* level, JSON_Value* value)
     if (value == NULL || json_value_get_type(value) != JSONObject)
         return false;
     JSON_Object* object = json_value_get_object(value);
-    if (!json_object_has_value_of_type(object, "sectors", JSONArray) ||
+    if (!json_object_has_value_of_type(object, "vertices", JSONArray) ||
+        !json_object_has_value_of_type(object, "sectors", JSONArray) ||
         !levelManager_parseLocation(&level->playerStart, json_object_get_value(object, "playerStart")))
         return false;
 
+    JSON_Array* jsonVertices = json_object_get_array(object, "vertices");
     JSON_Array* jsonSectors = json_object_get_array(object, "sectors");
+    size_t vertexCount = json_array_get_count(jsonVertices);
     size_t sectorCount = json_array_get_count(jsonSectors);
+    level->vertices = (xz_t*)malloc(sizeof(xz_t) * vertexCount);
+    level->vertexCount = vertexCount;
     level->sectors = (Sector*)malloc(sizeof(Sector) * sectorCount);
     level->sectorCount = (int)sectorCount;
-    if (level->sectors == NULL)
+    if (level->sectors == NULL || level->vertices == NULL)
         return false;
 
-    for (size_t i = 0; i < json_array_get_count(jsonSectors); i++)
+    for (size_t i = 0; i < vertexCount; i++)
+    {
+        if (!levelManager_parseXZ(level->vertices + i, json_array_get_value(jsonVertices, i)))
+            return false;
+    }
+
+    for (size_t i = 0; i < sectorCount; i++)
     {
         if (!levelManager_parseSector(&level->sectors[i], json_array_get_value(jsonSectors, i)))
             return false;
