@@ -159,10 +159,10 @@ bool_t renderer_clipByFov(const Renderer* me, lineSeg_t* wallSeg, TexCoord* texC
     return result;
 }
 
-int renderer_projectValue(real_t value, real_t depth, real_t fovScale, int halfSize)
+int renderer_projectValue(real_t value, real_t invDepth, real_t fovScale, int halfSize)
 {
     return real_to_int(
-        real_div(real_mul(value, fovScale), depth)
+        real_mul(real_mul(value, fovScale), invDepth)
     ) + halfSize;
 }
 
@@ -172,14 +172,16 @@ void renderer_project(const Renderer* me, const Sector* sector, const lineSeg_t*
     const real_t nominalYEnd = real_add(nominalYStart, real_from_int(sector->height));
     const xz_t startT = transformedSeg->start.xz;
     const xz_t endT = transformedSeg->end.xz;
+    const real_t invStartZ = real_reciprocal(startT.z);
+    const real_t invEndZ = real_reciprocal(endT.z);
 
-    projected->left.x = renderer_projectValue(startT.x, startT.z, me->horFovScale, HALF_RENDERER_WIDTH);
-    projected->left.yStart = renderer_projectValue(nominalYStart, startT.z, me->verFovScale, HALF_RENDERER_HEIGHT);
-    projected->left.yEnd = renderer_projectValue(nominalYEnd, startT.z, me->verFovScale, HALF_RENDERER_HEIGHT);
+    projected->left.x = renderer_projectValue(startT.x, invStartZ, me->horFovScale, HALF_RENDERER_WIDTH);
+    projected->left.yStart = renderer_projectValue(nominalYStart, invStartZ, me->verFovScale, HALF_RENDERER_HEIGHT);
+    projected->left.yEnd = renderer_projectValue(nominalYEnd, invStartZ, me->verFovScale, HALF_RENDERER_HEIGHT);
 
-    projected->right.x = renderer_projectValue(endT.x, endT.z, me->horFovScale, HALF_RENDERER_WIDTH);
-    projected->right.yStart = renderer_projectValue(nominalYStart, endT.z, me->verFovScale, HALF_RENDERER_HEIGHT);
-    projected->right.yEnd = renderer_projectValue(nominalYEnd, endT.z, me->verFovScale, HALF_RENDERER_HEIGHT);
+    projected->right.x = renderer_projectValue(endT.x, invEndZ, me->horFovScale, HALF_RENDERER_WIDTH);
+    projected->right.yStart = renderer_projectValue(nominalYStart, invEndZ, me->verFovScale, HALF_RENDERER_HEIGHT);
+    projected->right.yEnd = renderer_projectValue(nominalYEnd, invEndZ, me->verFovScale, HALF_RENDERER_HEIGHT);
 }
 
 void renderer_renderFilledSpan(Renderer* me, RendererTarget target, int x, int yWallLower, int yWallUpper, int yFillLower, int yFillUpper, real_t xNorm, TexCoord texCoord, const lineSeg_t* wallSeg, const Texture* texture)
