@@ -34,6 +34,10 @@ void renderer_free(Renderer* me)
 {
     if (me == NULL)
         return;
+    if (me->transformedVertices != NULL)
+        free(me->transformedVertices);
+    if (me->transformedStatus != NULL)
+        free(me->transformedStatus);
     free(me);
 }
 
@@ -61,11 +65,16 @@ void renderer_setFieldOfView(Renderer* me, real_t verFov)
     me->verFovScale = real_div(real_from_int(HALF_RENDERER_HEIGHT), tanHalfVerFov);
 }
 
-void renderer_setLevel(Renderer* renderer, const Level* level)
+void renderer_setLevel(Renderer* me, const Level* level)
 {
-    renderer->level = level;
-    renderer->location = level->playerStart;
-    location_updateSector(&renderer->location, level);
+    int statusCount = (level->vertexCount + 31) / 32;
+    me->transformedVertices = (xz_t*)realloc(me->transformedVertices, sizeof(xz_t) * level->vertexCount);
+    me->transformedStatus = (uint32_t*)realloc(me->transformedStatus, sizeof(uint32_t) * statusCount);
+    assert(me->transformedVertices != NULL && me->transformedStatus != NULL);
+
+    me->level = level;
+    me->location = level->playerStart;
+    location_updateSector(&me->location, level);
 }
 
 void renderer_setTextureManager(Renderer* me, TextureManagerHandle handle)
@@ -89,12 +98,22 @@ void renderer_transformLine(const Renderer* me, const lineSeg_t* line, lineSeg_t
     result->end.xz = renderer_transformPoint(me, line->end.xz);
 }
 
-void renderer_transformWall(const Renderer* me, const Sector* sector, int wallIndex, lineSeg_t* result)
+xz_t renderer_transformVertex(const Renderer* me, int vertexI)
 {
-    lineSeg_t lineSeg;
-    lineSeg.end.xz = me->level->vertices[sector->walls[wallIndex].startCorner];
-    lineSeg.start.xz = me->level->vertices[sector->walls[(wallIndex + 1) % sector->wallCount].startCorner];
-    renderer_transformLine(me, &lineSeg, result);
+    uint32_t statusElement = vertexI / 32, statusBit = 1 << (vertexI % 32);
+    if ((me->transformedStatus[statusElement] & statusBit) == 0) {
+        me->transformedStatus[statusElement] |= statusBit;
+        me->transformedVertices[vertexI] = renderer_transformPoint(me, me->level->vertices[vertexI]);
+    }
+    return me->transformedVertices[vertexI];
+}
+
+lineSeg_t renderer_transformWall(const Renderer* me, const Sector* sector, int wallIndex)
+{
+    return (lineSeg_t) {
+        .end = { .xz = renderer_transformVertex(me, sector->walls[wallIndex].startCorner) },
+        .start = { .xz = renderer_transformVertex(me, sector->walls[(wallIndex + 1) % sector->wallCount].startCorner) }
+    };
 }
 
 typedef struct
@@ -226,8 +245,7 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
     const Sector* const sector = request->sector;
     const Wall* const wall = &sector->walls[wallIndex];
 
-    lineSeg_t wallSeg;
-    renderer_transformWall(me, sector, wallIndex, &wallSeg);
+    lineSeg_t wallSeg = renderer_transformWall(me, sector, wallIndex);
     bool isWallStartBehind = real_compare(wallSeg.start.xz.z, real_zero) < 0;
     bool isWallEndBehind = real_compare(wallSeg.end.xz.z, real_zero) < 0;
     if (isWallStartBehind && isWallEndBehind)
@@ -397,6 +415,7 @@ void renderer_render(Renderer* renderer, RendererTarget target)
 
     if (renderer->level == NULL || renderer->location.sector < 0)
         return;
+    memset(renderer->transformedStatus, 0, sizeof(uint32_t) * ((renderer->level->vertexCount + 31) / 32));
     memset(renderer->boundarySets[0].yBottom, 0, sizeof(renderer->boundarySets[0].yBottom));
     memset(renderer->boundarySets[1].yBottom, 0, sizeof(renderer->boundarySets[1].yBottom));
     memset(renderer->wallBoundaries.yBottom, 0, sizeof(renderer->wallBoundaries.yBottom));

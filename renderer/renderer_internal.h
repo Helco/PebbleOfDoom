@@ -24,6 +24,9 @@ typedef struct BoundarySet {
 struct Renderer
 {
     const Level* level;
+    xz_t* transformedVertices;
+    uint32_t* transformedStatus;
+
     Location location;
     real_t eyeHeight;
     real_t horFovScale, verFovScale, fov;
