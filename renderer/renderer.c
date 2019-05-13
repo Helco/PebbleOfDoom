@@ -227,7 +227,7 @@ void renderer_renderContourSpan(Renderer* me, RendererTarget target, int x, int 
 {
     UNUSED(me);
     assert(x >= 0 && x < RENDERER_WIDTH);
-    if (target.colorFormat != RendererColorFormat_1BitBW)
+    if (target.colorFormat != RendererColorFormat_1BitBW || yStart > yEnd)
         return;
     const int stride = rendererColorFormat_getStride(target.colorFormat);
     uint8_t* const framebufferColumn = (uint8_t*)target.framebuffer + x * stride;
@@ -235,10 +235,20 @@ void renderer_renderContourSpan(Renderer* me, RendererTarget target, int x, int 
     yStart = max(yStart, drawBoundary->yBottom[x]);
     yEnd = min(yEnd, drawBoundary->yTop[x]);
 
-    for (int y = yStart; y <= yEnd; y++)
-    {
-        uint8_t* const pixelByte = framebufferColumn + y / 8;
-        *pixelByte |= 1 << (y % 8);
+    if (yEnd - yStart + 1 >= 8) {
+        uint8_t* pixelByte = framebufferColumn + yStart / 8;
+        if (yStart % 8 != 0) {
+            *(pixelByte++) |= 255 << (yStart % 8);
+            yStart += 8 - (yStart % 8);
+        }
+
+        int byteCount = (yEnd - yStart + 1) / 8;
+        memset(pixelByte, 255, byteCount);
+        yStart += byteCount * 8;
+    }
+    if (yStart <= yEnd) {
+        uint8_t* const pixelByte = framebufferColumn + yStart / 8;
+        *pixelByte |= ((1 << (yEnd - yStart + 1)) - 1) << (yStart % 8);
     }
 }
 
