@@ -1,6 +1,7 @@
 #include "textureresources.h"
 #include "../renderer/platform.h"
 
+#if PBL_IF_COLOR_ELSE(1, 0)
 typedef struct LoadedTexture
 {
     int referenceCount;
@@ -152,3 +153,42 @@ void texture_free(TextureManagerHandle manager, const Texture* textureToBeFreed)
         texture->texture.pixels = NULL;
     }
 }
+
+#else
+
+// silent fail aplite/diorite version
+
+TextureId loadTextureFromResource(uint32_t resourceId)
+{
+    return 0;
+}
+
+void freeTextures()
+{
+}
+
+const Texture* texture_load(TextureManagerHandle manager, TextureId id)
+{
+    static GColor pixel = { .argb = 0 };
+    static const Texture texture = {
+        .id = 0,
+        .size = { 1, 1 },
+        .pixels = &pixel
+    };
+    return &texture;
+}
+
+const Texture* texture_createEmpty(TextureManagerHandle manager, GSize size, GColor** contentPtr)
+{
+    return NULL;
+}
+
+void texture_resizeEmpty(TextureManagerHandle manager, TextureId id, GSize newSize, GColor** contentPtr)
+{
+}
+
+void texture_free(TextureManagerHandle manager, const Texture* texture)
+{
+}
+
+#endif

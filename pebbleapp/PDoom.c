@@ -59,6 +59,7 @@ void update_animation(Animation *animation, const AnimationProgress progress)
 bool loadTextures()
 {
   static const uint32_t resourceIds[] = {
+#if PBL_IF_COLOR_ELSE(1, 0)
       RESOURCE_ID_TEXTURE_WHITE,
       RESOURCE_ID_TEXTURE_GRAY,
       RESOURCE_ID_TEXTURE_YELLOW,
@@ -67,8 +68,8 @@ bool loadTextures()
       RESOURCE_ID_TEXTURE_ELEVATORS,
       RESOURCE_ID_TEXTURE_BLACKBOARD,
       RESOURCE_ID_TEXTURE_ENTRY,
-      RESOURCE_ID_TEXTURE_WHITE//,
-      //RESOURCE_ID_TEXTURE_404
+      RESOURCE_ID_TEXTURE_WHITE
+#endif
   };
   static const int countIds = sizeof(resourceIds) / sizeof(uint32_t);
   for (int i = 0; i < countIds; i++)

@@ -11,7 +11,7 @@
         "notfound": "404.png"
     },
     "playerStart": {
-        "position": [ 24.5, 13],
+        "position": [ 14, 9],
         "angle": 260,
         "height": 42
     },
