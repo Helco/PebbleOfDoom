@@ -65,6 +65,7 @@ size_t prv_convert_wall(Wall* wall, ResHandle handle, size_t offset)
     wall->startCorner = storedWall.startCorner;
     wall->texture = storedWall.texture;
     wall->texCoord = prv_convert_texCoord(storedWall.texCoord);
+    wall->color = prv_convert_color(storedWall.color);
     return offset + sizeof(StoredWall);
 }
 

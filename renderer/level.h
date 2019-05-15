@@ -26,6 +26,7 @@ typedef struct Wall {
     int portalTo;
     TextureId texture;
     TexCoord texCoord;
+    GColor color;
 } Wall;
 
 typedef struct Sector {

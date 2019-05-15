@@ -160,14 +160,19 @@ bool levelManager_parseWall(Wall* wall, JSON_Value* value)
     if (value == NULL || json_value_get_type(value) != JSONObject)
         return false;
     JSON_Object* object = json_value_get_object(value);
-    if (!json_object_has_value_of_type(object, "texture", JSONNumber) ||
-        !json_object_has_value_of_type(object, "startCorner", JSONNumber) ||
+    if (!json_object_has_value_of_type(object, "startCorner", JSONNumber) ||
         !levelManager_parseTexCoord(&wall->texCoord, json_object_get_value(object, "texCoord")))
         return false;
 
     wall->startCorner = (int)json_object_get_number(object, "startCorner");
-    wall->texture = (TextureId)json_object_get_number(object, "texture");
-    if (wall->texture < 0)
+    wall->texture = -1;
+    wall->color = (GColor) { .argb = 255 };
+
+    if (json_object_has_value_of_type(object, "texture", JSONNumber))
+        wall->texture = (TextureId)json_object_get_number(object, "texture");
+
+    if (json_object_has_value(object, "color") &&
+        !levelManager_parseGColor(&wall->color, json_object_get_value(object, "color")))
         return false;
 
     if (json_object_has_value(object, "portalTo")) {

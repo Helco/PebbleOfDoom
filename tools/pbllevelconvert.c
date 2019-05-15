@@ -67,7 +67,8 @@ void pbllevelconvert_writeWall(const Wall* wall, FILE* output)
         .startCorner = wall->startCorner,
         .portalTo = wall->portalTo,
         .texture = wall->texture,
-        .texCoord = pbllevelconvert_convertTexCoord(wall->texCoord)
+        .texCoord = pbllevelconvert_convertTexCoord(wall->texCoord),
+        .color = pbllevelconvert_convertColor(wall->color)
     };
     fwrite(&storedWall, sizeof(StoredWall), 1, output);
 }

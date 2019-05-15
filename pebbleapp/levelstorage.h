@@ -2,7 +2,7 @@
 #define LEVELSTORAGE_H
 #include "../renderer/platform.h"
 
-#define LEVEL_STORAGE_VERSION 2
+#define LEVEL_STORAGE_VERSION 3
 
 typedef uint8_t StoredGColor;
 
@@ -30,6 +30,7 @@ typedef struct StoredWall {
     int portalTo;
     TextureId texture;
     StoredTexCoord texCoord;
+    StoredGColor color;
 } StoredWall;
 
 typedef struct PACKED StoredSector {

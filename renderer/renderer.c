@@ -189,11 +189,14 @@ void renderer_project(const Renderer* me, const Sector* sector, const lineSeg_t*
     projected->right.yEnd = renderer_projectValue(nominalYEnd, invEndZ, me->verFovScale, HALF_RENDERER_HEIGHT);
 }
 
-void renderer_renderFilledSpan(Renderer* me, RendererTarget target, int x, int yWallLower, int yWallUpper, int yFillLower, int yFillUpper, real_t xNorm, TexCoord texCoord, const lineSeg_t* wallSeg, const Texture* texture)
+typedef void (*FilledSpanRenderFunc)(Renderer*, RendererTarget, int, int, int, int, int, real_t, TexCoord, const lineSeg_t*, const void*);
+
+void renderer_renderFilledSpan_textured(Renderer* me, RendererTarget target, int x, int yWallLower, int yWallUpper, int yFillLower, int yFillUpper, real_t xNorm, TexCoord texCoord, const lineSeg_t* wallSeg, const void* userdata)
 {
     UNUSED(me);
     if (target.colorFormat != RendererColorFormat_8BitColor)
         return;
+    const Texture* texture = (const Texture*)userdata;
     GColor* const framebufferColumn =  ((GColor*)target.framebuffer) + x * RENDERER_HEIGHT;
 
     // Calculate texture column
@@ -226,6 +229,16 @@ void renderer_renderFilledSpan(Renderer* me, RendererTarget target, int x, int y
         ];
         texRowII += texRowIncrI;
     }
+}
+
+void renderer_renderFilledSpan_colored(Renderer* me, RendererTarget target, int x, int yWallLower, int yWallUpper, int yFillLower, int yFillUpper, real_t xNorm, TexCoord texCoord, const lineSeg_t* wallSeg, const void* userdata)
+{
+    UNUSED(me, yWallLower, yWallUpper, xNorm, texCoord, wallSeg);
+    if (target.colorFormat != RendererColorFormat_8BitColor || yFillLower > yFillUpper)
+        return;
+    const GColor wallColor = *(GColor*)userdata;
+    GColor* const framebufferColumn = ((GColor*)target.framebuffer) + x * RENDERER_HEIGHT;
+    memset(framebufferColumn + yFillLower, wallColor.argb, yFillUpper - yFillLower + 1);
 }
 
 void renderer_renderContourSpan(Renderer* me, RendererTarget target, int x, int yStart, int yEnd)
@@ -286,10 +299,20 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
             max(request->left, p.left.x), min(request->right, p.right.x), sector);
     }
 
+    const Texture* texture = NULL;
+    FilledSpanRenderFunc renderSpan;
+    const void* renderSpanUser;
+    if (wall->texture == INVALID_TEXTURE_ID) {
+        renderSpan = renderer_renderFilledSpan_colored;
+        renderSpanUser = &wall->color;
+    } else {
+        renderSpan = renderer_renderFilledSpan_textured;
+        renderSpanUser = texture = texture_load(me->textureManager, wall->texture);
+    }
+
     // render wall
     const BoundarySet* drawBoundary = &me->boundarySets[me->curBoundarySet];
     BoundarySet* nextBoundary = &me->boundarySets[!me->curBoundarySet];
-    const Texture* const texture = texture_load(me->textureManager, wall->texture);
     const int renderLeft = max(request->left, p.left.x);
     const int renderRight = min(request->right, p.right.x);
     BresenhamIterator upperIt, lowerIt;
@@ -337,21 +360,22 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
         me->wallBoundaries.yTop[x] = min(yTop, upperIt.y0 - 1);
 
         real_t xNorm = real_div(real_from_int(x - p.left.x), real_from_int(p.right.x - p.left.x));
-        renderer_renderFilledSpan(me, target, x,
+        renderSpan(me, target, x,
             lowerIt.y0, upperIt.y0, max(yBottom, lowerIt.y0), min(yTop, yPortalStart - 1),
-            xNorm, texCoord, &wallSeg, texture);
+            xNorm, texCoord, &wallSeg, renderSpanUser);
 
         if (wall->portalTo >= 0) {
-            renderer_renderFilledSpan(me, target, x,
+            renderSpan(me, target, x,
                 lowerIt.y0, upperIt.y0, max(yBottom, yPortalEnd), min(yTop, upperIt.y0),
-                xNorm, texCoord, &wallSeg, texture);
+                xNorm, texCoord, &wallSeg, renderSpanUser);
         }
 
         x++;
     } while(upperStep != BRESENHAMSTEP_NONE);
     assert(lowerStep == BRESENHAMSTEP_NONE);
 
-    texture_free(me->textureManager, texture);
+    if (texture != NULL)
+        texture_free(me->textureManager, texture);
 }
 
 void renderer_renderSlabColumns(Renderer* renderer, RendererTarget target, const DrawRequest* request, const short* bottomSet, const short* topSet, bool isCeil)

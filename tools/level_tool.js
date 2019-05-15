@@ -101,7 +101,9 @@ const textureIndices = {};
 
 function getTextureIndex(name)
 {
-    if (!(name in textureIndices))
+    if (Array.isArray(name))
+        return -1;
+    else if (!(name in textureIndices))
         throw new Error(`Invalid texture index ${name}`);
     return textureIndices[name];
 }
@@ -149,10 +151,17 @@ let sectorObjects = [];
                 arr.unshift(sectorObject.walls[i-1].to);
             if (arr.length < 5)
                 arr.push([0, 0], [1, 1]);
+
+            let color = [3, 3, 3], textureI = -1;
+            if (Array.isArray(arr[2]))
+                color = checkColor(arr[2]);
+            else
+                textureI = getTextureIndex(arr[2]);
+
             sectorObject.walls[i] = {
                 from: checkVertexIndex(arr[0]),
                 to: checkVertexIndex(arr[1]),
-                textureI: getTextureIndex(arr[2]),
+                textureI, color,
                 texStart: checkVector(arr[3]),
                 texEnd: checkVector(arr[4]),
                 portalTo: -1
@@ -176,11 +185,17 @@ let sectorObjects = [];
         if (!(portal[3] in sectors))
             throw new Error(`Invalid portal target ${portal[3]}`);
 
+        let color = [3, 3, 3], textureI = -1;
+        if (Array.isArray(portal[4]))
+            color = checkColor(portal[4]);
+        else
+            textureI = getTextureIndex(portal[4]);
+
         const fromI = sectors[portal[2]].index, toI = sectors[portal[3]].index;
         sectorObjects[fromI].walls.push({
             from: checkVertexIndex(portal[0]),
             to: checkVertexIndex(portal[1]),
-            textureI: getTextureIndex(portal[4]),
+            textureI, color,
             texStart: checkVector(portal[5]),
             texEnd: checkVector(portal[6]),
             portalTo: toI
@@ -188,7 +203,7 @@ let sectorObjects = [];
         sectorObjects[toI].walls.push({
             from: checkVertexIndex(portal[1]),
             to: checkVertexIndex(portal[0]),
-            textureI: getTextureIndex(portal[4]),
+            textureI, color,
             texStart: checkVector(portal[5]),
             texEnd: checkVector(portal[6]),
             portalTo: fromI
@@ -241,6 +256,7 @@ const OUTPUT = {
         walls: obj.wallChain.map(wall => ({
             startCorner: wall.from,
             texture: wall.textureI,
+            color: wall.color,
             texCoord: {
                 start: wall.texStart,
                 end: wall.texEnd

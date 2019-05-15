@@ -191,7 +191,12 @@
             "walls": [
                 {
                     "startCorner": 14,
-                    "texture": 7,
+                    "texture": 4,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -207,6 +212,11 @@
                 {
                     "startCorner": 13,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -221,7 +231,12 @@
                 },
                 {
                     "startCorner": 24,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -237,6 +252,11 @@
                 {
                     "startCorner": 23,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -268,7 +288,12 @@
             "walls": [
                 {
                     "startCorner": 18,
-                    "texture": 2,
+                    "texture": -1,
+                    "color": [
+                        3,
+                        3,
+                        0
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -284,6 +309,11 @@
                 {
                     "startCorner": 15,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -299,6 +329,11 @@
                 {
                     "startCorner": 14,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -313,7 +348,12 @@
                 },
                 {
                     "startCorner": 23,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -328,7 +368,12 @@
                 },
                 {
                     "startCorner": 25,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -343,7 +388,12 @@
                 },
                 {
                     "startCorner": 27,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -358,7 +408,12 @@
                 },
                 {
                     "startCorner": 29,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -373,7 +428,12 @@
                 },
                 {
                     "startCorner": 31,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -389,6 +449,11 @@
                 {
                     "startCorner": 33,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -403,7 +468,12 @@
                 },
                 {
                     "startCorner": 22,
-                    "texture": 2,
+                    "texture": -1,
+                    "color": [
+                        3,
+                        3,
+                        0
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -419,6 +489,11 @@
                 {
                     "startCorner": 19,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -450,7 +525,12 @@
             "walls": [
                 {
                     "startCorner": 7,
-                    "texture": 4,
+                    "texture": 1,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -466,6 +546,11 @@
                 {
                     "startCorner": 6,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -480,7 +565,12 @@
                 },
                 {
                     "startCorner": 21,
-                    "texture": 2,
+                    "texture": -1,
+                    "color": [
+                        3,
+                        3,
+                        0
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -496,6 +586,11 @@
                 {
                     "startCorner": 22,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -510,7 +605,12 @@
                 },
                 {
                     "startCorner": 33,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -525,7 +625,12 @@
                 },
                 {
                     "startCorner": 35,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -540,7 +645,12 @@
                 },
                 {
                     "startCorner": 37,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -555,7 +665,12 @@
                 },
                 {
                     "startCorner": 39,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -587,7 +702,12 @@
             "walls": [
                 {
                     "startCorner": 0,
-                    "texture": 7,
+                    "texture": 4,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -603,6 +723,11 @@
                 {
                     "startCorner": 14,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -617,7 +742,12 @@
                 },
                 {
                     "startCorner": 15,
-                    "texture": 2,
+                    "texture": -1,
+                    "color": [
+                        3,
+                        3,
+                        0
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -633,6 +763,11 @@
                 {
                     "startCorner": 16,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -664,7 +799,12 @@
             "walls": [
                 {
                     "startCorner": 2,
-                    "texture": 6,
+                    "texture": 3,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -680,6 +820,11 @@
                 {
                     "startCorner": 0,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -694,7 +839,12 @@
                 },
                 {
                     "startCorner": 16,
-                    "texture": 2,
+                    "texture": -1,
+                    "color": [
+                        3,
+                        3,
+                        0
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -710,6 +860,11 @@
                 {
                     "startCorner": 17,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -724,7 +879,12 @@
                 },
                 {
                     "startCorner": 20,
-                    "texture": 2,
+                    "texture": -1,
+                    "color": [
+                        3,
+                        3,
+                        0
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -740,6 +900,11 @@
                 {
                     "startCorner": 21,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -771,7 +936,12 @@
             "walls": [
                 {
                     "startCorner": 19,
-                    "texture": 2,
+                    "texture": -1,
+                    "color": [
+                        3,
+                        3,
+                        0
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -787,6 +957,11 @@
                 {
                     "startCorner": 20,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -801,7 +976,12 @@
                 },
                 {
                     "startCorner": 17,
-                    "texture": 2,
+                    "texture": -1,
+                    "color": [
+                        3,
+                        3,
+                        0
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -817,6 +997,11 @@
                 {
                     "startCorner": 18,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -848,7 +1033,12 @@
             "walls": [
                 {
                     "startCorner": 13,
-                    "texture": 3,
+                    "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -864,6 +1054,11 @@
                 {
                     "startCorner": 12,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -878,7 +1073,12 @@
                 },
                 {
                     "startCorner": 32,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -893,7 +1093,12 @@
                 },
                 {
                     "startCorner": 30,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -908,7 +1113,12 @@
                 },
                 {
                     "startCorner": 28,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -923,7 +1133,12 @@
                 },
                 {
                     "startCorner": 26,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -939,6 +1154,11 @@
                 {
                     "startCorner": 24,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -970,7 +1190,12 @@
             "walls": [
                 {
                     "startCorner": 3,
-                    "texture": 0,
+                    "texture": -1,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -986,6 +1211,11 @@
                 {
                     "startCorner": 2,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1001,6 +1231,11 @@
                 {
                     "startCorner": 21,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1015,7 +1250,12 @@
                 },
                 {
                     "startCorner": 6,
-                    "texture": 4,
+                    "texture": 1,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1030,7 +1270,12 @@
                 },
                 {
                     "startCorner": 5,
-                    "texture": 0,
+                    "texture": -1,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1045,7 +1290,12 @@
                 },
                 {
                     "startCorner": 4,
-                    "texture": 5,
+                    "texture": 2,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1077,7 +1327,12 @@
             "walls": [
                 {
                     "startCorner": 9,
-                    "texture": 4,
+                    "texture": 1,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1092,7 +1347,12 @@
                 },
                 {
                     "startCorner": 8,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1107,7 +1367,12 @@
                 },
                 {
                     "startCorner": 40,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1122,7 +1387,12 @@
                 },
                 {
                     "startCorner": 38,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1137,7 +1407,12 @@
                 },
                 {
                     "startCorner": 36,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1152,7 +1427,12 @@
                 },
                 {
                     "startCorner": 34,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1168,6 +1448,11 @@
                 {
                     "startCorner": 32,
                     "texture": 0,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1182,7 +1467,12 @@
                 },
                 {
                     "startCorner": 12,
-                    "texture": 0,
+                    "texture": -1,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1197,7 +1487,12 @@
                 },
                 {
                     "startCorner": 11,
-                    "texture": 5,
+                    "texture": 2,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1212,7 +1507,12 @@
                 },
                 {
                     "startCorner": 10,
-                    "texture": 0,
+                    "texture": -1,
+                    "color": [
+                        3,
+                        3,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1244,7 +1544,12 @@
             "walls": [
                 {
                     "startCorner": 23,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1259,7 +1564,12 @@
                 },
                 {
                     "startCorner": 24,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1274,7 +1584,12 @@
                 },
                 {
                     "startCorner": 26,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1289,7 +1604,12 @@
                 },
                 {
                     "startCorner": 25,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1321,7 +1641,12 @@
             "walls": [
                 {
                     "startCorner": 25,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1336,7 +1661,12 @@
                 },
                 {
                     "startCorner": 26,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1351,7 +1681,12 @@
                 },
                 {
                     "startCorner": 28,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1366,7 +1701,12 @@
                 },
                 {
                     "startCorner": 27,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1398,7 +1738,12 @@
             "walls": [
                 {
                     "startCorner": 27,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1413,7 +1758,12 @@
                 },
                 {
                     "startCorner": 28,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1428,7 +1778,12 @@
                 },
                 {
                     "startCorner": 30,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1443,7 +1798,12 @@
                 },
                 {
                     "startCorner": 29,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1475,7 +1835,12 @@
             "walls": [
                 {
                     "startCorner": 29,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1490,7 +1855,12 @@
                 },
                 {
                     "startCorner": 30,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1505,7 +1875,12 @@
                 },
                 {
                     "startCorner": 32,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1520,7 +1895,12 @@
                 },
                 {
                     "startCorner": 31,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1552,7 +1932,12 @@
             "walls": [
                 {
                     "startCorner": 31,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1567,7 +1952,12 @@
                 },
                 {
                     "startCorner": 32,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1582,7 +1972,12 @@
                 },
                 {
                     "startCorner": 34,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1597,7 +1992,12 @@
                 },
                 {
                     "startCorner": 33,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1629,7 +2029,12 @@
             "walls": [
                 {
                     "startCorner": 33,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1644,7 +2049,12 @@
                 },
                 {
                     "startCorner": 34,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1659,7 +2069,12 @@
                 },
                 {
                     "startCorner": 36,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1674,7 +2089,12 @@
                 },
                 {
                     "startCorner": 35,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1706,7 +2126,12 @@
             "walls": [
                 {
                     "startCorner": 35,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1721,7 +2146,12 @@
                 },
                 {
                     "startCorner": 36,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1736,7 +2166,12 @@
                 },
                 {
                     "startCorner": 38,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1751,7 +2186,12 @@
                 },
                 {
                     "startCorner": 37,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1783,7 +2223,12 @@
             "walls": [
                 {
                     "startCorner": 37,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1798,7 +2243,12 @@
                 },
                 {
                     "startCorner": 38,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1813,7 +2263,12 @@
                 },
                 {
                     "startCorner": 40,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1828,7 +2283,12 @@
                 },
                 {
                     "startCorner": 39,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1860,7 +2320,12 @@
             "walls": [
                 {
                     "startCorner": 8,
-                    "texture": 8,
+                    "texture": -1,
+                    "color": [
+                        3,
+                        0,
+                        3
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1875,7 +2340,12 @@
                 },
                 {
                     "startCorner": 7,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1890,7 +2360,12 @@
                 },
                 {
                     "startCorner": 39,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,
@@ -1905,7 +2380,12 @@
                 },
                 {
                     "startCorner": 40,
-                    "texture": 1,
+                    "texture": -1,
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
                     "texCoord": {
                         "start": [
                             0,

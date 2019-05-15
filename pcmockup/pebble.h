@@ -13,10 +13,10 @@ typedef union GColor {
     uint8_t argb;
     struct
     {
-        uint8_t a : 2;
-        uint8_t r : 2;
-        uint8_t g : 2;
         uint8_t b : 2;
+        uint8_t g : 2;
+        uint8_t r : 2;
+        uint8_t a : 2;
     };
 } GColor;
 
