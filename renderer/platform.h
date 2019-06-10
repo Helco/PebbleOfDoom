@@ -50,4 +50,6 @@
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #endif
 
+#define PACKED __attribute__((__packed__))
+
 #endif

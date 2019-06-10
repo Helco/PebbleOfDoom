@@ -20,6 +20,11 @@
     "messageKeys": [],
     "resources": {
       "media": [
+          {
+              "type": "raw",
+              "name": "LEVEL_TEST",
+              "file": "levels/test.bin"
+          }
       ]
     }
   }

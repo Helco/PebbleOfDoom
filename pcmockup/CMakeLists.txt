@@ -22,6 +22,8 @@ set(sources_pcmockup
     safeframebuffer.c
     rendererinterface.c
     texturemanager.c
+    levelmanager.h
+    levelmanager.c
     windowcontainer.c
     imagewindow.c
     texturewindow.c
@@ -34,6 +36,7 @@ target_link_libraries(pcmockup
     ${SDL2_LIBRARY}
     stb
     podrenderer
+    parson
 )
 target_include_directories(pcmockup
     PRIVATE ${SDL2_INCLUDE_DIR}

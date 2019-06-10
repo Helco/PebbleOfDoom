@@ -22,6 +22,10 @@ typedef struct OptionsSpecification {
     const OptionHandler handlers[];
 } OptionsSpecification;
 
+void readOptions(int argc, char* const* argv, const OptionsSpecification* spec, void* userdata);
+
+#ifdef OPTSREADER_IMPLEMENTATION
+
 typedef struct OptionsReader
 {
     int argsLeft;
@@ -32,9 +36,6 @@ typedef struct OptionsReader
     const OptionsSpecification* const spec;
 } OptionsReader;
 
-void readOptions(int argc, char* const* argv, const OptionsSpecification* spec, void* userdata);
-
-#ifdef OPTSREADER_IMPLEMENTATION
 static bool prv_optsReader_isOption(const char* arg)
 {
     return *arg == '-';

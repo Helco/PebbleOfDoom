@@ -6,9 +6,12 @@
 #include "texgen/texgen.h"
 #include "window.h"
 #include "platform.h"
+#include "levelmanager.h"
 #include <glad/glad.h>
 
-#define TEXTURE_PATH "resources/textures/"
+#define RESOURCES_PATH "resources/"
+#define TEXTURE_PATH RESOURCES_PATH "textures/"
+#define LEVEL_PATH RESOURCES_PATH "levels/"
 
 GRect findBestFit(GRect target, float aspect);
 GRect padRect(GRect rect, GSize amount);

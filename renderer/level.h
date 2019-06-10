@@ -2,9 +2,13 @@
 #define LEVEL_H
 
 #include "algebra.h"
+#include "texture.h"
 #include <stdbool.h>
 
-typedef int TextureId;
+#define INVALID_LEVEL_ID ((LevelId)-1)
+
+typedef int LevelId;
+typedef void* LevelManagerHandle;
 
 typedef struct TexCoord {
     xy_t start, end;
@@ -38,13 +42,11 @@ typedef struct Level {
     Sector* sectors;
 } Level;
 
-Level* level_load(int levelId);
-void level_free(Level* me);
+extern const Level* level_load(LevelManagerHandle lvlManager, LevelId id);
+extern void level_free(LevelManagerHandle lvlManger, const Level* level);
+
 int level_findSectorAt(const Level* level, xz_t point);
-
 bool sector_isInside(const Sector* sector, xz_t point);
-
-// returns true if sector was changed
-bool location_updateSector(Location* location, const Level* level);
+bool location_updateSector(Location* location, const Level* level); // returns true if sector was changed
 
 #endif
