@@ -177,7 +177,7 @@ void renderer_renderFilledSpan(Renderer* me, RendererTarget target, int x, int y
         real_div(texCoord.end.x, wallSeg->end.xz.z)
     );
     real_t texLerped = real_div(invTexLerped, invZLerped);
-    int texCol = real_to_int(real_mul(texLerped, real_from_int(texture->size.w)));
+    int texCol = real_to_int(real_mul(texLerped, real_from_int(texture->size.w - 1)));
 
     // Calculate texture row (start and increment)
     real_t yNormalized = real_div(real_from_int(yFillLower - yWallLower), real_from_int(yWallUpper - yWallLower));
@@ -186,15 +186,19 @@ void renderer_renderFilledSpan(Renderer* me, RendererTarget target, int x, int y
         real_mul(real_sub(texCoord.end.y, texCoord.start.y), real_from_int(texture->size.h)),
         real_from_int(yWallUpper - yWallLower + 1));
 
+    int shift = 16;
+    int texRowII = real_to_int(real_mul(texRow, real_from_int(1 << shift)));
+    int texRowIncrI = real_to_int(real_mul(texRowIncr, real_from_int(1 << shift)));
+
     // Set pixels
     GColor* curPixel = framebufferColumn + yFillLower;
     for (int y = yFillLower; y <= yFillUpper; y++) {
-        int texRowI = real_to_int(texRow);
+        int texRowI = texRowII >> shift;
         *(curPixel++) = texture->pixels[
-            (texRowI % texture->size.h) * texture->size.w +
-                (texCol % texture->size.w)
+            (texRowI % texture->size.h)  +
+                (texCol % texture->size.w) * texture->size.w
         ];
-        texRow = real_add(texRow, texRowIncr);
+        texRowII += texRowIncrI;
     }
 }
 
