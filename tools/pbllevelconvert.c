@@ -1,4 +1,5 @@
 #define _CRT_NONSTDC_NO_DEPRECATE
+#define _CRT_NONSTDC_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
@@ -190,7 +191,12 @@ int main(int argc, char** argv)
     FILE* output = stdout;
     if (context.outputFilename != NULL) {
         shouldCloseOutput = true;
+#ifdef _MSC_VER
+        output = NULL;
+        fopen_s(&output, context.outputFilename, "wb");
+#else
         output = fopen(context.outputFilename, "wb");
+#endif
         if (!output) {
             fputs("Could not open output file.", stderr);
             return -1;
