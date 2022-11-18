@@ -12,3 +12,5 @@ compile_commands.json
 CTestTestfile.cmake
 test_detail.xml
 .lock*
+**/node_modules/
+/level.bin

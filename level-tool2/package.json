@@ -1,0 +1,11 @@
+{
+    "name": "level-tool2",
+    "description": "A simple level conversion tool",
+    "authors": "Helco",
+    "version": "1.0.0",
+    "main": "level-tool2",
+    "dependencies": {
+        "yaml": "2.1.3",
+        "bin-format": "^1.4.3"
+    }
+}

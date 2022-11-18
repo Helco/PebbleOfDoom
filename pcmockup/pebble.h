@@ -56,7 +56,7 @@ enum
     APP_LOG_LEVEL_DEBUG,
     APP_LOG_LEVEL_DEBUG_VERBOSE
 };
-#define APP_LOG(level,fmt,...) app_log(level, __FILE__, __LINE__, fmt __VA_ARGS__)
+#define APP_LOG(level,fmt,...) app_log(level, __FILE__, __LINE__, fmt, __VA_ARGS__)
 void app_log(uint8_t log_level, const char *src_filename, int src_line_number, const char *fmt, ...);
 
 #define TRIG_MAX_RATIO 0xffff

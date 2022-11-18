@@ -44,6 +44,7 @@ void levelManager_freeLevel(Level* level)
         free(sector->walls);
     }
     free(level->sectors);
+    free(level->vertices);
 }
 
 void levelManager_free(LevelManager* me)
@@ -72,183 +73,129 @@ const Level* levelManager_getLevelByIndex(LevelManager* me, int index)
     return &me->levels[index].level;
 }
 
-bool levelManager_parseGColor(GColor* color, JSON_Value* value)
+#include "levelstorage.h"
+
+GColor prv_convert_color(StoredGColor g)
 {
-    if (value == NULL || json_value_get_type(value) != JSONArray)
-        return false;
-    JSON_Array* array = json_value_get_array(value);
-    if (json_array_get_count(array) < 3 ||
-        json_array_get_count(array) > 4 ||
-        json_value_get_type(json_array_get_value(array, 0)) != JSONNumber ||
-        json_value_get_type(json_array_get_value(array, 1)) != JSONNumber ||
-        json_value_get_type(json_array_get_value(array, 2)) != JSONNumber)
-        return false;
+    return (GColor) { .argb = g };
+}
 
-    color->r = clampi(0, (int)json_array_get_number(array, 0), 3);
-    color->g = clampi(0, (int)json_array_get_number(array, 1), 3);
-    color->b = clampi(0, (int)json_array_get_number(array, 2), 3);
+xz_t prv_convert_xz(StoredVector v)
+{
+    return xz(real_from_float(v.x), real_from_float(v.z));
+}
 
-    if (json_array_get_count(array) == 4) {
-        if (json_value_get_type(json_array_get_value(array, 3)) != JSONNumber)
-            return false;
-        color->a = clampi(0, (int)json_array_get_number(array, 3), 3);
+xy_t prv_convert_xy(StoredVector v)
+{
+    return xy(real_from_float(v.x), real_from_float(v.y));
+}
+
+TexCoord prv_convert_texCoord(StoredTexCoord c)
+{
+    return (TexCoord) {
+        .start = prv_convert_xy(c.start),
+            .end = prv_convert_xy(c.end)
+    };
+}
+
+Location prv_convert_location(StoredLocation location)
+{
+    return (Location) {
+        .position = prv_convert_xz(location.position),
+            .sector = location.sector,
+            .angle = real_from_float(location.angle),
+            .height = real_from_float(location.height)
+    };
+}
+
+bool prv_convert_vertex(xz_t* vertex, FILE* fp)
+{
+    StoredVector storedVector;
+    if (fread(&storedVector, sizeof(StoredVector), 1, fp) != 1) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not read level vertex");
+        return false;
     }
 
+    *vertex = prv_convert_xz(storedVector);
     return true;
 }
 
-bool levelManager_parseXZ(xz_t* xz, JSON_Value* value)
+bool prv_convert_sector(Sector* sector, FILE* fp)
 {
-    if (value == NULL || json_value_get_type(value) != JSONArray)
+    StoredSector storedSector;
+    if (fread(&storedSector, sizeof(StoredSector), 1, fp) != 1) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not read level Sector");
         return false;
-    JSON_Array* array = json_value_get_array(value);
-    if (json_array_get_count(array) != 2 ||
-        json_value_get_type(json_array_get_value(array, 0)) != JSONNumber ||
-        json_value_get_type(json_array_get_value(array, 1)) != JSONNumber)
-        return false;
-
-    xz->x = real_from_float((float)json_array_get_number(array, 0));
-    xz->z = real_from_float((float)json_array_get_number(array, 1));
-    return true;
-}
-
-bool levelManager_parseXY(xy_t* xy, JSON_Value* value)
-{
-    xz_t xz;
-    if (!levelManager_parseXZ(&xz, value))
-        return false;
-    xy->x = xz.x;
-    xy->y = xz.z;
-    return true;
-}
-
-bool levelManager_parseTexCoord(TexCoord* texCoord, JSON_Value* value)
-{
-    if (value == NULL || json_value_get_type(value) != JSONObject)
-        return false;
-    JSON_Object* object = json_value_get_object(value);
-    return
-        levelManager_parseXY(&texCoord->start, json_object_get_value(object, "start")) &&
-        levelManager_parseXY(&texCoord->end, json_object_get_value(object, "end"));
-}
-
-bool levelManager_parseLocation(Location* location, JSON_Value* value)
-{
-    if (value == NULL || json_value_get_type(value) != JSONObject)
-        return false;
-    JSON_Object* object = json_value_get_object(value);
-    if (!json_object_has_value_of_type(object, "height", JSONNumber) ||
-        !json_object_has_value_of_type(object, "angle", JSONNumber) ||
-        !levelManager_parseXZ(&location->position, json_object_get_value(object, "position")))
-        return false;
-
-    location->height = real_from_float((float)json_object_get_number(object, "height"));
-    location->angle = real_degToRad(real_from_float((float)json_object_get_number(object, "angle")));
-    location->sector = -1;
-
-    if (json_object_has_value(object, "sector")) {
-        if (!json_object_has_value_of_type(object, "sector", JSONNumber))
-            return false;
-        location->sector = max(-1, (int)json_object_get_number(object, "sector"));
     }
 
-    return true;
-}
-
-bool levelManager_parseWall(Wall* wall, JSON_Value* value)
-{
-    if (value == NULL || json_value_get_type(value) != JSONObject)
+    sector->walls = (Wall*)malloc(sizeof(Wall) * storedSector.wallCount);
+    if (sector->walls == NULL) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not allocate sector walls");
         return false;
-    JSON_Object* object = json_value_get_object(value);
-    if (!json_object_has_value_of_type(object, "startCorner", JSONNumber) ||
-        !levelManager_parseTexCoord(&wall->texCoord, json_object_get_value(object, "texCoord")))
-        return false;
-
-    wall->startCorner = (int)json_object_get_number(object, "startCorner");
-    wall->texture = -1;
-    wall->color = (GColor) { .argb = 255 };
-
-    if (json_object_has_value_of_type(object, "texture", JSONNumber))
-        wall->texture = (TextureId)json_object_get_number(object, "texture");
-
-    if (json_object_has_value(object, "color") &&
-        !levelManager_parseGColor(&wall->color, json_object_get_value(object, "color")))
-        return false;
-
-    if (json_object_has_value(object, "portalTo")) {
-        if (!json_object_has_value_of_type(object, "portalTo", JSONNumber))
-            return false;
-        wall->portalTo = max(-1, (int)json_object_get_number(object, "portalTo"));
     }
 
+    sector->wallCount = storedSector.wallCount;
+    sector->height = storedSector.height;
+    sector->heightOffset = storedSector.heightOffset;
+    sector->floorColor = prv_convert_color(storedSector.floorColor);
+    sector->ceilColor = prv_convert_color(storedSector.ceilColor);
     return true;
 }
 
-bool levelManager_parseSector(Sector* sector, JSON_Value* value)
+bool prv_convert_wall(Wall* wall, FILE* fp)
 {
-    if (value == NULL || json_value_get_type(value) != JSONObject)
+    StoredWall storedWall;
+    if (fread(&storedWall, sizeof(StoredWall), 1, fp) != 1) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not read level wall");
         return false;
-    JSON_Object* object = json_value_get_object(value);
-    if (!json_object_has_value_of_type(object, "height", JSONNumber) ||
-        !json_object_has_value_of_type(object, "heightOffset", JSONNumber) ||
-        !json_object_has_value_of_type(object, "walls", JSONArray) ||
-        !levelManager_parseGColor(&sector->floorColor, json_object_get_value(object, "floorColor")) ||
-        !levelManager_parseGColor(&sector->ceilColor, json_object_get_value(object, "ceilColor")))
-        return false;
+    }
 
-    sector->height = (int)json_object_get_number(object, "height");
-    sector->heightOffset = (int)json_object_get_number(object, "heightOffset");
-    JSON_Array* jsonWalls = json_object_get_array(object, "walls");
-    size_t wallCount = json_array_get_count(jsonWalls);
-    sector->walls = (Wall*)malloc(sizeof(Wall) * wallCount);
-    sector->wallCount = (int)wallCount;
-    if (sector->walls == NULL)
-        return false;
+    wall->portalTo = storedWall.portalTo;
+    wall->startCorner = storedWall.startCorner;
+    wall->texture = storedWall.texture;
+    wall->texCoord = prv_convert_texCoord(storedWall.texCoord);
+    wall->color = prv_convert_color(storedWall.color);
+    return true;
+}
 
-    for (size_t i = 0; i < json_array_get_count(jsonWalls); i++)
+bool levelManager_loadLevel(Level* level, FILE* fp)
+{
+    StoredLevel storedLevel;
+    if (fread(&storedLevel, sizeof(StoredLevel), 1, fp) != 1) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not read level header");
+        return false;
+    }
+
+    if (storedLevel.storageVersion != LEVEL_STORAGE_VERSION) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown level storage version %d (should be %d)", storedLevel.storageVersion, LEVEL_STORAGE_VERSION);
+        return NULL;
+    }
+
+    Sector* sectors = level->sectors = (Sector*)malloc(sizeof(Sector) * storedLevel.sectorCount);
+    xz_t* vertices = level->vertices = (xz_t*)malloc(sizeof(xz_t) * storedLevel.vertexCount);
+    if (sectors == NULL || vertices == NULL) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not allocate %d sectors, %d walls and %d vertices", storedLevel.sectorCount, storedLevel.totalWallCount, storedLevel.vertexCount);
+        return NULL;
+    }
+    level->sectorCount = storedLevel.sectorCount;
+    level->vertexCount = storedLevel.vertexCount;
+    level->playerStart = prv_convert_location(storedLevel.playerStart);
+
+    for (int i = 0; i < storedLevel.vertexCount; i++)
+        if (!prv_convert_vertex(vertices + i, fp))
+            return false;
+
+    for (int i = 0; i < storedLevel.sectorCount; i++)
+        if (!prv_convert_sector(sectors + i, fp))
+            return false;
+
+    for (int i = 0; i < storedLevel.sectorCount; i++)
     {
-        if (!levelManager_parseWall(&sector->walls[i], json_array_get_value(jsonWalls, i)))
-            return false;
+        Sector* sector = level->sectors + i;
+        for (int j = 0; j < sector->wallCount; j++)
+            if (!prv_convert_wall(sector->walls + j, fp))
+                return false;
     }
-
-    return true;
-}
-
-bool levelManager_parseLevel(Level* level, JSON_Value* value)
-{
-    if (value == NULL || json_value_get_type(value) != JSONObject)
-        return false;
-    JSON_Object* object = json_value_get_object(value);
-    if (!json_object_has_value_of_type(object, "vertices", JSONArray) ||
-        !json_object_has_value_of_type(object, "sectors", JSONArray) ||
-        !levelManager_parseLocation(&level->playerStart, json_object_get_value(object, "playerStart")))
-        return false;
-
-    JSON_Array* jsonVertices = json_object_get_array(object, "vertices");
-    JSON_Array* jsonSectors = json_object_get_array(object, "sectors");
-    size_t vertexCount = json_array_get_count(jsonVertices);
-    size_t sectorCount = json_array_get_count(jsonSectors);
-    level->vertices = (xz_t*)malloc(sizeof(xz_t) * vertexCount);
-    level->vertexCount = vertexCount;
-    level->sectors = (Sector*)malloc(sizeof(Sector) * sectorCount);
-    level->sectorCount = (int)sectorCount;
-    if (level->sectors == NULL || level->vertices == NULL)
-        return false;
-
-    for (size_t i = 0; i < vertexCount; i++)
-    {
-        if (!levelManager_parseXZ(level->vertices + i, json_array_get_value(jsonVertices, i)))
-            return false;
-    }
-
-    for (size_t i = 0; i < sectorCount; i++)
-    {
-        if (!levelManager_parseSector(&level->sectors[i], json_array_get_value(jsonSectors, i)))
-            return false;
-    }
-
-    if (level->playerStart.sector < 0)
-        level->playerStart.sector = level_findSectorAt(level, level->playerStart.position);
 
     return true;
 }
@@ -258,8 +205,14 @@ LevelId levelManager_registerFile(LevelManager* me, const char* filename)
     assert(me != NULL && filename != NULL);
     char filenameBuffer[512];
     snprintf(filenameBuffer, 512, "%s%s", me->baseDirectory, filename);
-    JSON_Value* root = json_parse_file_with_comments(filenameBuffer);
-    if (root == NULL)
+    FILE* file;
+#ifdef _MSC_VER
+    file = NULL;
+    fopen_s(&file, filenameBuffer, "rb");
+#else
+    file = fopen(filename, "rb");
+#endif
+    if (file == NULL)
         return INVALID_LEVEL_ID;
 
     if (me->count == me->capacity)
@@ -271,8 +224,9 @@ LevelId levelManager_registerFile(LevelManager* me, const char* filename)
     LevelId levelId = me->count;
     LoadedLevel* loadedLevel = &me->levels[levelId];
     loadedLevel->source = strdup(filename);
-    if (!levelManager_parseLevel(&loadedLevel->level, root))
+    if (!levelManager_loadLevel(&loadedLevel->level, file))
         return INVALID_LEVEL_ID;
+    fclose(file);
 
     me->count++;
     return levelId;

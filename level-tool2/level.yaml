@@ -1,0 +1,59 @@
+zoom: 3
+
+defaultFloorColor: 2,2,2
+defaultCeilColor: 0,0,0
+
+vars:
+  w: 34
+  h: 20
+  area: w * h
+
+playerStart:
+  sector: startTri
+  position: 1, -15
+  angle: 40
+
+vertices:
+  v0: 70, 50
+  v1: 0, 50
+  v2: 0, -30
+  v3: 50, 80
+  v4: 20, 80
+  v5: 90, 65
+  v6: -20, 65
+
+sectors:
+  startTri:
+    y: 0
+    h: 25
+    floorColor: 0,0,3
+    ceilColor: 3,0,0
+    walls:
+      - v1
+      - v2
+      - v0
+
+  north:
+    y: -5
+    h: 30
+    walls:
+      - v0
+      - v3
+      - v4
+      - v1
+
+  right:
+    y: 0
+    h: 25
+    walls:
+      - v0
+      - v5
+      - v3
+
+  left:
+    y: 0
+    h: 25
+    walls:
+      - v4
+      - v6
+      - v1
