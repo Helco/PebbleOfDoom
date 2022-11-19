@@ -1,5 +1,6 @@
 #include "segame.h"
 #include "platform.h"
+#include "resources.h"
 
 #define PLAYER_TURN_SPEED real_from_float(2)
 #define PLAYER_WALK_SPEED real_from_float(2) // might be too fast for release, but for testing good

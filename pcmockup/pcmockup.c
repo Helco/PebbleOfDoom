@@ -70,13 +70,12 @@ PCMockup *pcmockup_init()
 
     renderer_setTextureManager(me->renderer, me->textureManager);
     if (
-        textureManager_registerFile(me->textureManager, "info_desk.png") == INVALID_TEXTURE_ID ||
-        textureManager_registerFile(me->textureManager, "cantina.png") == INVALID_TEXTURE_ID ||
-        textureManager_registerFile(me->textureManager, "elevators.png") == INVALID_TEXTURE_ID ||
-        textureManager_registerFile(me->textureManager, "blackboard.png") == INVALID_TEXTURE_ID ||
-        textureManager_registerFile(me->textureManager, "entry.png") == INVALID_TEXTURE_ID ||
-        textureManager_registerFile(me->textureManager, "404.png") == INVALID_TEXTURE_ID ||
-        textureManager_registerSpriteFile(me->textureManager, "spr_book.png") == INVALID_SPRITE_ID)
+        textureManager_registerSpriteFile(me->textureManager, "spr_book.png") == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "icon_digits.png") == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "icon_boots.png") == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "icon_gold.png") == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "spr_heart.png") == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "icon_key.png") == INVALID_SPRITE_ID)
     {
         pcmockup_free(me);
         return NULL;
