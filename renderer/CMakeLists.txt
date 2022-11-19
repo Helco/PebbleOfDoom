@@ -12,6 +12,8 @@ set(sources_podrenderer
     algebra.c
     level.h
     level.c
+    segame.h
+    segame.c
 
     texgen/texgen.h
     texgen/texgen_internal.h

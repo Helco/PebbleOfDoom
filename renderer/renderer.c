@@ -607,7 +607,12 @@ void renderer_render(Renderer* renderer, RendererTarget target)
         renderer_renderSector(renderer, target, curRequest);
         curRequest = drawRequestStack_pop(&renderer->drawRequests);
     }
-};
+}
+
+Location* renderer_getLocation(Renderer* me)
+{
+    return &me->location;
+}
 
 void renderer_rotate(Renderer* renderer, real_t angle)
 {

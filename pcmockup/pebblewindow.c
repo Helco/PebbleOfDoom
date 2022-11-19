@@ -1,5 +1,6 @@
 #include "pcmockup.h"
 #include "platform.h"
+#include "segame.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -14,11 +15,13 @@ struct PebbleWindow
     Renderer* renderer;
     GSize pebbleSize;
     RendererColorFormat format;
+    SEGame game;
 };
 
 void pebbleWindow_free(void* userdata);
 void pebbleWindow_contentUpdate(void* userdata);
 void pebbleWindow_onKeyDown(SDL_Keysym sym, void* userdata);
+void pebbleWindow_onKeyUp(SDL_Keysym sym, void* userdata);
 
 PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GSize pebbleSize, RendererColorFormat format, Renderer* renderer)
 {
@@ -38,6 +41,7 @@ PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GS
         .destruct = pebbleWindow_free,
         .contentUpdate = pebbleWindow_contentUpdate,
         .keyDown = pebbleWindow_onKeyDown,
+        .keyUp = pebbleWindow_onKeyUp,
         .userdata = me
     });
 
@@ -64,6 +68,8 @@ PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GS
         return NULL;
     }
 
+    segame_init(&me->game, renderer);
+
     me->pebbleSize = pebbleSize;
     me->format = format;
     me->renderer = renderer;
@@ -81,6 +87,7 @@ void pebbleWindow_free(void* userdata)
         safeFramebuffer_free(me->framebuffer);
     if (me->texturePixelFormat != NULL)
         SDL_FreeFormat(me->texturePixelFormat);
+    segame_free(&me->game);
     free(me);
 }
 
@@ -152,6 +159,9 @@ static void prv_pebbleWindow_convertPebbleToTexture(PebbleWindow* me)
 void pebbleWindow_contentUpdate(void* userdata)
 {
     PebbleWindow* me = (PebbleWindow*)userdata;
+
+    segame_update(&me->game);
+
     safeFramebuffer_prepare(me->framebuffer);
     renderer_render(me->renderer, (RendererTarget) {
         .framebuffer = pebbleWindow_getPebbleFramebuffer(me),
@@ -168,6 +178,9 @@ void pebbleWindow_onKeyDown(SDL_Keysym sym, void* userdata)
     PebbleWindow* me = (PebbleWindow*)userdata;
     switch(sym.sym)
     {
+    case (SDLK_u): segame_input_direction_raw(&me->game, false, true); break;
+    case (SDLK_o): segame_input_direction_raw(&me->game, true, true); break;
+
         case (SDLK_w): renderer_walk(me->renderer, xz_forward, maxStepHeight); break;
         case (SDLK_s): renderer_walk(me->renderer, xz_backward, maxStepHeight); break;
         case (SDLK_a): renderer_walk(me->renderer, xz_left, maxStepHeight); break;
@@ -186,6 +199,28 @@ void pebbleWindow_onKeyDown(SDL_Keysym sym, void* userdata)
 
             renderer_moveTo(me->renderer, playerLocation);
         }break;
+    }
+}
+
+void pebbleWindow_onKeyUp(SDL_Keysym sym, void* userdata)
+{
+    PebbleWindow* me = (PebbleWindow*)userdata;
+    switch (sym.sym)
+    {
+    case (SDLK_u):
+        segame_input_direction_raw(&me->game, false, false);
+        segame_input_direction_click(&me->game, false);
+        break;
+    case (SDLK_o):
+        segame_input_direction_raw(&me->game, true, false);
+        segame_input_direction_click(&me->game, true);
+        break;
+    case (SDLK_i):
+        segame_input_select_click(&me->game);
+        break;
+    case (SDLK_k):
+        segame_input_back_click(&me->game);
+        break;
     }
 }
 

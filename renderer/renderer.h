@@ -33,6 +33,7 @@ void renderer_setTextureManager(Renderer* renderer, TextureManagerHandle handle)
  */
 void renderer_render(Renderer* renderer, const RendererTarget target);
 
+Location* renderer_getLocation(Renderer* renderer);
 void renderer_moveTo(Renderer* renderer, Location playerLocation);
 void renderer_rotate(Renderer* renderer, real_t angle); //angle should be in degrees
 void renderer_move(Renderer* renderer, xz_t direction);
