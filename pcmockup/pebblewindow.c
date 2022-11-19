@@ -164,13 +164,14 @@ void pebbleWindow_contentUpdate(void* userdata)
 
 void pebbleWindow_onKeyDown(SDL_Keysym sym, void* userdata)
 {
+    const int maxStepHeight = 5;
     PebbleWindow* me = (PebbleWindow*)userdata;
     switch(sym.sym)
     {
-        case (SDLK_w): renderer_move(me->renderer, xz_forward); break;
-        case (SDLK_s): renderer_move(me->renderer, xz_backward); break;
-        case (SDLK_a): renderer_move(me->renderer, xz_left); break;
-        case (SDLK_d): renderer_move(me->renderer, xz_right); break;
+        case (SDLK_w): renderer_walk(me->renderer, xz_forward, maxStepHeight); break;
+        case (SDLK_s): renderer_walk(me->renderer, xz_backward, maxStepHeight); break;
+        case (SDLK_a): renderer_walk(me->renderer, xz_left, maxStepHeight); break;
+        case (SDLK_d): renderer_walk(me->renderer, xz_right, maxStepHeight); break;
         case (SDLK_UP): renderer_moveVertical(me->renderer, xy_up); break;
         case (SDLK_DOWN): renderer_moveVertical(me->renderer, xy_down); break;
         case (SDLK_LEFT): renderer_rotate(me->renderer, rotationLeft); break;

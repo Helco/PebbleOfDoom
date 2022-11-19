@@ -26,28 +26,39 @@ bool sector_isInside(const Sector* sector, const xz_t* vertices, xz_t point)
     return true;
 }
 
-bool location_updateSector(Location* me, const Level* level)
+bool location_updateSectorNear(Location* me, const Level* level)
 {
-    if (me->sector >= 0) {
-        const Sector* oldSector = &level->sectors[me->sector];
-        if (sector_isInside(oldSector, level->vertices, me->position))
-            return false;
+    if (me->sector < 0)
+        return false;
 
-        // Near search
-        for (int i = 0; i < oldSector->wallCount; i++)
+    const Sector* oldSector = &level->sectors[me->sector];
+    if (sector_isInside(oldSector, level->vertices, me->position))
+        return false;
+
+    // Near search
+    for (int i = 0; i < oldSector->wallCount; i++)
+    {
+        int targetI = oldSector->walls[i].portalTo;
+        if (targetI >= 0 && sector_isInside(&level->sectors[targetI], level->vertices, me->position))
         {
-            int targetI = oldSector->walls[i].portalTo;
-            if (targetI >= 0 && sector_isInside(&level->sectors[targetI], level->vertices, me->position))
-            {
-                me->sector = targetI;
-                return true;
-            }
+            me->sector = targetI;
+            return true;
         }
     }
 
+    me->sector = -1; // nothing found
+    return true;
+}
+
+bool location_updateSector(Location* me, const Level* level)
+{
+    bool result = location_updateSectorNear(me, level);
+    if (!result || me->sector >= 0)
+        return result;
+
     // Thorough search
     int newSectorI = level_findSectorAt(level, me->position);
-    bool result = newSectorI == me->sector;
+    result = newSectorI == me->sector;
     me->sector = newSectorI;
     return result;
 }

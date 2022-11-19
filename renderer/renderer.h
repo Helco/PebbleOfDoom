@@ -36,6 +36,7 @@ void renderer_render(Renderer* renderer, const RendererTarget target);
 void renderer_moveTo(Renderer* renderer, Location playerLocation);
 void renderer_rotate(Renderer* renderer, real_t angle); //angle should be in degrees
 void renderer_move(Renderer* renderer, xz_t direction);
+void renderer_walk(Renderer* renderer, xz_t direction, int maxStepHeight); // checks for collision and steps
 void renderer_moveVertical(Renderer* renderer, xy_t direction);
 
 #ifdef DEBUG_WINDOWS

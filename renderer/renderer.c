@@ -621,6 +621,35 @@ void renderer_move(Renderer* renderer, xz_t directions)
     location_updateSector(&renderer->location, renderer->level);
 }
 
+void renderer_walk(Renderer* renderer, xz_t directions, int maxStepHeight)
+{
+    Location oldLocation = renderer->location;
+
+    directions = xz_rotate(directions, real_neg(renderer->location.angle));
+    renderer->location.position = xz_add(renderer->location.position, directions);
+    if (!location_updateSectorNear(&renderer->location, renderer->level))
+        return;
+
+    if (renderer->location.sector < 0)
+    {
+        // wandered outside a wall
+        renderer->location = oldLocation;
+        return;
+    }
+
+    // gone through a portal
+    Sector* oldSector = &renderer->level->sectors[oldLocation.sector];
+    Sector* newSector = &renderer->level->sectors[renderer->location.sector];
+    int stepSize = newSector->heightOffset - oldSector->heightOffset;
+    if (stepSize > maxStepHeight)
+    {
+        renderer->location = oldLocation;
+        return;
+    }
+
+    renderer->location.height = real_from_int(newSector->heightOffset);
+}
+
 void renderer_moveVertical(Renderer* renderer, xy_t directions)
 {
     renderer->location.height = real_add(renderer->location.height, directions.y);

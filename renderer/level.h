@@ -74,5 +74,6 @@ extern void level_free(LevelManagerHandle lvlManger, const Level* level);
 int level_findSectorAt(const Level* level, xz_t point);
 bool sector_isInside(const Sector* sector, const xz_t* vertices, xz_t point);
 bool location_updateSector(Location* location, const Level* level); // returns true if sector was changed
+bool location_updateSectorNear(Location* location, const Level* level); // returns true if sector was changed, only searches neighbour sectors
 
 #endif
