@@ -578,6 +578,10 @@ void renderer_renderSector(Renderer* renderer, RendererTarget target, const Draw
     for (int i = 0; i < request->sector->wallCount; i++)
         renderer_renderWall(renderer, target, request, i);
     renderer_renderSlabs(renderer, target, request);
+}
+
+void renderer_renderSectorEntities(Renderer* renderer, RendererTarget target, const DrawRequest* request)
+{
     for (int i = 0; i < request->sector->entityCount; i++)
         renderer_renderEntity(renderer, target, request, i);
 }
@@ -604,19 +608,25 @@ void renderer_render(Renderer* renderer, RendererTarget target)
     drawRequestStack_push(&renderer->drawRequests,
         &renderer->level->sectors[renderer->location.sector],
         0, RENDERER_WIDTH - 1, NULL);
-    drawRequestStack_nextDepth(&renderer->drawRequests);
+    //drawRequestStack_nextDepth(&renderer->drawRequests);
 
-    const DrawRequest* curRequest = drawRequestStack_pop(&renderer->drawRequests);
-    int lastDepth = 0;
-    while (curRequest != NULL)
+    int nextDepth = 0;
+    for (int i = 0; i < renderer->drawRequests.count; i++)
     {
-        if (lastDepth != curRequest->depth)
-        {
-            lastDepth = curRequest->depth;
+        if (i == nextDepth)
             drawRequestStack_nextDepth(&renderer->drawRequests);
-        }
+
+        const DrawRequest* curRequest = &renderer->drawRequests.requests[i];
         renderer_renderSector(renderer, target, curRequest);
-        curRequest = drawRequestStack_pop(&renderer->drawRequests);
+
+        if (i == nextDepth)
+            nextDepth = renderer->drawRequests.count;
+    }
+
+    for (int i = renderer->drawRequests.count - 1; i >= 0; i--)
+    {
+        const DrawRequest* curRequest = &renderer->drawRequests.requests[i];
+        renderer_renderSectorEntities(renderer, target, curRequest);
     }
 }
 
@@ -678,14 +688,14 @@ void renderer_moveTo(Renderer* renderer, Location relativOrigin)
 
 void drawRequestStack_reset(DrawRequestStack* stack)
 {
-    stack->start = stack->end = stack->depth = 0;
+    stack->count = stack->depth = 0;
 }
 
 void drawRequestStack_push(DrawRequestStack* stack, const Sector* sector, int left, int right, const Sector* sourceSector)
 {
-    const int insertAt = stack->end;
-    stack->end = (stack->end + 1) % MAX_DRAW_DEPTH;
-    assert(stack->end != stack->start);
+    const int insertAt = stack->count;
+    assert(insertAt < MAX_DRAW_SECTORS);
+    stack->count = (stack->count + 1) % MAX_DRAW_SECTORS;
     stack->requests[insertAt] = (DrawRequest) {
         .sector = sector,
         .left = left,
@@ -698,15 +708,6 @@ void drawRequestStack_push(DrawRequestStack* stack, const Sector* sector, int le
 void drawRequestStack_nextDepth(DrawRequestStack* stack)
 {
     stack->depth++;
-}
-
-const DrawRequest* drawRequestStack_pop(DrawRequestStack* stack)
-{
-    if (stack->start == stack->end)
-        return NULL;
-    const DrawRequest* result = &stack->requests[stack->start];
-    stack->start = (stack->start + 1) % MAX_DRAW_DEPTH;
-    return result;
 }
 
 void bresenham_init(BresenhamIterator* it, int x0, int y0, int x1, int y1)

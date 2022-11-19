@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #define MAX_DRAW_DEPTH 8
+#define MAX_DRAW_SECTORS 16
 
 typedef struct BoundarySet {
     uint8_t yTop[RENDERER_WIDTH];
@@ -17,8 +18,8 @@ typedef struct DrawRequest {
 } DrawRequest;
 
 typedef struct DrawRequestStack {
-    DrawRequest requests[MAX_DRAW_DEPTH];
-    int start, end, depth;
+    DrawRequest requests[MAX_DRAW_SECTORS];
+    int count, depth;
 } DrawRequestStack;
 
 struct Renderer
@@ -56,7 +57,6 @@ typedef enum BresenhamStep
 void drawRequestStack_reset(DrawRequestStack* stack);
 void drawRequestStack_push(DrawRequestStack* stack, const Sector* sector, int left, int right, const Sector* sourceSector);
 void drawRequestStack_nextDepth(DrawRequestStack* stack);
-const DrawRequest* drawRequestStack_pop(DrawRequestStack* stack);
 
 void bresenham_init(BresenhamIterator* it, int x0, int y0, int x1, int y1);
 BresenhamStep bresenham_step(BresenhamIterator* it);
