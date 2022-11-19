@@ -95,7 +95,7 @@ void textureManager_free(TextureManager* me)
             if (itSprite->source != NULL)
                 free(itSprite->source);
         }
-        free(me->textures);
+        free(me->sprites);
     }
     free(me);
 }
@@ -168,10 +168,10 @@ void prv_convertRGBAtoPebbleSprite(const uint8_t* rgbaPixels, uint8_t* bw, uint8
 
             bwRow[byte] = (bwRow[byte] & ~mask) | ((itRGBAPixel[0] > 127) << bit);
             alphaRow[byte] = (alphaRow[byte] & ~mask) | ((itRGBAPixel[3] > 127) << bit);
+            itRGBAPixel += 4;
         }
         bwRow += bytesPerRow;
         alphaRow += bytesPerRow;
-        itRGBAPixel += 4;
     }
 }
 
@@ -266,6 +266,14 @@ const Texture* textureManager_loadTexture(TextureManager* me, TextureId id)
     return &loadedTexture->texture;
 }
 
+const Sprite* textureManager_loadSprite(TextureManager* me, SpriteId id)
+{
+    assert(id >= 0 && id < me->spriteCount && "Tried to load invalid sprite id");
+    LoadedSprite* loadedSprite = &me->sprites[id];
+    loadedSprite->referenceCount++;
+    return &loadedSprite->sprite;
+}
+
 const Texture* textureManager_createEmptyTexture(TextureManager* me, GSize size, GColor** outputPtr)
 {
     assert(size.w >= 0 && size.h >= 0);
@@ -299,6 +307,15 @@ void textureManager_freeTexture(TextureManager* me, const Texture* texture)
     LoadedTexture* loadedTexture = &me->textures[texture->id];
     assert(loadedTexture->referenceCount > 0);
     loadedTexture->referenceCount--;
+}
+
+void textureManager_freeSprite(TextureManager* me, const Sprite* sprite)
+{
+    assert(sprite != NULL && sprite->id >= 0 && sprite->id < me->spriteCount &&
+        "Tried to free invalid sprite");
+    LoadedSprite* loadedSprite = &me->sprites[sprite->id];
+    assert(loadedSprite->referenceCount > 0);
+    loadedSprite->referenceCount--;
 }
 
 TexGenerationContext* textureManager_createGeneratedTexture(TextureManager* me, TexGeneratorID id, int size)

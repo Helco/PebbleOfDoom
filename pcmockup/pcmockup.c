@@ -75,7 +75,8 @@ PCMockup *pcmockup_init()
         textureManager_registerFile(me->textureManager, "elevators.png") == INVALID_TEXTURE_ID ||
         textureManager_registerFile(me->textureManager, "blackboard.png") == INVALID_TEXTURE_ID ||
         textureManager_registerFile(me->textureManager, "entry.png") == INVALID_TEXTURE_ID ||
-        textureManager_registerFile(me->textureManager, "404.png") == INVALID_TEXTURE_ID)
+        textureManager_registerFile(me->textureManager, "404.png") == INVALID_TEXTURE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "spr_book.png") == INVALID_SPRITE_ID)
     {
         pcmockup_free(me);
         return NULL;

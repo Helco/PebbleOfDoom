@@ -489,6 +489,43 @@ void renderer_renderSlabs(Renderer* me, RendererTarget target, const DrawRequest
         false);*/
 }
 
+void renderer_renderSpriteSpan(Renderer* me, RendererTarget target, const BoundarySet* drawBoundary, const Sprite* sprite, WallSection p, int x, real_t spriteYIncr)
+{
+    UNUSED(me);
+    if (target.colorFormat != RendererColorFormat_1BitBW)
+        return;
+    uint8_t* fb = ((uint8_t*)target.framebuffer) + x * rendererColorFormat_getStride(target.colorFormat);
+
+    const int texColumn = lerpi(x, p.left.x, p.right.x, 0, sprite->size.h - 1);
+    assert(texColumn >= 0 && texColumn < sprite->size.h);
+    const uint8_t* texBW = sprite->bw + texColumn * sprite->bytesPerRow;
+    const uint8_t* texAlpha = sprite->alpha + texColumn * sprite->bytesPerRow;
+
+    const int yLow = max(drawBoundary->yBottom[x], p.left.yStart);
+    const int yHigh = min(drawBoundary->yTop[x], p.left.yEnd);
+    real_t texRow = real_mul(real_from_int(yLow - p.left.yStart), spriteYIncr);
+
+    for (int y = yLow; y <= yHigh; y++)
+    {
+        int texRowI = real_to_int(real_round(texRow));
+        assert(texRowI >= 0 && texRowI < sprite->size.w);
+        int texByte = texRowI / 8;
+        int texShift = texRowI % 8;
+        int fbByte = y / 8;
+        int fbShift = y % 8;
+        int fbMask = 1 << fbShift;
+
+        int fbValue = fb[fbByte] >> fbShift;
+        int texValue = texBW[texByte] >> texShift;
+        int texAlphaValue = texAlpha[texByte] >> texShift;
+        fbValue = (texAlphaValue & texValue) | (~texAlphaValue & fbValue);
+
+        fb[fbByte] = (fb[fbByte] & ~fbMask) | ((fbValue & 1) << fbShift);
+
+        texRow = real_add(texRow, spriteYIncr);
+    }
+}
+
 void renderer_renderEntity(Renderer* me, RendererTarget target, const DrawRequest* request, int entityIndex)
 {
     const Sector* const sector = request->sector;
@@ -515,12 +552,18 @@ void renderer_renderEntity(Renderer* me, RendererTarget target, const DrawReques
     // I wonder if we can run into precision errors here
     assert(p.left.yStart == p.right.yStart && p.left.yEnd == p.right.yEnd);
 
+    const Sprite* sprite = sprite_load(me->textureManager, entity->sprite);
     const int renderLeft = max(request->left, p.left.x);
     const int renderRight = min(request->right, p.right.x);
+    const real_t spriteYIncr = real_norm_lerp(real_from_int(p.left.yStart + 1),
+        real_from_int(p.left.yStart), real_from_int(p.left.yEnd),
+        real_zero, real_from_int(sprite->size.w - 1));
+
     for (int x = renderLeft; x <= renderRight; x++)
     {
-        renderer_renderContourSpan(me, target, drawBoundary, x, p.left.yStart, p.left.yEnd);
+        renderer_renderSpriteSpan(me, target, drawBoundary, sprite, p, x, spriteYIncr);
     }
+    sprite_free(me->textureManager, sprite);
 }
 
 void renderer_renderSector(Renderer* renderer, RendererTarget target, const DrawRequest* request)

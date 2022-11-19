@@ -27,6 +27,18 @@ void texture_free(TextureManagerHandle manager, const Texture* texture)
     textureManager_freeTexture(textureManager, texture);
 }
 
+const Sprite* sprite_load(TextureManagerHandle manager, SpriteId id)
+{
+    TextureManager* textureManager = (TextureManager*)manager;
+    return textureManager_loadSprite(textureManager, id);
+}
+
+void sprite_free(TextureManagerHandle manager, const Sprite* sprite)
+{
+    TextureManager* textureManager = (TextureManager*)manager;
+    textureManager_freeSprite(textureManager, sprite);
+}
+
 const Level* level_load(LevelManagerHandle manager, LevelId id)
 {
     LevelManager* levelManager = (LevelManager*)manager;
