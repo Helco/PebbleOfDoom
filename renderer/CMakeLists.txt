@@ -14,6 +14,7 @@ set(sources_podrenderer
     level.c
     segame.h
     segame.c
+    segame_render.c
     resources.h
 
     texgen/texgen.h

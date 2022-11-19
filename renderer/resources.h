@@ -8,7 +8,7 @@ enum {
     RESOURCE_ID_ICON_BOOTS,
     RESOURCE_ID_ICON_GOLD,
     RESOURCE_ID_SPR_HEART, // actually double-duty as icon
-    RESOURCE_ID_ICON_NKEY
+    RESOURCE_ID_ICON_KEY
 };
 #else
 #include <pebble.h>

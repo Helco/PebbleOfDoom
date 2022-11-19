@@ -7,7 +7,9 @@
 
 #define RENDERER_WIDTH 168
 #define HALF_RENDERER_WIDTH (RENDERER_WIDTH / 2)
-#define RENDERER_HEIGHT 144
+#define SCREEN_HEIGHT 144
+#define HUD_HEIGHT 32
+#define RENDERER_HEIGHT (SCREEN_HEIGHT - HUD_HEIGHT)
 #define HALF_RENDERER_HEIGHT (RENDERER_HEIGHT / 2)
 
 typedef enum RendererColorFormat
@@ -28,6 +30,7 @@ Renderer* renderer_init();
 void renderer_free(Renderer* renderer);
 void renderer_setLevel(Renderer* renderer, const Level* level);
 void renderer_setTextureManager(Renderer* renderer, TextureManagerHandle handle);
+TextureManagerHandle renderer_getTextureManager(Renderer* renderer);
 /*
  * framebuffer - *column-stored* framebuffer pointer
  */

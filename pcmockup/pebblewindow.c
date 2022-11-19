@@ -163,10 +163,12 @@ void pebbleWindow_contentUpdate(void* userdata)
     segame_update(&me->game);
 
     safeFramebuffer_prepare(me->framebuffer);
-    renderer_render(me->renderer, (RendererTarget) {
+    RendererTarget target = {
         .framebuffer = pebbleWindow_getPebbleFramebuffer(me),
         .colorFormat = me->format
-    });
+    };
+    renderer_render(me->renderer, target);
+    segame_render(&me->game, target);
     safeFramebuffer_check(me->framebuffer);
     prv_pebbleWindow_convertPebbleToTexture(me);
     imageWindow_setImageData(me->window, me->pebbleSize, me->textureData);

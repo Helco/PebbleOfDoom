@@ -8,8 +8,8 @@
 int rendererColorFormat_getStride(RendererColorFormat format)
 {
     static const int RENDERER_STRIDE[] = {
-        [RendererColorFormat_8BitColor] = RENDERER_HEIGHT,
-        [RendererColorFormat_1BitBW] = ((RENDERER_HEIGHT + 7) / 8 + 3) / 4 * 4
+        [RendererColorFormat_8BitColor] = SCREEN_HEIGHT,
+        [RendererColorFormat_1BitBW] = ((SCREEN_HEIGHT + 7) / 8 + 3) / 4 * 4
     };
     return RENDERER_STRIDE[format];
 }
@@ -80,6 +80,11 @@ void renderer_setLevel(Renderer* me, const Level* level)
 void renderer_setTextureManager(Renderer* me, TextureManagerHandle handle)
 {
     me->textureManager = handle;
+}
+
+TextureManagerHandle renderer_getTextureManager(Renderer* me)
+{
+    return me->textureManager;
 }
 
 xz_t renderer_transformVector(const Renderer* me, xz_t vector)
@@ -579,7 +584,13 @@ void renderer_renderSector(Renderer* renderer, RendererTarget target, const Draw
 
 void renderer_render(Renderer* renderer, RendererTarget target)
 {
-    memset(target.framebuffer, 0, RENDERER_WIDTH * rendererColorFormat_getStride(target.colorFormat));
+    target.framebuffer = ((uint8_t*)target.framebuffer) + (HUD_HEIGHT / 8);
+    const int stride = rendererColorFormat_getStride(target.colorFormat);
+    for (int x = 0; x < RENDERER_WIDTH; x++)
+    {
+        memset(((uint8_t*)target.framebuffer) + x * stride, 0, stride - (HUD_HEIGHT / 8));
+    }
+    //memset(target.framebuffer, 0, RENDERER_WIDTH * rendererColorFormat_getStride(target.colorFormat));
 
     if (renderer->level == NULL || renderer->location.sector < 0)
         return;

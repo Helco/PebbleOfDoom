@@ -110,7 +110,7 @@ PCMockup *pcmockup_init()
     PebbleWindow* pebbleWindow = pebbleWindow_init(
         me->windowContainer,
         windowGrid_getSingleBounds(&windowGrid, 0),
-        GSize(RENDERER_WIDTH, RENDERER_HEIGHT),
+        GSize(RENDERER_WIDTH, SCREEN_HEIGHT),
         RendererColorFormat_1BitBW,
         me->renderer
     );

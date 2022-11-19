@@ -13,8 +13,9 @@ void player_resetMovement(Player* me)
 
 void player_reset(Player* me)
 {
-    me->health = me->maxHealth = 1;
-    me->gold = 0;
+    me->maxHealth = 2;
+    me->health = 2;
+    me->gold = 15;
     me->activeAction = PLAYERACT_USE;
     player_resetMovement(me);
 }
@@ -35,12 +36,29 @@ SEGame* segame_init(SEGame* me, Renderer* renderer)
     me->renderer = renderer;
     me->player.location = renderer_getLocation(me->renderer);
     me->isPaused = false;
+    me->hadRenderedBefore = false;
+
+    TextureManagerHandle textureManager = renderer_getTextureManager(renderer);
+    me->iconDigits = sprite_load(textureManager, RESOURCE_ID_ICON_DIGITS);
+    me->iconGold = sprite_load(textureManager, RESOURCE_ID_ICON_GOLD);
+    me->iconHeart = sprite_load(textureManager, RESOURCE_ID_SPR_HEART);
+    me->iconPlayerActions[PLAYERACT_WALK] = sprite_load(textureManager, RESOURCE_ID_ICON_BOOTS);
+    me->iconPlayerActions[PLAYERACT_USE] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
+    me->iconPlayerActions[PLAYERACT_PICK] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
+    me->iconPlayerActions[PLAYERACT_BATTERY] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
+    me->iconPlayerActions[PLAYERACT_KEY] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
+
     return me;
 }
 
 void segame_free(SEGame* me)
 {
-    UNUSED(me);
+    TextureManagerHandle textureManager = renderer_getTextureManager(me->renderer);
+    sprite_free(textureManager, me->iconDigits);
+    sprite_free(textureManager, me->iconGold);
+    sprite_free(textureManager, me->iconHeart);
+    for (int i = 0; i < COUNT_PLAYERACT; i++)
+        sprite_free(textureManager, me->iconPlayerActions[i]);
 }
 
 void segame_update(SEGame* me)
