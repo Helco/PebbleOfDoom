@@ -3,7 +3,12 @@
 #include "renderer.h"
 #include <stdbool.h>
 
-#define MAX_DRAW_DEPTH 16
+#define MAX_DRAW_DEPTH 8
+
+typedef struct BoundarySet {
+    uint8_t yTop[RENDERER_WIDTH];
+    uint8_t yBottom[RENDERER_WIDTH];
+} BoundarySet;
 
 typedef struct DrawRequest {
     const Sector* sector;
@@ -16,11 +21,6 @@ typedef struct DrawRequestStack {
     int start, end, depth;
 } DrawRequestStack;
 
-typedef struct BoundarySet {
-    short yTop[RENDERER_WIDTH];
-    short yBottom[RENDERER_WIDTH];
-} BoundarySet;
-
 struct Renderer
 {
     const Level* level;
@@ -31,10 +31,9 @@ struct Renderer
     real_t eyeHeight;
     real_t horFovScale, verFovScale, fov;
     lineSeg_t leftFovSeg, rightFovSeg;
-    BoundarySet boundarySets[2];
+    BoundarySet stackBoundarySets[MAX_DRAW_DEPTH + 1];
     BoundarySet wallBoundaries;
     short spanStart[RENDERER_HEIGHT];
-    int curBoundarySet;
     DrawRequestStack drawRequests;
 
     TextureManagerHandle textureManager;

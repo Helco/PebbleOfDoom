@@ -116,6 +116,25 @@ lineSeg_t renderer_transformWall(const Renderer* me, const Sector* sector, int w
     };
 }
 
+lineSeg_t renderer_transformEntity(const Renderer* me, xz_t position, real_t radius)
+{
+    position = renderer_transformPoint(me, position);
+    lineSeg_t l = { .start = {.xz = position}, .end = {.xz = position } };
+    l.start.xz.x = real_sub(l.start.xz.x, radius);
+    l.end.xz.x = real_add(l.start.xz.x, radius);
+    return l;
+
+    /* alternative billboarding was tried, but not only does this need normalize
+       it also produces sloped edges so we cannot optimize for bitmap blits.
+
+    xz_t left = xz_normalize(xz_orthogonal(position));
+    left = xz_scale(left, radius);
+    return (lineSeg_t) {
+        .start = { .xz = xz_add(position, left) },
+        .end = {.xz = xz_sub(position, left) }
+    };*/
+}
+
 typedef struct
 {
     struct {
@@ -171,10 +190,10 @@ int renderer_projectValue(real_t value, real_t invDepth, real_t fovScale, int ha
     ) + halfSize;
 }
 
-void renderer_project(const Renderer* me, const Sector* sector, const lineSeg_t* transformedSeg, WallSection* projected)
+void renderer_project(const Renderer* me, real_t heightOffset, real_t height, const lineSeg_t* transformedSeg, WallSection* projected)
 {
-    const real_t nominalYStart = real_sub(real_from_int(sector->heightOffset), real_add(me->location.height, me->eyeHeight));
-    const real_t nominalYEnd = real_add(nominalYStart, real_from_int(sector->height));
+    const real_t nominalYStart = real_sub(heightOffset, real_add(me->location.height, me->eyeHeight));
+    const real_t nominalYEnd = real_add(nominalYStart, height);
     const xz_t startT = transformedSeg->start.xz;
     const xz_t endT = transformedSeg->end.xz;
     const real_t invStartZ = real_reciprocal(startT.z);
@@ -241,44 +260,47 @@ void renderer_renderFilledSpan_colored(Renderer* me, RendererTarget target, int 
     memset(framebufferColumn + yFillLower, wallColor.argb, yFillUpper - yFillLower + 1);
 }
 
-void renderer_renderContourSpan(Renderer* me, RendererTarget target, int x, int yStart, int yEnd)
+void renderer_renderContourSpan(Renderer* me, RendererTarget target, const BoundarySet* drawBoundary, int x, int yStart, int yEnd)
 {
     UNUSED(me);
     assert(x >= 0 && x < RENDERER_WIDTH);
-    if (target.colorFormat != RendererColorFormat_1BitBW || yStart > yEnd)
-        return;
-    const int stride = rendererColorFormat_getStride(target.colorFormat);
-    uint8_t* const framebufferColumn = (uint8_t*)target.framebuffer + x * stride;
-    const BoundarySet* drawBoundary = &me->boundarySets[me->curBoundarySet];
     yStart = max(yStart, drawBoundary->yBottom[x]);
     yEnd = min(yEnd, drawBoundary->yTop[x]);
+    if (target.colorFormat != RendererColorFormat_1BitBW || yStart > yEnd)
+        return;
 
-    if (yEnd - yStart + 1 >= 8) {
-        uint8_t* pixelByte = framebufferColumn + yStart / 8;
-        if (yStart % 8 != 0) {
-            *(pixelByte++) |= 255 << (yStart % 8);
-            yStart += 8 - (yStart % 8);
-        }
+    const int stride = rendererColorFormat_getStride(target.colorFormat);
+    uint8_t* const framebufferColumn = (uint8_t*)target.framebuffer + x * stride;
+    uint8_t* pixelByte = framebufferColumn + yStart / 8;
+    int bitCount = yEnd - yStart + 1;
 
-        int byteCount = (yEnd - yStart + 1) / 8;
-        memset(pixelByte, 255, byteCount);
-        yStart += byteCount * 8;
+    { // just to group, first try to align
+        *(pixelByte++) |= ((1 << min(8, bitCount)) - 1) << (yStart % 8);
+        bitCount -= min(8 - (yStart % 8), bitCount);
     }
-    if (yStart <= yEnd) {
-        uint8_t* const pixelByte = framebufferColumn + yStart / 8;
-        *pixelByte |= ((1 << (yEnd - yStart + 1)) - 1) << (yStart % 8);
+
+    if (bitCount >= 8) {
+        int byteCount = bitCount / 8;
+        memset(pixelByte, 255, byteCount);
+        pixelByte += byteCount;
+        bitCount = bitCount % 8;
+    }
+
+    if (bitCount > 0) {
+        *pixelByte |= (1 << bitCount) - 1;
     }
 }
 
-void renderer_renderNonPortalContour(Renderer* me, RendererTarget target, int x,
+void renderer_renderNonPortalContour(Renderer* me, RendererTarget target, const BoundarySet* drawBoundary,
+    int x,
     int portalNomLow, int portalNomHigh, int sectorHeight,
     int drawLow, int drawHigh)
 {
     const int portalDrawLow = lerpi(portalNomLow, 0, sectorHeight, drawLow, drawHigh);
     const int portalDrawHigh = lerpi(portalNomHigh, 0, sectorHeight, drawLow, drawHigh);
 
-    renderer_renderContourSpan(me, target, x, drawLow, portalDrawLow);
-    renderer_renderContourSpan(me, target, x, portalDrawHigh, drawHigh);
+    renderer_renderContourSpan(me, target, drawBoundary, x, drawLow, portalDrawLow);
+    renderer_renderContourSpan(me, target, drawBoundary, x, portalDrawHigh, drawHigh);
 }
 
 void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest* request, int wallIndex)
@@ -297,7 +319,7 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
         return;
 
     WallSection p;
-    renderer_project(me, sector, &wallSeg, &p);
+    renderer_project(me, real_from_int(sector->heightOffset), real_from_int(sector->height), &wallSeg, &p);
     if (p.left.x >= p.right.x || p.right.x < request->left || p.left.x > request->right)
         return;
 
@@ -322,8 +344,8 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
     }
 
     // render wall
-    const BoundarySet* drawBoundary = &me->boundarySets[me->curBoundarySet];
-    BoundarySet* nextBoundary = &me->boundarySets[!me->curBoundarySet];
+    const BoundarySet* drawBoundary = &me->stackBoundarySets[request->depth];
+    BoundarySet* nextBoundary = &me->stackBoundarySets[request->depth + 1];
     const int renderLeft = max(request->left, p.left.x);
     const int renderRight = min(request->right, p.right.x);
     BresenhamIterator upperIt, lowerIt;
@@ -338,16 +360,16 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
     if (renderLeft == p.left.x && !isWallStartBehind && (wall->flags & WALL_CONTOUR_LEFT))
     {
         if (wall->portalTo < 0 || wall->flags & WALL_CONTOUR_LEFTPORTAL)
-            renderer_renderContourSpan(me, target, renderLeft, lowerIt.y0, upperIt.y0);
+            renderer_renderContourSpan(me, target, drawBoundary, renderLeft, lowerIt.y0, upperIt.y0);
         else
-            renderer_renderNonPortalContour(me, target, renderLeft, portalNomStart, portalNomEnd, sector->height, lowerIt.y0, upperIt.y0);
+            renderer_renderNonPortalContour(me, target, drawBoundary, renderLeft, portalNomStart, portalNomEnd, sector->height, lowerIt.y0, upperIt.y0);
     }
     if (renderRight == p.right.x && !isWallEndBehind && (wall->flags & WALL_CONTOUR_RIGHT))
     {
         if (wall->portalTo < 0 || wall->flags & WALL_CONTOUR_RIGHTPORTAL)
-            renderer_renderContourSpan(me, target, renderRight, lowerIt.y1, upperIt.y1);
+            renderer_renderContourSpan(me, target, drawBoundary, renderRight, lowerIt.y1, upperIt.y1);
         else
-            renderer_renderNonPortalContour(me, target, renderRight, portalNomStart, portalNomEnd, sector->height, lowerIt.y1, upperIt.y1);
+            renderer_renderNonPortalContour(me, target, drawBoundary, renderRight, portalNomStart, portalNomEnd, sector->height, lowerIt.y1, upperIt.y1);
     }
 
     // render wall spans
@@ -360,12 +382,12 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
         do {
             upperStep = bresenham_step(&upperIt);
             if (wall->flags & WALL_CONTOUR_TOP)
-                renderer_renderContourSpan(me, target, x, upperIt.y0, upperIt.y0);
+                renderer_renderContourSpan(me, target, drawBoundary, x, upperIt.y0, upperIt.y0);
         } while (upperStep != BRESENHAMSTEP_X && upperStep != BRESENHAMSTEP_NONE);
         do {
             lowerStep = bresenham_step(&lowerIt);
             if (wall->flags & WALL_CONTOUR_BOTTOM)
-                renderer_renderContourSpan(me, target, x, lowerIt.y0, lowerIt.y0);
+                renderer_renderContourSpan(me, target, drawBoundary, x, lowerIt.y0, lowerIt.y0);
         } while (lowerStep != BRESENHAMSTEP_X && lowerStep != BRESENHAMSTEP_NONE);
         assert(upperIt.x0 == lowerIt.x0);
 
@@ -376,9 +398,9 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
             nextBoundary->yTop[x] = clampi(yBottom, yPortalEnd, yTop);
 
             if (wall->flags & WALL_CONTOUR_BOTTOMPORTAL)
-                renderer_renderContourSpan(me, target, x, yPortalStart, yPortalStart);
+                renderer_renderContourSpan(me, target, drawBoundary, x, yPortalStart, yPortalStart);
             if (wall->flags & WALL_CONTOUR_TOPPORTAL)
-                renderer_renderContourSpan(me, target, x, yPortalEnd, yPortalEnd);
+                renderer_renderContourSpan(me, target, drawBoundary, x, yPortalEnd, yPortalEnd);
         }
 
         me->wallBoundaries.yBottom[x] = max(yBottom, lowerIt.y0);
@@ -456,14 +478,49 @@ void renderer_renderSlabColumns(Renderer* renderer, RendererTarget target, const
 
 void renderer_renderSlabs(Renderer* me, RendererTarget target, const DrawRequest* request)
 {
-    renderer_renderSlabColumns(me, target, request,
+    UNUSED(me, target, request);
+    /*renderer_renderSlabColumns(me, target, request,
         me->wallBoundaries.yTop,
         me->boundarySets[me->curBoundarySet].yTop,
         true);
     renderer_renderSlabColumns(me, target, request,
         me->boundarySets[me->curBoundarySet].yBottom,
         me->wallBoundaries.yBottom,
-        false);
+        false);*/
+}
+
+void renderer_renderEntity(Renderer* me, RendererTarget target, const DrawRequest* request, int entityIndex)
+{
+    const Sector* const sector = request->sector;
+    const Entity* const entity = &sector->entities[entityIndex];
+    const BoundarySet* drawBoundary = &me->stackBoundarySets[request->depth];
+
+    lineSeg_t entitySeg = renderer_transformEntity(me, entity->location.position, real_from_int(20));
+    bool isEntityStartBehind = real_compare(entitySeg.start.xz.z, real_zero) < 0;
+    bool isEntityEndBehind = real_compare(entitySeg.end.xz.z, real_zero) < 0;
+    if (isEntityStartBehind && isEntityEndBehind)
+        return;
+
+    TexCoord texCoord = {
+        .start = xy_zero,
+        .end = xy_one
+    };
+    if (!renderer_clipByFov(me, &entitySeg, &texCoord))
+        return;
+
+    WallSection p;
+    renderer_project(me, entity->location.height, real_from_int(15), &entitySeg, &p);
+    if (p.left.x >= p.right.x || p.right.x < request->left || p.left.x > request->right)
+        return;
+    // I wonder if we can run into precision errors here
+    assert(p.left.yStart == p.right.yStart && p.left.yEnd == p.right.yEnd);
+
+    const int renderLeft = max(request->left, p.left.x);
+    const int renderRight = min(request->right, p.right.x);
+    for (int x = renderLeft; x <= renderRight; x++)
+    {
+        renderer_renderContourSpan(me, target, drawBoundary, x, p.left.yStart, p.left.yEnd);
+    }
 }
 
 void renderer_renderSector(Renderer* renderer, RendererTarget target, const DrawRequest* request)
@@ -473,6 +530,8 @@ void renderer_renderSector(Renderer* renderer, RendererTarget target, const Draw
     for (int i = 0; i < request->sector->wallCount; i++)
         renderer_renderWall(renderer, target, request, i);
     renderer_renderSlabs(renderer, target, request);
+    for (int i = 0; i < request->sector->entityCount; i++)
+        renderer_renderEntity(renderer, target, request, i);
 }
 
 void renderer_render(Renderer* renderer, RendererTarget target)
@@ -482,15 +541,10 @@ void renderer_render(Renderer* renderer, RendererTarget target)
     if (renderer->level == NULL || renderer->location.sector < 0)
         return;
     memset(renderer->transformedStatus, 0, sizeof(uint32_t) * ((renderer->level->vertexCount + 31) / 32));
-    memset(renderer->boundarySets[0].yBottom, 0, sizeof(renderer->boundarySets[0].yBottom));
-    memset(renderer->boundarySets[1].yBottom, 0, sizeof(renderer->boundarySets[1].yBottom));
+    memset(renderer->stackBoundarySets[0].yBottom, 0, sizeof(renderer->stackBoundarySets[0].yBottom));
+    memset(renderer->stackBoundarySets[0].yTop, RENDERER_HEIGHT - 1, sizeof(renderer->stackBoundarySets[0].yBottom));
     memset(renderer->wallBoundaries.yBottom, 0, sizeof(renderer->wallBoundaries.yBottom));
-    for (int i = 0; i < RENDERER_WIDTH; i++) {
-        renderer->wallBoundaries.yTop[i] =
-        renderer->boundarySets[0].yTop[i] =
-            renderer->boundarySets[1].yTop[i] = RENDERER_HEIGHT - 1;
-    }
-    renderer->curBoundarySet = 0;
+    memset(renderer->wallBoundaries.yTop, RENDERER_HEIGHT - 1, sizeof(renderer->wallBoundaries.yTop));
 
     drawRequestStack_reset(&renderer->drawRequests);
     drawRequestStack_push(&renderer->drawRequests,
@@ -505,7 +559,6 @@ void renderer_render(Renderer* renderer, RendererTarget target)
         if (lastDepth != curRequest->depth)
         {
             lastDepth = curRequest->depth;
-            renderer->curBoundarySet = !renderer->curBoundarySet;
             drawRequestStack_nextDepth(&renderer->drawRequests);
         }
         renderer_renderSector(renderer, target, curRequest);
