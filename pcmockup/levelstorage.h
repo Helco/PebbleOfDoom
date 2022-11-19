@@ -46,17 +46,28 @@ typedef struct PACKED StoredWallV4 {
 typedef struct PACKED StoredSector {
     int wallOffset;
     int wallCount;
+    int entityCount;
     int height;
     int heightOffset;
     StoredGColor floorColor;
     StoredGColor ceilColor;
 } StoredSector;
 
+typedef struct PACKED StoredEntity {
+    StoredLocation location;
+    SpriteId sprite;
+    uint8_t type;
+    uint8_t arg1;
+    uint8_t arg2;
+    uint8_t arg3;
+} StoredEntity;
+
 typedef struct PACKED StoredLevel {
     int storageVersion;
     int sectorCount;
     int totalWallCount;
     int vertexCount;
+    int totalEntityCount;
     StoredLocation playerStart;
 } StoredLevel;
 

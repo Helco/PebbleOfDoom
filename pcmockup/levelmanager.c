@@ -42,6 +42,7 @@ void levelManager_freeLevel(Level* level)
     {
         Sector* sector = &level->sectors[sectorI];
         free(sector->walls);
+        free(sector->entities);
     }
     free(level->sectors);
     free(level->vertices);
@@ -134,7 +135,14 @@ bool prv_convert_sector(Sector* sector, FILE* fp)
         return false;
     }
 
+    sector->entities = (Entity*)malloc(sizeof(Entity) * storedSector.entityCount);
+    if (sector->entities == NULL) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not allocate sector entities");
+        return false;
+    }
+
     sector->wallCount = storedSector.wallCount;
+    sector->entityCount = storedSector.entityCount;
     sector->height = storedSector.height;
     sector->heightOffset = storedSector.heightOffset;
     sector->floorColor = prv_convert_color(storedSector.floorColor);
@@ -156,6 +164,23 @@ bool prv_convert_wall(Wall* wall, FILE* fp)
     wall->texCoord = prv_convert_texCoord(storedWall.texCoord);
     wall->color = prv_convert_color(storedWall.color);
     wall->flags = storedWall.flags;
+    return true;
+}
+
+bool prv_convert_entity(Entity* entity, FILE* fp)
+{
+    StoredEntity storedEntity;
+    if (fread(&storedEntity, sizeof(StoredEntity), 1, fp) != 1) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not read level entity");
+        return false;
+    }
+
+    entity->location = prv_convert_location(storedEntity.location);
+    entity->sprite = storedEntity.sprite;
+    entity->type = storedEntity.type;
+    entity->arg1 = storedEntity.arg1;
+    entity->arg2 = storedEntity.arg2;
+    entity->arg3 = storedEntity.arg3;
     return true;
 }
 
@@ -195,6 +220,14 @@ bool levelManager_loadLevel(Level* level, FILE* fp)
         Sector* sector = level->sectors + i;
         for (int j = 0; j < sector->wallCount; j++)
             if (!prv_convert_wall(sector->walls + j, fp))
+                return false;
+    }
+
+    for (int i = 0; i < storedLevel.sectorCount; i++)
+    {
+        Sector* sector = level->sectors + i;
+        for (int j = 0; j < sector->entityCount; j++)
+            if (!prv_convert_entity(sector->entities + j, fp))
                 return false;
     }
 

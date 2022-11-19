@@ -42,12 +42,23 @@ typedef struct Wall {
     WallFlags flags;
 } Wall;
 
+typedef struct Entity {
+    Location location;
+    SpriteId sprite;
+    uint8_t type;
+    uint8_t arg1;
+    uint8_t arg2;
+    uint8_t arg3;
+} Entity;
+
 typedef struct Sector {
     int wallCount;
+    int entityCount;
     int height, heightOffset;
     GColor floorColor;
     GColor ceilColor;
     Wall* walls;
+    Entity* entities;
 } Sector;
 
 typedef struct Level {

@@ -16,6 +16,7 @@ const FormatLocation = new Format()
 const FormatSector = new Format()
     .int32LE("wallOffset")
     .int32LE("wallCount")
+    .int32LE("entityCount")
     .int32LE("height")
     .int32LE("heightOffset")
     .uint8("floorColor")
@@ -28,17 +29,27 @@ const FormatWall = new Format()
     .nest("texStart", FormatVector)
     .nest("texEnd", FormatVector)
     .uint8("color")
-    .uint8("flags")
+    .uint8("flags");
+
+const FormatEntity = new Format()
+    .nest("location", FormatLocation)
+    .int32LE("sprite")
+    .uint8("type")
+    .uint8("arg1")
+    .uint8("arg2")
+    .uint8("arg3");
 
 const FormatLevel = new Format()
     .int32LE("storageVersion")
     .int32LE("sectorCount")
     .int32LE("wallCount")
     .int32LE("vertexCount")
+    .int32LE("entityCount")
     .nest("playerStart", FormatLocation)
     .listEof("vertices", FormatVector)
     .listEof("sectors", FormatSector)
-    .listEof("walls", FormatWall);
+    .listEof("walls", FormatWall)
+    .listEof("entities", FormatEntity);
 
 const level = {
     storageVersion: 4,
@@ -90,6 +101,9 @@ const level = {
             color: 0xff,
             flags: 0,
         }
+    ],
+    entities: [
+
     ]
 };
 
@@ -97,6 +111,7 @@ const descr = yaml.parse(fs.readFileSync("level-tool2/level.yaml", "utf-8"));
 level.vertices = [];
 level.sectors = [];
 level.walls = [];
+level.entities = [];
 
 let evalEnv = "(()=>{";
 for (var v in descr.vars)
@@ -162,7 +177,7 @@ const defaultCeilColor = colvalue(descr.defaultCeilColor, "defaultCeilColor");
 const portalMap = new Map();
 const cornerMap = new Map();
 
-// First pass, normalize walls
+// First pass
 for (var sectorName in descr.sectors)
 {
     const sector = descr.sectors[sectorName];
@@ -176,12 +191,14 @@ for (var sectorName in descr.sectors)
         ? colvalue(sector.ceilColor, sectorName + "_ceilColor")
         : defaultCeilColor;
 
+    if (!("entities" in sector))
+        sector.entities = [];
+
     sector.wallOffset = level.walls.length;
     sector.wallCount = sector.walls.length;
+    sector.entityCount = sector.entities.length;
     sector.index = level.sectors.length;
     level.sectors.push(sector);
-
-    //sector.walls = sector.walls.reverse();
 
     for (var i = 0; i < sector.walls.length; i++)
     {
@@ -230,6 +247,31 @@ for (var sectorName in descr.sectors)
         {
             portalMap.set(key, { sector, wallIndex: i });
         }
+    }
+
+    for (var i = 0; i < sector.entities.length; i++)
+    {
+        var e = sector.entities[i];
+
+        e.location = { 
+            sector: sector.index,
+            angle: 0,
+            height: sector.y,
+            position: vecvalue(e.position, `${sectorName}_entity${i}_pos`)
+        };
+        if ("y" in e)
+            e.location.height = fvalue(e.y, `${sectorName}_entity${i}_y`);
+        e.sprite = ivalue(e.sprite, `${sectorName}_entity${i}_sprite`);
+        function optivalue(obj, prop, def, name) {
+            return (prop in obj) ? ivalue(obj[prop], `${name}_${prop}`) : def;
+        }
+        e.type = optivalue(e, "type", 0, `${sectorName}_entity${i}`);
+        e.arg1 = optivalue(e, "arg1", 0, `${sectorName}_entity${i}`);
+        e.arg2 = optivalue(e, "arg2", 0, `${sectorName}_entity${i}`);
+        e.arg3 = optivalue(e, "arg3", 0, `${sectorName}_entity${i}`);
+        e.index = level.entities.length;
+
+        level.entities.push(e);
     }
 }
 
@@ -287,6 +329,11 @@ if ("zoom" in descr)
         level.vertices[i].x *= zoom;
         level.vertices[i].y *= zoom;
     }
+    for (var i = 0; i < level.entities.length; i++)
+    {
+        level.entities[i].location.position.x *= zoom;
+        level.entities[i].location.position.y *= zoom;
+    }
     level.playerStart.position.x *= zoom;
     level.playerStart.position.y *= zoom;
 }
@@ -295,4 +342,5 @@ if ("zoom" in descr)
 level.vertexCount = level.vertices.length;
 level.sectorCount = level.sectors.length;
 level.wallCount = level.walls.length;
+level.entityCount = level.entities.length;
 fs.writeFileSync("resources/levels/test.bin", FormatLevel.write(level));
