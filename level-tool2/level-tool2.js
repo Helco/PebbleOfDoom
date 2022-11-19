@@ -28,6 +28,7 @@ const FormatWall = new Format()
     .nest("texStart", FormatVector)
     .nest("texEnd", FormatVector)
     .uint8("color")
+    .uint8("flags")
 
 const FormatLevel = new Format()
     .int32LE("storageVersion")
@@ -40,7 +41,7 @@ const FormatLevel = new Format()
     .listEof("walls", FormatWall);
 
 const level = {
-    storageVersion: 3,
+    storageVersion: 4,
     sectorCount: 1,
     wallCount: 1,
     vertexCount: 2,
@@ -86,7 +87,8 @@ const level = {
                 x: 1,
                 y: 1
             },
-            color: 0xff
+            color: 0xff,
+            flags: 0,
         }
     ]
 };
@@ -158,6 +160,7 @@ const defaultFloorColor = colvalue(descr.defaultFloorColor, "defaultFloorColor")
 const defaultCeilColor = colvalue(descr.defaultCeilColor, "defaultCeilColor");
 
 const portalMap = new Map();
+const cornerMap = new Map();
 
 // First pass, normalize walls
 for (var sectorName in descr.sectors)
@@ -196,23 +199,15 @@ for (var sectorName in descr.sectors)
             level.vertices.push(vertex);
         }
 
-        sector.walls[i] = w = {
-            corner: vertex,
-            startCorner: vertex.index,
-            portalTo: -1,
-            texture: -1,
-            color: 0xff,
-            texStart: {
-                x: 0,
-                y: 0
-            },
-            texEnd: {
-                x: 1,
-                y: 1
-            },
-            index: sector.wallOffset + i
-        };
-
+        w.corner = vertex;
+        w.startCorner = vertex.index;
+        w.portalTo = -1;
+        w.texture = -1;
+        w.color = 0xff;
+        w.texStart = { x: 0, y: 0 };
+        w.texEnd = { x: 1, y: 1 };
+        w.index = sector.wallOffset + i;
+        sector.walls[i] = w;
         level.walls.push(w);
     }
 
@@ -256,15 +251,24 @@ for (var sectorName in descr.sectors)
         }
         
         if (!("contourLeft" in w)) w.contourLeft = true;
+        if (!("contourLeftPortal" in w)) w.contourLeftPortal = true;
+        if (!("contourRight" in w)) w.contourRight = false;
+        if (!("contourRightPortal" in w)) w.contourRightPortal = false;
         if (!("contourTop" in w)) w.contourTop = defContourTop;
+        if (!("contourTopPortal" in w)) w.contourTopPortal = defContourTop;
         if (!("contourBottom" in w)) w.contourBottom = defContourBottom;
+        if (!("contourBottomPortal" in w)) w.contourBottomPortal = defContourBottom;
         if (!("breakable" in w)) w.breakable = false;
 
         w.flags = 0 |
-            (w.contourLeft ? (1 << 0) : 0) |
-            (w.contourTop ? (1 << 1) : 0) |
-            (w.contourBottom ? (1 << 2) : 0) |
-            (w.breakable ? (1 << 3) : 0);
+            (w.contourLeft          ? (1 << 0) : 0) |
+            (w.contourLeftPortal    ? (1 << 1) : 0) |
+            (w.contourRight         ? (1 << 2) : 0) |
+            (w.contourRightPortal   ? (1 << 3) : 0) |
+            (w.contourTop           ? (1 << 4) : 0) |
+            (w.contourTopPortal     ? (1 << 5) : 0) |
+            (w.contourBottom        ? (1 << 6) : 0) |
+            (w.contourBottomPortal  ? (1 << 7) : 0);
     }
 }
 

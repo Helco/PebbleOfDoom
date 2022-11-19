@@ -133,7 +133,7 @@ static const OptionsSpecification pbllevelconvert_spec = {
 void pbllevelconvert_writeLevel(const Level* level, FILE* output)
 {
     StoredLevel storedLevel = {
-        .storageVersion = LEVEL_STORAGE_VERSION,
+        .storageVersion = LEVEL_STORAGE_VERSION_V3,
         .sectorCount = level->sectorCount,
         .vertexCount = level->vertexCount,
         .playerStart = pbllevelconvert_convertLocation(level->playerStart),

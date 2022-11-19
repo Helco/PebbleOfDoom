@@ -30,17 +30,20 @@ sectors:
     ceilColor: 3,0,0
     walls:
       - v1
-      - v2
+      - corner: v2
+        contourLeft: false
       - v0
 
   north:
-    y: -5
-    h: 30
+    y: -10
+    h: 35
     walls:
-      - v0
+      - corner: v0
       - v3
-      - v4
-      - v1
+      - corner: v4
+        contourLeft: false
+      - corner: v1
+        contourLeftPortal: false
 
   right:
     y: 0
@@ -54,6 +57,8 @@ sectors:
     y: 0
     h: 25
     walls:
-      - v4
-      - v6
-      - v1
+      - corner: v4
+      - corner: v6
+        contourLeft: false
+      - corner: v1
+        contourLeft: false

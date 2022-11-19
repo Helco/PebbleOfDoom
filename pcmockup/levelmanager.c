@@ -144,8 +144,8 @@ bool prv_convert_sector(Sector* sector, FILE* fp)
 
 bool prv_convert_wall(Wall* wall, FILE* fp)
 {
-    StoredWall storedWall;
-    if (fread(&storedWall, sizeof(StoredWall), 1, fp) != 1) {
+    StoredWallV4 storedWall;
+    if (fread(&storedWall, sizeof(StoredWallV4), 1, fp) != 1) {
         APP_LOG(APP_LOG_LEVEL_ERROR, "Could not read level wall");
         return false;
     }
@@ -155,6 +155,7 @@ bool prv_convert_wall(Wall* wall, FILE* fp)
     wall->texture = storedWall.texture;
     wall->texCoord = prv_convert_texCoord(storedWall.texCoord);
     wall->color = prv_convert_color(storedWall.color);
+    wall->flags = storedWall.flags;
     return true;
 }
 
@@ -166,8 +167,8 @@ bool levelManager_loadLevel(Level* level, FILE* fp)
         return false;
     }
 
-    if (storedLevel.storageVersion != LEVEL_STORAGE_VERSION) {
-        APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown level storage version %d (should be %d)", storedLevel.storageVersion, LEVEL_STORAGE_VERSION);
+    if (storedLevel.storageVersion != LEVEL_STORAGE_VERSION_V4) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown level storage version %d (should be %d)", storedLevel.storageVersion, LEVEL_STORAGE_VERSION_V4);
         return NULL;
     }
 

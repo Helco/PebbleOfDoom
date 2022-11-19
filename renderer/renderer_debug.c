@@ -162,7 +162,7 @@ bool igcLocation(Location* location)
 void renderer_debug_cameraOptions(Renderer* me, ImGuiWindowFlags* flags, const void* userdata)
 {
     UNUSED(flags, userdata);
-    igcSliderReal("Eye Height", &me->eyeHeight, 0.0f, 20.0f);
+    igcSliderReal("Eye Height", &me->eyeHeight, -20.0f, 20.0f);
 
     real_t fovDeg = real_radToDeg(me->fov);
     if (igcSliderReal("Field of View", &fovDeg, 1.0f, 179.0f))

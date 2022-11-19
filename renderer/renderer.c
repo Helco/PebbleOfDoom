@@ -270,6 +270,17 @@ void renderer_renderContourSpan(Renderer* me, RendererTarget target, int x, int 
     }
 }
 
+void renderer_renderNonPortalContour(Renderer* me, RendererTarget target, int x,
+    int portalNomLow, int portalNomHigh, int sectorHeight,
+    int drawLow, int drawHigh)
+{
+    const int portalDrawLow = lerpi(portalNomLow, 0, sectorHeight, drawLow, drawHigh);
+    const int portalDrawHigh = lerpi(portalNomHigh, 0, sectorHeight, drawLow, drawHigh);
+
+    renderer_renderContourSpan(me, target, x, drawLow, portalDrawLow);
+    renderer_renderContourSpan(me, target, x, portalDrawHigh, drawHigh);
+}
+
 void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest* request, int wallIndex)
 {
     const Sector* const sector = request->sector;
@@ -324,10 +335,20 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
         renderRight, lerpi(renderRight, p.left.x, p.right.x, p.left.yEnd, p.right.yEnd));
 
     // render wall side contours
-    if (renderLeft == p.left.x && !isWallStartBehind)
-        renderer_renderContourSpan(me, target, renderLeft, lowerIt.y0, upperIt.y0);
-    if (renderRight == p.right.x && !isWallEndBehind)
-        renderer_renderContourSpan(me, target, renderRight, lowerIt.y1, upperIt.y1);
+    if (renderLeft == p.left.x && !isWallStartBehind && (wall->flags & WALL_CONTOUR_LEFT))
+    {
+        if (wall->portalTo < 0 || wall->flags & WALL_CONTOUR_LEFTPORTAL)
+            renderer_renderContourSpan(me, target, renderLeft, lowerIt.y0, upperIt.y0);
+        else
+            renderer_renderNonPortalContour(me, target, renderLeft, portalNomStart, portalNomEnd, sector->height, lowerIt.y0, upperIt.y0);
+    }
+    if (renderRight == p.right.x && !isWallEndBehind && (wall->flags & WALL_CONTOUR_RIGHT))
+    {
+        if (wall->portalTo < 0 || wall->flags & WALL_CONTOUR_RIGHTPORTAL)
+            renderer_renderContourSpan(me, target, renderRight, lowerIt.y1, upperIt.y1);
+        else
+            renderer_renderNonPortalContour(me, target, renderRight, portalNomStart, portalNomEnd, sector->height, lowerIt.y1, upperIt.y1);
+    }
 
     // render wall spans
     BresenhamStep upperStep, lowerStep;
@@ -338,11 +359,13 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
 
         do {
             upperStep = bresenham_step(&upperIt);
-            renderer_renderContourSpan(me, target, x, upperIt.y0, upperIt.y0);
+            if (wall->flags & WALL_CONTOUR_TOP)
+                renderer_renderContourSpan(me, target, x, upperIt.y0, upperIt.y0);
         } while (upperStep != BRESENHAMSTEP_X && upperStep != BRESENHAMSTEP_NONE);
         do {
             lowerStep = bresenham_step(&lowerIt);
-            renderer_renderContourSpan(me, target, x, lowerIt.y0, lowerIt.y0);
+            if (wall->flags & WALL_CONTOUR_BOTTOM)
+                renderer_renderContourSpan(me, target, x, lowerIt.y0, lowerIt.y0);
         } while (lowerStep != BRESENHAMSTEP_X && lowerStep != BRESENHAMSTEP_NONE);
         assert(upperIt.x0 == lowerIt.x0);
 
@@ -352,8 +375,10 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
             yPortalEnd = lerpi(portalNomEnd, 0, sector->height, lowerIt.y0, upperIt.y0);
             nextBoundary->yTop[x] = clampi(yBottom, yPortalEnd, yTop);
 
-            renderer_renderContourSpan(me, target, x, yPortalStart, yPortalStart);
-            renderer_renderContourSpan(me, target, x, yPortalEnd, yPortalEnd);
+            if (wall->flags & WALL_CONTOUR_BOTTOMPORTAL)
+                renderer_renderContourSpan(me, target, x, yPortalStart, yPortalStart);
+            if (wall->flags & WALL_CONTOUR_TOPPORTAL)
+                renderer_renderContourSpan(me, target, x, yPortalEnd, yPortalEnd);
         }
 
         me->wallBoundaries.yBottom[x] = max(yBottom, lowerIt.y0);

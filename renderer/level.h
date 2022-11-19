@@ -9,6 +9,18 @@
 
 typedef int LevelId;
 typedef void* LevelManagerHandle;
+typedef uint8_t WallFlags;
+
+enum WallFlags_ {
+    WALL_CONTOUR_LEFT           = (1 << 0),
+    WALL_CONTOUR_LEFTPORTAL     = (1 << 1),
+    WALL_CONTOUR_RIGHT          = (1 << 2),
+    WALL_CONTOUR_RIGHTPORTAL    = (1 << 3),
+    WALL_CONTOUR_TOP            = (1 << 4),
+    WALL_CONTOUR_TOPPORTAL      = (1 << 5),
+    WALL_CONTOUR_BOTTOM         = (1 << 6),
+    WALL_CONTOUR_BOTTOMPORTAL   = (1 << 7)
+};
 
 typedef struct TexCoord {
     xy_t start, end;
@@ -27,6 +39,7 @@ typedef struct Wall {
     TextureId texture;
     TexCoord texCoord;
     GColor color;
+    WallFlags flags;
 } Wall;
 
 typedef struct Sector {
