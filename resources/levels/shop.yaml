@@ -1,0 +1,85 @@
+zoom: 3
+
+defaultFloorColor: 2,2,2
+defaultCeilColor: 0,0,0
+
+vars:
+  entBook: 0
+  entItemOffer: 1
+  entMonster: 2
+  entShopkeeper: 3
+  entTechpriest: 4
+  size: 40
+  counterSize: 8
+  counterHeight: 13
+  doorWidth: 8
+  doorDepth: 2
+  doorHeight: 25
+  h: 40
+
+vertices:
+  baseLL: 0, 0
+  baseRL: size, 0
+  baseLH: 0, size
+  baseRH: size, size
+  counterLL: counterSize, 0
+  counterRL: counterSize*2, 0
+  counterLH: counterSize, size
+  counterRH: counterSize*2, size
+  doorLL: size, size/2-doorWidth/2
+  doorRL: size+doorDepth, size/2-doorWidth/2
+  doorLH: size, size/2+doorWidth/2
+  doorRH: size+doorDepth, size/2+doorWidth/2
+
+playerStart:
+  sector: base
+  position: size-doorDepth, size/2
+  angle: -1.5
+
+sectors:
+  behind:
+    y: 0
+    h: h
+    walls:
+      - counterLH
+      - baseLH
+      - baseLL
+      - counterLL
+
+  counter:
+    y: counterHeight
+    h: h - counterHeight
+    walls:
+      - counterRH
+      - counterLH
+      - counterLL
+      - counterRL
+    entities:
+      - type: entShopkeeper
+        position: counterSize * 1.5, size/2
+      - type: entItemOffer
+        position: counterSize * 1.3, size/8
+        arg1: 0
+      - type: entItemOffer
+        position: counterSize * 1.3, size/8*7
+        arg1: 1
+
+  base:
+    y: 0
+    h: h
+    walls:
+      - baseRH
+      - counterRH
+      - counterRL
+      - baseRL
+      - doorLL
+      - doorLH
+
+  door:
+    y: 0
+    h: doorHeight
+    walls:
+      - doorRH
+      - doorLH
+      - doorLL
+      - doorRL

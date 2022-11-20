@@ -40,7 +40,7 @@ typedef struct Player
     PlayerAction activeAction;
     bool isWalking, isTurningLeft, isTurningRight;
     bool hasKey, hasBattery, hadDoneTutorial, hasEnteredCave, hasSpokenToPriest, hasGotClue;
-    bool priestHasSeenBattery;
+    bool priestHasSeenBattery, hasSpokenToShopKeeper, shopKeeperTold;
 } Player;
 
 typedef struct Menu
@@ -155,6 +155,12 @@ void monster_dtor(SEGame* game, EntityData* data);
 
 void techpriest_init(SEGame* game, EntityData* data);
 void techpriest_act(SEGame* game, EntityData* data);
+
+void shopkeeper_init(SEGame* game, EntityData* data);
+void shopkeeper_act(SEGame* game, EntityData* data);
+
+void itemoffer_init(SEGame* game, EntityData* data);
+void itemoffer_act(SEGame* game, EntityData* data);
 
 void segame_input_select_click(SEGame* me);
 void segame_input_select_long_click(SEGame* me);

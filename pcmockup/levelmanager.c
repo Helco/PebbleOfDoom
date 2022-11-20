@@ -193,6 +193,7 @@ bool prv_convert_entity(Entity* entity, FILE* fp)
     entity->arg1 = storedEntity.arg1;
     entity->arg2 = storedEntity.arg2;
     entity->arg3 = storedEntity.arg3;
+    entity->radius = 15;
     return true;
 }
 

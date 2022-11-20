@@ -103,6 +103,7 @@ size_t prv_convert_entity(Entity* entity, ResHandle handle, size_t offset)
     entity->arg1 = storedEntity.arg1;
     entity->arg2 = storedEntity.arg2;
     entity->arg3 = storedEntity.arg3;
+    entity->radius = 15;
     return offset + sizeof(StoredEntity);
 }
 

@@ -49,6 +49,7 @@ typedef struct Entity {
     uint8_t arg1;
     uint8_t arg2;
     uint8_t arg3;
+    int radius;
 } Entity;
 
 typedef struct Sector {

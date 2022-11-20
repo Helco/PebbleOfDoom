@@ -250,13 +250,13 @@ void techpriest_init(SEGame* game, EntityData* data)
 
 void techpriest_act(SEGame* game, EntityData* data)
 {
-    menu_reset(&game->menu);
     if (!game->player.hasSpokenToPriest)
     {
         game->menu.lines = techpriest_lines_new;
         game->menu.lineI = -1;
         menu_cb_babble_lines(game, -1);
         game->player.hasSpokenToPriest = true;
+        game->player.gold += 5;
     }
     else if (!game->player.hasKey)
     {
@@ -297,4 +297,121 @@ void techpriest_act(SEGame* game, EntityData* data)
         game->menu.callback = menu_cb_just_close;
         data->techpriest.noProgressLine = (data->techpriest.noProgressLine + 1) % 3;
     }
+}
+
+const char* const shopkeeper_lines_new[] =
+{
+    "Well hello there, and who are you?",
+    "I am the shopkeeper, I am the only one selling things around here",
+    "Do you want into the caves? Only I have the KEY TO THE CAVES",
+    "And you can buy it. Here. If you have the gold. Three gold.",
+    NULL
+};
+
+const char* const shopkeeper_lines_random[] =
+{
+    "Well, are you already back? Too scared of the caves?",
+    "Don't just stand there, buy something if you are already here.",
+    "Has the priest also send you on the quest? You are just like the rest, hehehe..."
+};
+
+void shopkeeper_init(SEGame* game, EntityData* data)
+{
+    UNUSED(game);
+    data->actionDistanceSqr = real_from_int(30 * 30);
+    data->playerAction = PLAYERACT_SPEAK;
+    data->entity->sprite = RESOURCE_ID_SPR_SHOPKEEPER;
+    data->entity->radius = 10;
+}
+
+void shopkeeper_act(SEGame* game, EntityData* data)
+{
+    UNUSED(data);
+    if (!game->player.hasSpokenToShopKeeper)
+    {
+        game->player.hasSpokenToShopKeeper = true;
+        game->menu.lines = shopkeeper_lines_new;
+        game->menu.lineI = -1;
+    }
+    else if (!game->player.hasSpokenToPriest)
+    {
+        menu_reset(&game->menu);
+        game->menu.text = "Well I don't have any work for you, but maybe the priest in the cathedral?";
+        game->menu.callback = menu_cb_just_close;
+    }
+    else if (!game->player.hasKey && !game->player.hasEnteredCave)
+    {
+        menu_reset(&game->menu);
+        game->menu.text = "Sure you can buy the key, here you go.\nHave fun, don't let the grumpy watches bite you";
+        game->menu.callback = menu_cb_just_close;
+        game->player.hasKey = true;
+        game->player.gold -= 3;
+    }
+    else if (game->player.hasKey && !game->player.hasEnteredCave)
+    {
+        menu_reset(&game->menu);
+        game->menu.text = "Well go on if you will. And if you don't make it, could you return the key?";
+        game->menu.callback = menu_cb_just_close;
+    }
+    else
+    {
+        menu_reset(&game->menu);
+        game->menu.text = shopkeeper_lines_random[rand() % 3];
+        game->menu.callback = menu_cb_just_close;
+    }
+}
+
+void itemoffer_init(SEGame* game, EntityData* data)
+{
+    UNUSED(game);
+    data->actionDistanceSqr = real_from_int(30 * 30);
+    data->playerAction = PLAYERACT_SPEAK;
+    data->entity->sprite = data->entity->arg1 == 0 ? RESOURCE_ID_SPR_BATTERY : RESOURCE_ID_SPR_HEART;
+    data->entity->radius = 12;
+}
+
+static int activatedItem = 0;
+
+void itemoffer_menu_result(SEGame* game, int button)
+{
+    int price = activatedItem == 0 ? 10 : 5;
+    if (button == 0 && game->player.gold >= price)
+    {
+        game->player.gold -= price;
+        menu_reset(&game->menu);
+        game->menu.text = "Here you go.";
+        game->menu.callback = menu_cb_just_close;
+    }
+    else if (button == 0 && game->player.gold < price)
+    {
+        menu_reset(&game->menu);
+        game->menu.text = "You don't have enough gold. Come back when you are less poor";
+        game->menu.callback = menu_cb_just_close;
+    }
+    else if (button == 1)
+    {
+        game->isPaused = false;
+    }
+}
+
+void itemoffer_menu_confirm(SEGame* game, int button)
+{
+    UNUSED(button);
+    menu_reset(&game->menu);
+    game->menu.text = activatedItem == 0
+        ? "Want to buy the battery for\n10 Gold?"
+        : "Want to buy the Heart for\n5 Gold?";
+    game->menu.buttons[0] = "Yes";
+    game->menu.buttons[1] = "No";
+    game->menu.callback = itemoffer_menu_result;
+}
+
+void itemoffer_act(SEGame* game, EntityData* data)
+{
+    activatedItem = data->entity->arg1;
+    menu_reset(&game->menu);
+    game->menu.text = activatedItem == 0
+        ? "A battery.\nGood against all machines that have just run out of juice."
+        : "A heart.\nIf one is good, why not have two?";
+    game->menu.callback = itemoffer_menu_confirm;
 }

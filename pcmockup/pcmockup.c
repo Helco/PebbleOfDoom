@@ -88,7 +88,12 @@ PCMockup *pcmockup_init()
         textureManager_registerSpriteFile(me->textureManager, "spr_ptr_push.png", RESOURCE_ID_SPR_PTR_PUSH) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "spr_ptr_dead.png", RESOURCE_ID_SPR_PTR_DEAD) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "spr_pt2.png", RESOURCE_ID_SPR_PT2) == INVALID_SPRITE_ID ||
-        textureManager_registerSpriteFile(me->textureManager, "spr_techpriest.png", RESOURCE_ID_SPR_TECHPRIEST) == INVALID_SPRITE_ID)
+        textureManager_registerSpriteFile(me->textureManager, "spr_techpriest.png", RESOURCE_ID_SPR_TECHPRIEST) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "spr_techpriest_angery.png", RESOURCE_ID_SPR_TECHPRIEST_ANGERY) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "spr_techpriest_pushed.png", RESOURCE_ID_SPR_TECHPRIEST_PUSHED) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "spr_techpriest_dead.png", RESOURCE_ID_SPR_TECHPRIEST_DEAD) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "spr_shopkeeper.png", RESOURCE_ID_SPR_SHOPKEEPER) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "spr_battery.png", RESOURCE_ID_SPR_BATTERY) == INVALID_SPRITE_ID)
     {
         pcmockup_free(me);
         return NULL;
@@ -100,7 +105,8 @@ PCMockup *pcmockup_init()
     texgen_execute(texgenctx);
 
     if (levelManager_registerFile(me->levelManager, "test.bin", RESOURCE_ID_LVL_HOME) == INVALID_LEVEL_ID ||
-        levelManager_registerFile(me->levelManager, "cathedral.bin", RESOURCE_ID_LVL_CATHEDRAL) == INVALID_LEVEL_ID)
+        levelManager_registerFile(me->levelManager, "cathedral.bin", RESOURCE_ID_LVL_CATHEDRAL) == INVALID_LEVEL_ID ||
+        levelManager_registerFile(me->levelManager, "shop.bin", RESOURCE_ID_LVL_SHOP) == INVALID_LEVEL_ID)
     {
         pcmockup_free(me);
         return NULL;

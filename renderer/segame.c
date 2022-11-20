@@ -11,6 +11,10 @@ static const EntityBrain EntityBrains[] = {
         .init = book_init,
         .playerAction = book_act
     },
+    [ENTITY_ITEM_OFFER] = {
+        .init = itemoffer_init,
+        .playerAction = itemoffer_act
+    },
     [ENTITY_MONSTER] = {
         .init = monster_init,
         .playerAction = monster_act,
@@ -20,6 +24,10 @@ static const EntityBrain EntityBrains[] = {
     [ENTITY_TECHPRIEST] = {
         .init = techpriest_init,
         .playerAction = techpriest_act
+    },
+    [ENTITY_SHOPKEEPER] = {
+        .init = shopkeeper_init,
+        .playerAction = shopkeeper_act
     }
 };
 
@@ -75,7 +83,7 @@ SEGame* segame_init(SEGame* me, Renderer* renderer, LevelManagerHandle levelMana
     me->iconPlayerActions[PLAYERACT_KEY] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
     me->iconPlayerActions[PLAYERACT_SPEAK] = sprite_load(textureManager, RESOURCE_ID_ICON_SPEAK);
 
-    segame_changeLevel(me, RESOURCE_ID_LVL_CATHEDRAL);
+    segame_changeLevel(me, RESOURCE_ID_LVL_SHOP);
     return me;
 }
 
