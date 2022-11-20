@@ -42,7 +42,7 @@ void sprite_free(TextureManagerHandle manager, const Sprite* sprite)
 const Level* level_load(LevelManagerHandle manager, LevelId id)
 {
     LevelManager* levelManager = (LevelManager*)manager;
-    return levelManager_getLevelByIndex(levelManager, (int)id);
+    return levelManager_getLevelById(levelManager, id);
 }
 
 void level_free(LevelManagerHandle manager, const Level* level)

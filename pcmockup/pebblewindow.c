@@ -16,6 +16,7 @@ struct PebbleWindow
     GSize pebbleSize;
     RendererColorFormat format;
     SEGame game;
+    int startSelectDown;
 };
 
 void pebbleWindow_free(void* userdata);
@@ -23,7 +24,7 @@ void pebbleWindow_contentUpdate(void* userdata);
 void pebbleWindow_onKeyDown(SDL_Keysym sym, void* userdata);
 void pebbleWindow_onKeyUp(SDL_Keysym sym, void* userdata);
 
-PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GSize pebbleSize, RendererColorFormat format, Renderer* renderer)
+PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GSize pebbleSize, RendererColorFormat format, Renderer* renderer, LevelManagerHandle levelManager)
 {
     PebbleWindow* me = (PebbleWindow*)malloc(sizeof(PebbleWindow));
     if (me == NULL)
@@ -68,7 +69,7 @@ PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GS
         return NULL;
     }
 
-    segame_init(&me->game, renderer);
+    segame_init(&me->game, renderer, levelManager);
 
     me->pebbleSize = pebbleSize;
     me->format = format;
@@ -160,6 +161,12 @@ void pebbleWindow_contentUpdate(void* userdata)
 {
     PebbleWindow* me = (PebbleWindow*)userdata;
 
+    if (me->startSelectDown > 0 && SDL_GetTicks() - me->startSelectDown > 500)
+    {
+        me->startSelectDown = -1;
+        segame_input_select_long_click(&me->game);
+    }
+
     segame_update(&me->game);
 
     safeFramebuffer_prepare(me->framebuffer);
@@ -179,6 +186,7 @@ void pebbleWindow_onKeyDown(SDL_Keysym sym, void* userdata)
     PebbleWindow* me = (PebbleWindow*)userdata;
     switch(sym.sym)
     {
+    case(SDLK_i): if (me->startSelectDown == 0) me->startSelectDown = SDL_GetTicks(); break;
     case (SDLK_u): segame_input_direction_raw(&me->game, false, true); break;
     case (SDLK_o): segame_input_direction_raw(&me->game, true, true); break;
 
@@ -217,7 +225,9 @@ void pebbleWindow_onKeyUp(SDL_Keysym sym, void* userdata)
         segame_input_direction_click(&me->game, true);
         break;
     case (SDLK_i):
-        segame_input_select_click(&me->game);
+        if (me->startSelectDown > 0)
+            segame_input_select_click(&me->game);
+        me->startSelectDown = 0;
         break;
     case (SDLK_k):
         segame_input_back_click(&me->game);

@@ -46,7 +46,8 @@ sectors:
         contourLeftPortal: false
     entities:
       - position: 40, 65
-        sprite: 1
+        type: 0
+        y: 5
 
   right:
     y: 0

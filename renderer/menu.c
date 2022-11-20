@@ -55,3 +55,9 @@ void menu_back(Menu* menu)
     assert(menu->callback != NULL);
     menu->callback(menu->game, -1);
 }
+
+void menu_cb_just_close(SEGame* game, int button)
+{
+    UNUSED(button);
+    game->isPaused = false;
+}

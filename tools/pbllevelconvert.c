@@ -180,7 +180,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    LevelId levelId = levelManager_registerFile(levelManager, context.inputFilename);
+    LevelId levelId = levelManager_registerFile(levelManager, context.inputFilename, 0);
     if (levelId == INVALID_LEVEL_ID) {
         fputs("Could not load level.", stderr);
         return -1;

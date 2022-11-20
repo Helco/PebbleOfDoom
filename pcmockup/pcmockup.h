@@ -42,7 +42,7 @@ void safeFramebuffer_prepare(SafeFramebuffer* me);
 void safeFramebuffer_check(SafeFramebuffer* me);
 
 typedef struct PebbleWindow PebbleWindow;
-PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GSize pebbleSize, RendererColorFormat format, Renderer* renderer);
+PebbleWindow* pebbleWindow_init(WindowContainer* parent, GRect initialBounds, GSize pebbleSize, RendererColorFormat format, Renderer* renderer, LevelManagerHandle levelManager);
 ImageWindow* pebbleWindow_asImageWindow(PebbleWindow* window);
 #define PebbleWindow_Tag FOURCC('P', 'E', 'B', 'B')
 

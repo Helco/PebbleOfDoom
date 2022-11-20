@@ -9,6 +9,7 @@
 typedef struct LoadedLevel
 {
     Level level;
+    LevelId id;
     char* source;
 } LoadedLevel;
 
@@ -72,6 +73,17 @@ const Level* levelManager_getLevelByIndex(LevelManager* me, int index)
     assert(me != NULL);
     assert(index >= 0 && index < me->count);
     return &me->levels[index].level;
+}
+
+const Level* levelManager_getLevelById(LevelManager* me, LevelId id)
+{
+    for (int i = 0; i < me->count; i++)
+    {
+        if (me->levels[i].id == id)
+            return &me->levels[i].level;
+    }
+    assert(false && "Invalid level id");
+    return NULL;
 }
 
 #include "levelstorage.h"
@@ -234,7 +246,7 @@ bool levelManager_loadLevel(Level* level, FILE* fp)
     return true;
 }
 
-LevelId levelManager_registerFile(LevelManager* me, const char* filename)
+LevelId levelManager_registerFile(LevelManager* me, const char* filename, LevelId id)
 {
     assert(me != NULL && filename != NULL);
     char filenameBuffer[512];
@@ -255,13 +267,14 @@ LevelId levelManager_registerFile(LevelManager* me, const char* filename)
         me->levels = (LoadedLevel*)realloc(me->levels, sizeof(LoadedLevel) * me->capacity);
         assert(me->levels != NULL);
     }
-    LevelId levelId = me->count;
-    LoadedLevel* loadedLevel = &me->levels[levelId];
+    int levelIndex = me->count;
+    LoadedLevel* loadedLevel = &me->levels[levelIndex];
+    loadedLevel->id = id;
     loadedLevel->source = strdup(filename);
     if (!levelManager_loadLevel(&loadedLevel->level, file))
         return INVALID_LEVEL_ID;
     fclose(file);
 
     me->count++;
-    return levelId;
+    return id;
 }

@@ -87,13 +87,11 @@ PCMockup *pcmockup_init()
     texgen_setSize(texgenctx, 64);
     texgen_execute(texgenctx);
 
-    if (levelManager_registerFile(me->levelManager, "test.bin") == INVALID_LEVEL_ID)
+    if (levelManager_registerFile(me->levelManager, "test.bin", RESOURCE_ID_LVL_HOME) == INVALID_LEVEL_ID)
     {
         pcmockup_free(me);
         return NULL;
     }
-    me->level = levelManager_getLevelByIndex(me->levelManager, 0);
-    renderer_setLevel(me->renderer, me->level);
 
     me->windowContainer = windowContainer_init(WINDOW_START_SIZE);
     if (me->windowContainer == NULL)
@@ -113,7 +111,8 @@ PCMockup *pcmockup_init()
         windowGrid_getSingleBounds(&windowGrid, 0),
         GSize(RENDERER_WIDTH, SCREEN_HEIGHT),
         RendererColorFormat_1BitBW,
-        me->renderer
+        me->renderer,
+        me->levelManager
     );
     if (pebbleWindow == NULL)
     {
