@@ -7,6 +7,7 @@ static Level loadedLevel;
 static Sector* sectors = NULL;
 static Wall* walls = NULL;
 static xz_t* vertices = NULL;
+static Entity* entities = NULL;
 
 GColor prv_convert_color(StoredGColor g)
 {
@@ -55,10 +56,10 @@ size_t prv_convert_vertex(xz_t* vertex, ResHandle handle, size_t offset)
 
 size_t prv_convert_wall(Wall* wall, ResHandle handle, size_t offset)
 {
-    StoredWall storedWall;
-    if (resource_load_byte_range(handle, offset, (uint8_t*)&storedWall, sizeof(StoredWall)) != sizeof(StoredWall)) {
+    StoredWallV4 storedWall;
+    if (resource_load_byte_range(handle, offset, (uint8_t*)&storedWall, sizeof(StoredWallV4)) != sizeof(StoredWallV4)) {
         APP_LOG(APP_LOG_LEVEL_ERROR, "Could not read level wall");
-        return offset + sizeof(StoredWall);
+        return offset + sizeof(StoredWallV4);
     }
 
     wall->portalTo = storedWall.portalTo;
@@ -66,7 +67,8 @@ size_t prv_convert_wall(Wall* wall, ResHandle handle, size_t offset)
     wall->texture = storedWall.texture;
     wall->texCoord = prv_convert_texCoord(storedWall.texCoord);
     wall->color = prv_convert_color(storedWall.color);
-    return offset + sizeof(StoredWall);
+    wall->flags = storedWall.flags;
+    return offset + sizeof(StoredWallV4);
 }
 
 size_t prv_convert_sector(Sector* sector, ResHandle handle, size_t offset)
@@ -79,11 +81,29 @@ size_t prv_convert_sector(Sector* sector, ResHandle handle, size_t offset)
 
     sector->walls = walls + storedSector.wallOffset;
     sector->wallCount = storedSector.wallCount;
+    sector->entityCount = storedSector.entityCount;
     sector->height = storedSector.height;
     sector->heightOffset = storedSector.heightOffset;
     sector->floorColor = prv_convert_color(storedSector.floorColor);
     sector->ceilColor = prv_convert_color(storedSector.ceilColor);
     return offset + sizeof(StoredSector);
+}
+
+size_t prv_convert_entity(Entity* entity, ResHandle handle, size_t offset)
+{
+    StoredEntity storedEntity;
+    if (resource_load_byte_range(handle, offset, (uint8_t*)&storedEntity, sizeof(StoredEntity)) != sizeof(StoredEntity)) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not read level entity");
+        return offset + sizeof(StoredEntity);
+    }
+
+    entity->location = prv_convert_location(storedEntity.location);
+    entity->sprite = storedEntity.sprite;
+    entity->type = storedEntity.type;
+    entity->arg1 = storedEntity.arg1;
+    entity->arg2 = storedEntity.arg2;
+    entity->arg3 = storedEntity.arg3;
+    return offset + sizeof(StoredEntity);
 }
 
 LevelId loadLevelFromResource(uint32_t resourceId)
@@ -116,16 +136,17 @@ const Level* level_load(LevelManagerHandle lvlManager, LevelId id)
     }
     offset += sizeof(storedLevel);
 
-    if (storedLevel.storageVersion != LEVEL_STORAGE_VERSION) {
-        APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown level storage version %d (should be %d)", storedLevel.storageVersion, LEVEL_STORAGE_VERSION);
+    if (storedLevel.storageVersion != LEVEL_STORAGE_VERSION_V4) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown level storage version %d (should be %d)", storedLevel.storageVersion, LEVEL_STORAGE_VERSION_V4);
         return NULL;
     }
 
     sectors = (Sector*)malloc(sizeof(Sector) * storedLevel.sectorCount);
     walls = (Wall*)malloc(sizeof(Wall) * storedLevel.totalWallCount);
     vertices = (xz_t*)malloc(sizeof(xz_t) * storedLevel.vertexCount);
-    if (sectors == NULL || walls == NULL || vertices == NULL) {
-        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not allocate %d sectors, %d walls and %d vertices", storedLevel.sectorCount, storedLevel.totalWallCount, storedLevel.vertexCount);
+    entities = (Entity*)malloc(sizeof(Entity) * storedLevel.totalEntityCount);
+    if (sectors == NULL || walls == NULL || vertices == NULL || entities == NULL) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Could not allocate %d sectors, %d walls and %d vertices and %d entities", storedLevel.sectorCount, storedLevel.totalWallCount, storedLevel.vertexCount, storedLevel.totalEntityCount);
         return NULL;
     }
 
@@ -144,6 +165,16 @@ const Level* level_load(LevelManagerHandle lvlManager, LevelId id)
 
     for (int i = 0; i < storedLevel.totalWallCount; i++)
         offset = prv_convert_wall(walls + i, handle, offset);
+
+    for (int i = 0; i < storedLevel.totalEntityCount; i++)
+        offset = prv_convert_entity(entities + i, handle, offset);
+
+    int off = 0;
+    for (int i = 0; i < storedLevel.sectorCount; i++)
+    {
+        sectors[i].entities = entities + off;
+        off += sectors[i].entityCount;
+    }
 
     return &loadedLevel;
 }

@@ -214,7 +214,7 @@ TextureId textureManager_registerFile(TextureManager* me, const char* filename)
     return loadedTex->texture.id;
 }
 
-SpriteId textureManager_registerSpriteFile(TextureManager* me, const char* filename)
+SpriteId textureManager_registerSpriteFile(TextureManager* me, const char* filename, SpriteId id)
 {
     static char pathBuffer[TEXTURE_PATH_SIZE];
     snprintf(pathBuffer, TEXTURE_PATH_SIZE, TEXTURE_PATH "%s", filename);
@@ -254,6 +254,7 @@ SpriteId textureManager_registerSpriteFile(TextureManager* me, const char* filen
     loadedSprite->sprite.bytesPerRow = bytesPerRow;
     loadedSprite->sprite.bw = bw;
     loadedSprite->sprite.alpha = alpha;
+    loadedSprite->sprite.id = id;
     loadedSprite->source = strdup(filename);
     return loadedSprite->sprite.id;
 }
@@ -268,8 +269,17 @@ const Texture* textureManager_loadTexture(TextureManager* me, TextureId id)
 
 const Sprite* textureManager_loadSprite(TextureManager* me, SpriteId id)
 {
-    assert(id >= 0 && id < me->spriteCount && "Tried to load invalid sprite id");
-    LoadedSprite* loadedSprite = &me->sprites[id];
+    LoadedSprite* loadedSprite = NULL;
+    for (int i = 0; i < me->spriteCount; i++)
+    {
+        if (me->sprites[i].sprite.id == id)
+        {
+            loadedSprite = me->sprites + i;
+            break;
+        }
+    }
+
+    assert(loadedSprite != NULL && "Tried to load invalid sprite id");
     loadedSprite->referenceCount++;
     return &loadedSprite->sprite;
 }
@@ -311,9 +321,17 @@ void textureManager_freeTexture(TextureManager* me, const Texture* texture)
 
 void textureManager_freeSprite(TextureManager* me, const Sprite* sprite)
 {
-    assert(sprite != NULL && sprite->id >= 0 && sprite->id < me->spriteCount &&
-        "Tried to free invalid sprite");
-    LoadedSprite* loadedSprite = &me->sprites[sprite->id];
+    assert(sprite != NULL && "Tried to free invalid sprite");
+    LoadedSprite* loadedSprite = NULL;
+    for (int i = 0; i < me->spriteCount; i++)
+    {
+        if (me->sprites[i].sprite.id == sprite->id)
+        {
+            loadedSprite = me->sprites + i;
+            break;
+        }
+    }
+    assert(loadedSprite != NULL && "Tried to load invalid sprite id");
     assert(loadedSprite->referenceCount > 0);
     loadedSprite->referenceCount--;
 }

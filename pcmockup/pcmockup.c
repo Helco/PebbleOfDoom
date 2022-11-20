@@ -4,6 +4,7 @@
 #include "renderer.h"
 #include "texgen/texgen.h"
 #include "platform.h"
+#include "resources.h"
 
 static const GSize WINDOW_START_SIZE = { 1024, 768 };
 static const int MAX_FRAMERATE = 60;
@@ -70,12 +71,12 @@ PCMockup *pcmockup_init()
 
     renderer_setTextureManager(me->renderer, me->textureManager);
     if (
-        textureManager_registerSpriteFile(me->textureManager, "spr_book.png") == INVALID_SPRITE_ID ||
-        textureManager_registerSpriteFile(me->textureManager, "icon_digits.png") == INVALID_SPRITE_ID ||
-        textureManager_registerSpriteFile(me->textureManager, "icon_boots.png") == INVALID_SPRITE_ID ||
-        textureManager_registerSpriteFile(me->textureManager, "icon_gold.png") == INVALID_SPRITE_ID ||
-        textureManager_registerSpriteFile(me->textureManager, "spr_heart.png") == INVALID_SPRITE_ID ||
-        textureManager_registerSpriteFile(me->textureManager, "icon_key.png") == INVALID_SPRITE_ID)
+        textureManager_registerSpriteFile(me->textureManager, "spr_book.png", RESOURCE_ID_SPR_BOOK) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "icon_digits.png", RESOURCE_ID_ICON_DIGITS) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "icon_boots.png", RESOURCE_ID_ICON_BOOTS) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "icon_gold.png", RESOURCE_ID_ICON_GOLD) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "spr_heart.png", RESOURCE_ID_SPR_HEART) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "icon_key.png", RESOURCE_ID_ICON_KEY) == INVALID_SPRITE_ID)
     {
         pcmockup_free(me);
         return NULL;

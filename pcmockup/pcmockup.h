@@ -72,7 +72,7 @@ TexGenerationContext* textureManager_getGenerationContext(TextureManager* me, Te
 int textureManager_getTextureCount(TextureManager* me);
 const Texture* textureManager_getTextureByIndex(TextureManager* me, int index);
 const char* textureManager_getTextureSource(TextureManager* me, const Texture* texture);
-SpriteId textureManager_registerSpriteFile(TextureManager* me, const char* filename); // relative to texture folder
+SpriteId textureManager_registerSpriteFile(TextureManager* me, const char* filename, SpriteId id); // relative to texture folder
 const Sprite* textureManager_loadSprite(TextureManager* me, SpriteId id);
 void textureManager_freeSprite(TextureManager* me, const Sprite* sprite);
 

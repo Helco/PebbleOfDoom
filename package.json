@@ -11,8 +11,7 @@
     "sdkVersion": "3",
     "enableMultiJS": true,
     "targetPlatforms": [
-      "basalt",
-      "aplite"
+      "diorite"
     ],
     "watchapp": {
       "watchface": false
@@ -20,60 +19,46 @@
     "messageKeys": [],
     "resources": {
       "media": [
-          {
-              "type": "raw",
-              "name": "LEVEL_TEST",
-              "file": "levels/lobby.bin"
-          },
         {
-            "type": "bitmap",
-            "name": "TEXTURE_BLACKBOARD",
-            "file": "textures/blackboard.png",
-            "memoryFormat": "8Bit",
-            "targetPlatforms": [
-                "basalt",
-                "chalk"
-            ]
+          "type": "bitmap",
+          "name": "SPR_BOOK",
+          "file": "textures/spr_book.png",
+          "memoryFormat": "2BitPalette"
         },
         {
-            "type": "bitmap",
-            "name": "TEXTURE_CANTINA",
-            "file": "textures/cantina.png",
-            "memoryFormat": "8Bit",
-            "targetPlatforms": [
-                "basalt",
-                "chalk"
-            ]
+          "type": "bitmap",
+          "name": "ICON_DIGITS",
+          "file": "textures/icon_digits.png",
+          "memoryFormat": "2BitPalette"
         },
         {
-            "type": "bitmap",
-            "name": "TEXTURE_ELEVATORS",
-            "file": "textures/elevators.png",
-            "memoryFormat": "8Bit",
-            "targetPlatforms": [
-                "basalt",
-                "chalk"
-            ]
+          "type": "bitmap",
+          "name": "ICON_BOOTS",
+          "file": "textures/icon_boots.png",
+          "memoryFormat": "2BitPalette"
         },
         {
-            "type": "bitmap",
-            "name": "TEXTURE_ENTRY",
-            "file": "textures/entry.png",
-            "memoryFormat": "8Bit",
-            "targetPlatforms": [
-                "basalt",
-                "chalk"
-            ]
+          "type": "bitmap",
+          "name": "ICON_GOLD",
+          "file": "textures/icon_gold.png",
+          "memoryFormat": "2BitPalette"
         },
         {
-            "type": "bitmap",
-            "name": "TEXTURE_INFODESK",
-            "file": "textures/info_desk.png",
-            "memoryFormat": "8Bit",
-            "targetPlatforms": [
-                "basalt",
-                "chalk"
-            ]
+          "type": "bitmap",
+          "name": "SPR_HEART",
+          "file": "textures/spr_heart.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_KEY",
+          "file": "textures/icon_key.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "raw",
+          "name": "LEVEL_TEST",
+          "file": "levels/test.bin"
         }
       ]
     }

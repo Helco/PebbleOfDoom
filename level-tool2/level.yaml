@@ -10,7 +10,7 @@ vars:
 
 playerStart:
   sector: startTri
-  position: 1, -15
+  position: 85/3, 200/3
   angle: 1
 
 vertices:
@@ -46,7 +46,7 @@ sectors:
         contourLeftPortal: false
     entities:
       - position: 40, 65
-        sprite: 0
+        sprite: 1
 
   right:
     y: 0
