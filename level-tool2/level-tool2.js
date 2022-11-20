@@ -261,6 +261,8 @@ for (var sectorName in descr.sectors)
         };
         if ("y" in e)
             e.location.height += fvalue(e.y, `${sectorName}_entity${i}_y`);
+        else
+            e.location.height += 5;
         e.sprite = ivalue(e.sprite, `${sectorName}_entity${i}_sprite`);
         function optivalue(obj, prop, def, name) {
             return (prop in obj) ? ivalue(obj[prop], `${name}_${prop}`) : def;

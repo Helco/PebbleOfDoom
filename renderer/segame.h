@@ -47,6 +47,7 @@ typedef struct Player
     int gold;
     PlayerAction activeAction;
     bool isWalking, isTurningLeft, isTurningRight;
+    bool hasKey, hasBattery, hadDoneTutorial;
 } Player;
 
 typedef struct Menu
@@ -70,6 +71,7 @@ typedef struct EntityBrain
     EntityCallback init;
     EntityCallback playerAction;
     EntityCallback update;
+    EntityCallback dtor;
 } EntityBrain;
 
 struct EntityData
@@ -79,6 +81,7 @@ struct EntityData
     PlayerAction playerAction;
     real_t actionDistanceSqr;
     real_t curDistanceSqr;
+    bool isDead;
     union {
         struct {
             const char* text;
@@ -91,7 +94,13 @@ struct EntityData
             xz_t direction;
             real_t distanceLeft;
             real_t speed;
+            real_t regularSpeed;
             int health;
+            int pushTimer;
+            int attackTimer;
+            bool wasAttacking;
+
+            const Sprite* sprAlive, * sprPushed, * sprDead;
         } monster;
         struct {
         } shopkeeper;
@@ -129,6 +138,7 @@ void segame_free(SEGame* me);
 void segame_update(SEGame* me);
 void segame_render(SEGame* me, RendererTarget renderer);
 void segame_changeLevel(SEGame* me, LevelId newLevel);
+void segame_hurtPlayer(SEGame* me);
 
 void menu_reset(Menu* menu);
 void menu_render(Menu* menu, RendererTarget renderer);
@@ -140,6 +150,11 @@ void menu_cb_just_close(SEGame* game, int button);
 
 void book_init(SEGame* game, EntityData* data);
 void book_act(SEGame* game, EntityData* data);
+
+void monster_init(SEGame* game, EntityData* data);
+void monster_act(SEGame* game, EntityData* data);
+void monster_update(SEGame* game, EntityData* data);
+void monster_dtor(SEGame* game, EntityData* data);
 
 void segame_input_select_click(SEGame* me);
 void segame_input_select_long_click(SEGame* me);

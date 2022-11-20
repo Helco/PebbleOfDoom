@@ -2,14 +2,20 @@
 #include "platform.h"
 #include "resources.h"
 
-#define PLAYER_TURN_SPEED real_from_float(2)
+#define PLAYER_TURN_SPEED real_from_float(3)
 #define PLAYER_WALK_SPEED real_from_float(2) // might be too fast for release, but for testing good
-#define PLAYER_MAX_STEP_HEIGHT 7
+#define PLAYER_MAX_STEP_HEIGHT 12
 
 static const EntityBrain EntityBrains[] = {
     [ENTITY_BOOK] = {
         .init = book_init,
         .playerAction = book_act
+    },
+    [ENTITY_MONSTER] = {
+        .init = monster_init,
+        .playerAction = monster_act,
+        .update = monster_update,
+        .dtor = monster_dtor
     }
 };
 
@@ -22,7 +28,7 @@ void player_reset(Player* me)
 {
     me->maxHealth = 2;
     me->health = 2;
-    me->gold = 15;
+    me->gold = 0;
     me->activeAction = PLAYERACT_WALK;
     player_resetMovement(me);
 }
@@ -76,7 +82,7 @@ void segame_free(SEGame* me)
     sprite_free(textureManager, me->iconHeart);
     for (int i = 0; i < COUNT_PLAYERACT; i++)
         sprite_free(textureManager, me->iconPlayerActions[i]);
-    level_free(me->levelManager, me->level);
+    segame_changeLevel(me, INVALID_LEVEL_ID);
 }
 
 void segame_update(SEGame* me)
@@ -94,10 +100,14 @@ void segame_update(SEGame* me)
         for (int i = 0; i < me->entityCount; i++)
         {
             EntityData* entity = &me->entities[i];
+            if (entity->isDead)
+                continue;
+
             xz_t playerToEntity = xz_sub(entity->entity->location.position, me->player.location->position);
             entity->curDistanceSqr = xz_lengthSqr(playerToEntity);
 
-            if (real_compare(entity->curDistanceSqr, entity->actionDistanceSqr) < 0 &&
+            if (entity->playerAction != PLAYERACT_WALK &&
+                real_compare(entity->curDistanceSqr, entity->actionDistanceSqr) < 0 &&
                 real_compare(entity->curDistanceSqr, lastDistanceSqr) < 0)
             {
                 xz_t localDirection = xz_invScale(playerToEntity, real_sqrt(entity->curDistanceSqr));
@@ -130,6 +140,14 @@ void segame_changeLevel(SEGame* me, LevelId levelId)
 {
     if (me->level != NULL)
         level_free(me->levelManager, me->level);
+    for (int i = 0; i < me->entityCount; i++)
+    {
+        if (me->entities[i].brain->dtor != NULL)
+            me->entities[i].brain->dtor(me, &me->entities[i]);
+    }
+
+    if (levelId == INVALID_LEVEL_ID)
+        return;
 
     me->level = level_load(me->levelManager, levelId);
     renderer_setLevel(me->renderer, me->level);
@@ -142,12 +160,46 @@ void segame_changeLevel(SEGame* me, LevelId levelId)
             Entity* entity = &me->level->sectors[i].entities[j];
             EntityData* data = &me->entities[entityI];
             data->entity = entity;
+            data->isDead = false;
             data->brain = &EntityBrains[entity->type];
             data->brain->init(me, data);
         }
     }
     me->entityCount = entityI;
     me->focusedEntity = NULL;
+}
+
+void segame_menu_died_3(SEGame* me, int button)
+{
+    UNUSED(button);
+    me->player.health = me->player.maxHealth;
+    menu_reset(&me->menu);
+    me->menu.text = "Let me patch you up. Now go and be more careful!";
+    me->menu.callback = menu_cb_just_close;
+}
+
+void segame_menu_died_2(SEGame* me, int button)
+{
+    UNUSED(button);
+    menu_reset(&me->menu);
+    me->menu.text = "I found you outside the cave.\nSeems like someone stole your gold.";
+    me->menu.callback = segame_menu_died_3;
+}
+
+void segame_hurtPlayer(SEGame* me)
+{
+    trigger_haptic(200);
+    me->player.health--;
+    if (me->player.health < 0)
+    {
+        me->player.health = 1;
+        me->player.gold /= 3;
+        segame_changeLevel(me, RESOURCE_ID_LVL_CATHEDRAL);
+        //me->player.location->position = xz(real_from_int(300), real_from_int(200)); 
+        menu_reset(&me->menu);
+        me->menu.text = "Hey, wake up!\nOh good, you are alive...";
+        me->menu.callback = segame_menu_died_2;
+    }
 }
 
 void segame_input_select_click(SEGame* me)

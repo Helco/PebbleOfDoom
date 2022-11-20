@@ -7,7 +7,7 @@
 #include "resources.h"
 
 static const GSize WINDOW_START_SIZE = { 1024, 768 };
-static const int MAX_FRAMERATE = 60;
+static const int MAX_FRAMERATE = 30;
 
 struct PCMockup
 {
@@ -76,7 +76,14 @@ PCMockup *pcmockup_init()
         textureManager_registerSpriteFile(me->textureManager, "icon_boots.png", RESOURCE_ID_ICON_BOOTS) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "icon_gold.png", RESOURCE_ID_ICON_GOLD) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "spr_heart.png", RESOURCE_ID_SPR_HEART) == INVALID_SPRITE_ID ||
-        textureManager_registerSpriteFile(me->textureManager, "icon_key.png", RESOURCE_ID_ICON_KEY) == INVALID_SPRITE_ID)
+        textureManager_registerSpriteFile(me->textureManager, "icon_key.png", RESOURCE_ID_ICON_KEY) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "spr_pr.png", RESOURCE_ID_SPR_PC) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "spr_pr_push.png", RESOURCE_ID_SPR_PC_PUSH) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "spr_pr_dead.png", RESOURCE_ID_SPR_PC_DEAD) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "spr_ptr.png", RESOURCE_ID_SPR_PTR) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "spr_ptr_push.png", RESOURCE_ID_SPR_PTR_PUSH) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "spr_ptr_dead.png", RESOURCE_ID_SPR_PTR_DEAD) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "spr_pt2.png", RESOURCE_ID_SPR_PT2) == INVALID_SPRITE_ID)
     {
         pcmockup_free(me);
         return NULL;

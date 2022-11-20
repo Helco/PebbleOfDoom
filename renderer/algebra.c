@@ -16,6 +16,13 @@ int clampi(int start, int value, int end)
     return max(start, min(value, end));
 }
 
+real_t real_lerpi(int value, int inStart, int inEnd, int outStart, int outEnd)
+{
+    return real_norm_lerp(real_from_int(value),
+        real_from_int(inStart), real_from_int(inEnd),
+        real_from_int(outStart), real_from_int(outEnd));
+}
+
 //
 // 2-dimensional vector
 //

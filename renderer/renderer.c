@@ -637,7 +637,10 @@ void renderer_renderSector(Renderer* renderer, RendererTarget target, const Draw
 void renderer_renderSectorEntities(Renderer* renderer, RendererTarget target, const DrawRequest* request)
 {
     for (int i = 0; i < request->sector->entityCount; i++)
-        renderer_renderEntity(renderer, target, request, i);
+    {
+        if (request->sector->entities[i].sprite != INVALID_SPRITE_ID)
+            renderer_renderEntity(renderer, target, request, i);
+    }
 }
 
 void renderer_render(Renderer* renderer, RendererTarget target)
@@ -648,7 +651,6 @@ void renderer_render(Renderer* renderer, RendererTarget target)
     {
         memset(((uint8_t*)target.framebuffer) + x * stride, 0, stride - (HUD_HEIGHT / 8));
     }
-    //memset(target.framebuffer, 0, RENDERER_WIDTH * rendererColorFormat_getStride(target.colorFormat));
 
     if (renderer->level == NULL || renderer->location.sector < 0)
         return;

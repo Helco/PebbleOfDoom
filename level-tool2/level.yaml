@@ -4,13 +4,15 @@ defaultFloorColor: 2,2,2
 defaultCeilColor: 0,0,0
 
 vars:
+  entBook: 0
+  entMonster: 2
   w: 34
   h: 20
   area: w * h
 
 playerStart:
   sector: startTri
-  position: 85/3, 200/3
+  position: 36/3, 128/3
   angle: 1
 
 vertices:
@@ -46,8 +48,8 @@ sectors:
         contourLeftPortal: false
     entities:
       - position: 40, 65
-        type: 0
-        y: 5
+        type: entMonster
+        arg1: 0
 
   right:
     y: 0

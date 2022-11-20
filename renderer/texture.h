@@ -35,4 +35,6 @@ extern void sprite_free(TextureManagerHandle manager, const Sprite* sprite);
 extern const Sprite* text_sprite_create(TextureManagerHandle manager, const char* text);
 extern void text_sprite_free(const Sprite* sprite);
 
+extern void trigger_haptic(int length);
+
 #endif

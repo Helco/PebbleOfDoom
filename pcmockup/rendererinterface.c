@@ -74,3 +74,19 @@ void text_sprite_free(const Sprite* sprite)
     assert(sprite->id == -2);
     free((void*)sprite);
 }
+
+#if WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <Windows.h>
+#endif
+
+void trigger_haptic(int length)
+{
+#if WIN32
+    Beep(800, length);
+#else
+    puts("\a");
+#endif
+}
