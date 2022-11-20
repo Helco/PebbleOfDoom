@@ -1,12 +1,16 @@
 #include "segame.h"
 #include "platform.h"
 
-void menu_open(Menu* menu)
+void menu_reset(Menu* menu)
 {
+    memset(menu->buttons, 0, sizeof(menu->buttons));
     menu->hadBeenRendered = false;
     menu->size = (GSize){ .w = 0, .h = 0 };
     menu->curButton = 0;
     menu->flippedButton = -1;
+    menu->text = NULL;
+    menu->callback = NULL;
+
     menu->game->isPaused = true;
 }
 
@@ -44,4 +48,10 @@ void menu_select(Menu* menu)
             menu->buttons[menu->curButton] != NULL);
         menu->callback(menu->game, menu->curButton);
     }
+}
+
+void menu_back(Menu* menu)
+{
+    assert(menu->callback != NULL);
+    menu->callback(menu->game, -1);
 }

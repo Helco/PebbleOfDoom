@@ -3,6 +3,7 @@
 #include "renderer.h"
 
 #define MENU_BORDER 4
+#define MENU_BUTTON_SPACE 16
 #define MAX_BUTTONS 4
 
 typedef int PlayerAction;
@@ -58,11 +59,12 @@ void segame_free(SEGame* me);
 void segame_update(SEGame* me);
 void segame_render(SEGame* me, RendererTarget renderer);
 
-void menu_open(Menu* menu);
+void menu_reset(Menu* menu);
 void menu_render(Menu* menu, RendererTarget renderer);
 void menu_left(Menu* menu);
 void menu_right(Menu* menu);
 void menu_select(Menu* menu);
+void menu_back(Menu* menu);
 
 void segame_input_select_click(SEGame* me);
 void segame_input_back_click(SEGame* me);

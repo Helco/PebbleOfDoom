@@ -30,6 +30,12 @@ void player_update_movement(Player* me, Renderer* renderer)
         renderer_walk(renderer, (xz_t) { .x = real_zero, .z = PLAYER_WALK_SPEED }, PLAYER_MAX_STEP_HEIGHT);  
 }
 
+void segame_main_menu(SEGame* me, int button)
+{
+    UNUSED(me);
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Pressed %d", button);
+}
+
 SEGame* segame_init(SEGame* me, Renderer* renderer)
 {
     memset(me, 0, sizeof(SEGame));
@@ -50,8 +56,11 @@ SEGame* segame_init(SEGame* me, Renderer* renderer)
     me->iconPlayerActions[PLAYERACT_BATTERY] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
     me->iconPlayerActions[PLAYERACT_KEY] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
 
-    me->menu.text = "Be careful, there . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . \nare monsters in\nthe caves.";
-    menu_open(&me->menu);
+    menu_reset(&me->menu);
+    me->menu.text = "Want to skidaddle?";
+    me->menu.buttons[0] = "> Yeppers <";
+    me->menu.buttons[1] = "> NOPE <";
+    me->menu.callback = segame_main_menu;
 
     return me;
 }
@@ -110,5 +119,12 @@ void segame_input_direction_raw(SEGame* me, bool isRight, bool isDown)
 
 void segame_input_back_click(SEGame* me)
 {
-    me->isPaused = !me->isPaused;
+    if (me->isPaused)
+    {
+        menu_back(&me->menu);
+    }
+    else
+    {
+        // open main menu here
+    }
 }

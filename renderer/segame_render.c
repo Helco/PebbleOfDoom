@@ -132,24 +132,70 @@ void prv_render_menuBackground(RendererTarget target, int x, int y, int w, int h
     render_clearBitColumn(target, x + w - 2, y + 1, y + h - 2);
 }
 
+void render_flipBitRect(RendererTarget target, GRect rect)
+{
+    int yStart = rect.origin.y;
+    int yEnd = rect.origin.y + rect.size.h - 1;
+    for (int x = 0; x < rect.size.w; x++)
+        render_flipBitColumn(target, rect.origin.x + x, yStart, yEnd);
+}
+
 void menu_render(Menu* me, RendererTarget target)
 {
     if (!me->hadBeenRendered)
     {
         TextureManagerHandle textureManager = renderer_getTextureManager(me->game->renderer);
         const Sprite* mainText = text_sprite_create(textureManager, me->text);
+        const Sprite* buttonTexts[MAX_BUTTONS] = { 0 };
 
-        me->size = (GSize){ .w = mainText->size.w + MENU_BORDER * 2, .h = mainText->size.h + MENU_BORDER * 2 };
+        me->size = mainText->size;
+        for (int i = 0; i < MAX_BUTTONS; i++)
+        {
+            if (me->buttons[i] == NULL)
+                break;
+            buttonTexts[i] = text_sprite_create(textureManager, me->buttons[i]);
+            me->size.w = max(me->size.w, buttonTexts[i]->size.w);
+            me->size.h += MENU_BUTTON_SPACE;
+        }
+        me->size.w += MENU_BORDER * 2;
+        me->size.h += MENU_BORDER * 2;
 
         int x = RENDERER_WIDTH / 2 - me->size.w / 2;
         int y = SCREEN_HEIGHT / 2 - me->size.h / 2;
         prv_render_menuBackground(target, x, y, me->size.w, me->size.h);
-        x += MENU_BORDER;
-        y += MENU_BORDER;
 
-        prv_render_textSprite(target, mainText, x, y);
+        x += MENU_BORDER;
+        y += me->size.h - MENU_BORDER - mainText->size.h;
+        prv_render_textSprite(target, mainText, x, y + 2);
+
+        for (int i = 0; i < MAX_BUTTONS; i++)
+        {
+            if (me->buttons[i] == NULL)
+                break;
+            me->buttonRects[i] = (GRect){
+                .origin = {
+                    .x = x = RENDERER_WIDTH / 2 - buttonTexts[i]->size.w / 2,
+                    .y = y -= MENU_BUTTON_SPACE
+                },
+                .size = buttonTexts[i]->size
+            };
+            prv_render_textSprite(target, buttonTexts[i], x, y + 2);
+        }
 
         text_sprite_free(mainText);
+        for (int i = 0; i < MAX_BUTTONS; i++)
+        {
+            if (buttonTexts[i] != NULL)
+                text_sprite_free(buttonTexts[i]);
+        }
         me->hadBeenRendered = true;
     }
+
+    if (me->curButton == me->flippedButton)
+        return;
+
+    if (me->flippedButton >= 0)
+        render_flipBitRect(target, me->buttonRects[me->flippedButton]);
+    render_flipBitRect(target, me->buttonRects[me->curButton]);
+    me->flippedButton = me->curButton;
 }
