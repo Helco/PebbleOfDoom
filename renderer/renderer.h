@@ -43,6 +43,10 @@ void renderer_move(Renderer* renderer, xz_t direction);
 void renderer_walk(Renderer* renderer, xz_t direction, int maxStepHeight); // checks for collision and steps
 void renderer_moveVertical(Renderer* renderer, xy_t direction);
 
+void render_setBitColumn(RendererTarget target, int x, int yStart, int yEnd);
+void render_clearBitColumn(RendererTarget target, int x, int yStart, int yEnd);
+void render_flipBitColumn(RendererTarget target, int x, int yStart, int yEnd);
+
 #ifdef DEBUG_WINDOWS
 struct SDL_Renderer; // no need to include SDL here
 typedef int ImGuiWindowFlags;

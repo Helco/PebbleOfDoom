@@ -200,7 +200,6 @@ typedef struct LoadedSprite
 } LoadedSprite;
 
 static LoadedSprite sprites[MAX_TEXTURES] = { { 0 } };
-static SpriteId nextSpriteId = 0;
 
 static int findNextSpriteSlot()
 {

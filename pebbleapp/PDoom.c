@@ -4,6 +4,7 @@
 #include "../renderer/renderer.h"
 #include "../renderer/texgen/texgen.h"
 #include "../renderer/segame.h"
+#include "../renderer/platform.h"
 
 Window* s_main_window;
 Layer* root_layer;
@@ -15,6 +16,10 @@ time_t lastSecond;
 uint16_t lastSecondMs;
 int curFPS = 0;
 static SEGame game;
+static GFont font;
+static GBitmap* framebuffer_bitmap;
+static GContext* ctx;
+static void* framebuffer;
 
 int time_difference_ms(time_t a, uint16_t aMs, time_t b, uint16_t bMs)
 {
@@ -23,10 +28,11 @@ int time_difference_ms(time_t a, uint16_t aMs, time_t b, uint16_t bMs)
         (int)(aMs) - bMs;
 }
 
-void update_layer(Layer* layer, GContext* ctx)
+void update_layer(Layer* layer, GContext* gctx)
 {
-  GBitmap* framebuffer_bitmap = graphics_capture_frame_buffer(ctx);
-  void* framebuffer = gbitmap_get_data(framebuffer_bitmap);
+  ctx = gctx;
+  framebuffer_bitmap = graphics_capture_frame_buffer(ctx);
+  framebuffer = gbitmap_get_data(framebuffer_bitmap);
 
   segame_update(&game);
 
@@ -37,7 +43,6 @@ void update_layer(Layer* layer, GContext* ctx)
           RendererColorFormat_1BitBW
       )
   };
-  renderer_render(renderer, target);
   segame_render(&game, target);
 
   graphics_release_frame_buffer(ctx, framebuffer_bitmap);
@@ -54,6 +59,62 @@ void update_layer(Layer* layer, GContext* ctx)
       lastSecondMs = curTimeMs;
   }
   curFPS++;
+}
+
+const Sprite* text_sprite_create(TextureManagerHandle _, const char* text)
+{
+  UNUSED(_);
+
+  if (font == NULL)
+    font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
+  
+  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_context_set_text_color(ctx, GColorBlack);
+
+  GRect box = {
+    .origin = { .x = 0, .y = 0 },
+    .size = { .w = SCREEN_HEIGHT * 9 / 10, .h = RENDERER_WIDTH * 9 / 10 }
+  };
+  const GTextOverflowMode overflowMode = GTextOverflowModeWordWrap;
+  const GTextAlignment alignment = GTextAlignmentLeft;
+  GSize size = graphics_text_layout_get_content_size(text, font, box, overflowMode, alignment);
+
+  int bytesPerRow = (size.w + 31) / 32 * 4;
+  Sprite* sprite = (Sprite*)malloc(sizeof(Sprite) + bytesPerRow * size.h);
+  if (sprite == NULL)
+  {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Could not allocate %d bytes for text sprite %s", sizeof(Sprite) + bytesPerRow * size.h, text);
+    return NULL;
+  }
+  sprite->id = -2;
+  sprite->size = size;
+  sprite->bytesPerRow = bytesPerRow;
+  sprite->bw = (uint8_t*)(sprite + 1);
+  sprite->alpha = NULL;
+
+  // offscreen text rendering based on https://github.com/mhungerford/pebble_offscreen_rendering_text_demo/blob/master/src/main.c
+  uint8_t *orig_addr = gbitmap_get_data(framebuffer_bitmap);
+  GBitmapFormat orig_format = gbitmap_get_format(framebuffer_bitmap);
+  uint16_t orig_stride = gbitmap_get_bytes_per_row(framebuffer_bitmap);
+  graphics_release_frame_buffer(ctx, framebuffer_bitmap);
+  gbitmap_set_data(framebuffer_bitmap, sprite->bw, GBitmapFormat1Bit, sprite->bytesPerRow, false);
+  graphics_draw_text(ctx, text, font, box, overflowMode, alignment, NULL);
+  gbitmap_set_data(framebuffer_bitmap, orig_addr, orig_format, orig_stride, false);
+
+  framebuffer_bitmap = graphics_capture_frame_buffer(ctx);
+  framebuffer = gbitmap_get_data(framebuffer_bitmap);
+
+  return sprite;
+}
+
+void text_sprite_free(const Sprite* sprite)
+{
+  if (sprite == NULL)
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Tried to free NULL text sprite");
+  else if (sprite->id != -2)
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Tried to free fake text sprite");
+  else
+    free((void*)sprite);
 }
 
 void update_animation(Animation *animation, const AnimationProgress progress)

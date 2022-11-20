@@ -32,9 +32,11 @@ void player_update_movement(Player* me, Renderer* renderer)
 
 SEGame* segame_init(SEGame* me, Renderer* renderer)
 {
+    memset(me, 0, sizeof(SEGame));
     player_reset(&me->player);
     me->renderer = renderer;
     me->player.location = renderer_getLocation(me->renderer);
+    me->menu.game = me;
     me->isPaused = false;
     me->hadRenderedBefore = false;
 
@@ -47,6 +49,9 @@ SEGame* segame_init(SEGame* me, Renderer* renderer)
     me->iconPlayerActions[PLAYERACT_PICK] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
     me->iconPlayerActions[PLAYERACT_BATTERY] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
     me->iconPlayerActions[PLAYERACT_KEY] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
+
+    me->menu.text = "Be careful, there . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . \nare monsters in\nthe caves.";
+    menu_open(&me->menu);
 
     return me;
 }
@@ -77,7 +82,7 @@ void segame_input_select_click(SEGame* me)
 {
     if (me->isPaused)
     {
-
+        menu_select(&me->menu);
     }
     else
         me->player.isWalking = !me->player.isWalking;
@@ -85,7 +90,12 @@ void segame_input_select_click(SEGame* me)
 
 void segame_input_direction_click(SEGame* me, bool isRight)
 {
-    UNUSED(me, isRight);
+    if (!me->isPaused)
+        return;
+    if (isRight)
+        menu_right(&me->menu);
+    else
+        menu_left(&me->menu);
 }
 
 void segame_input_direction_raw(SEGame* me, bool isRight, bool isDown)

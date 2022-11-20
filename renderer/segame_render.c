@@ -47,6 +47,9 @@ void prv_renderIcon(RendererTarget target, const Sprite* sprite, int x)
 
 void segame_render(SEGame* me, RendererTarget target)
 {
+    if (!me->isPaused || !me->hadRenderedBefore)
+        renderer_render(me->renderer, target);
+
     if (!me->hadRenderedBefore)
     {
         const int stride = rendererColorFormat_getStride(target.colorFormat);
@@ -54,6 +57,12 @@ void segame_render(SEGame* me, RendererTarget target)
         for (int i = 0; i < RENDERER_WIDTH; i++)
             memset(fb + i * stride, 0xff, HUD_HEIGHT / 8);
         me->hadRenderedBefore = true;
+    }
+
+    if (me->isPaused)
+    {
+        menu_render(&me->menu, target);
+        return;
     }
 
     prv_renderIcon(target, me->iconGold, 0);
@@ -78,5 +87,69 @@ void segame_render(SEGame* me, RendererTarget target)
             prv_renderIconSrc(target, spriteSrc, x, (i % 2) * DIGIT_WIDTH, DIGIT_WIDTH);
         else
             prv_renderIconSrcInv(target, spriteSrc, x, (i % 2) * DIGIT_WIDTH, DIGIT_WIDTH);
+    }
+
+}
+
+void prv_render_textSprite(RendererTarget target, const Sprite* sprite, int x, int y)
+{
+    assert(x >= 0 && y >= 0 && x + sprite->size.w <= RENDERER_WIDTH && y + sprite->size.h <= SCREEN_HEIGHT);
+    assert(target.colorFormat == RendererColorFormat_1BitBW);
+
+    const int stride = rendererColorFormat_getStride(target.colorFormat);
+    uint8_t* fb = (uint8_t*)target.framebuffer;
+    const uint8_t* bw = sprite->bw;
+    int xOff = x, yOff = y;
+
+    for (x = 0; x < sprite->size.w; x++)
+    {
+        for (y = 0; y < sprite->size.h; y++)
+        {
+            int xByte = x / 8;
+            int xBit = x % 8;
+            int yByte = (yOff + y) / 8;
+            int yBit = (yOff + y) % 8;
+
+            int spriteBit = (bw[(sprite->size.h - 1 - y) * sprite->bytesPerRow + xByte] >> xBit) & 1;
+            fb[stride * (xOff + x) + yByte] &= ~(spriteBit << yBit);
+        }
+    }
+}
+
+void prv_render_menuBackground(RendererTarget target, int x, int y, int w, int h)
+{
+    assert(target.colorFormat == RendererColorFormat_1BitBW);
+    assert(x >= 0 && y >= 0 && w > 0 && h > 0);
+    assert(x + w <= RENDERER_WIDTH && y + h <= SCREEN_HEIGHT);
+    for (int i = 0; i < w; i++)
+        render_setBitColumn(target, x + i, y, y + h - 1);
+    for (int i = 1; i < w - 1; i++)
+    {
+        render_clearBitColumn(target, x + i, y + 1, y + 1);
+        render_clearBitColumn(target, x + i, y + h - 2, y + h - 2);
+    }
+    render_clearBitColumn(target, x + 1, y + 1, y + h - 2);
+    render_clearBitColumn(target, x + w - 2, y + 1, y + h - 2);
+}
+
+void menu_render(Menu* me, RendererTarget target)
+{
+    if (!me->hadBeenRendered)
+    {
+        TextureManagerHandle textureManager = renderer_getTextureManager(me->game->renderer);
+        const Sprite* mainText = text_sprite_create(textureManager, me->text);
+
+        me->size = (GSize){ .w = mainText->size.w + MENU_BORDER * 2, .h = mainText->size.h + MENU_BORDER * 2 };
+
+        int x = RENDERER_WIDTH / 2 - me->size.w / 2;
+        int y = SCREEN_HEIGHT / 2 - me->size.h / 2;
+        prv_render_menuBackground(target, x, y, me->size.w, me->size.h);
+        x += MENU_BORDER;
+        y += MENU_BORDER;
+
+        prv_render_textSprite(target, mainText, x, y);
+
+        text_sprite_free(mainText);
+        me->hadBeenRendered = true;
     }
 }

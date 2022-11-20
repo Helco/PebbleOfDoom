@@ -2,6 +2,9 @@
 #define SEGAME_H
 #include "renderer.h"
 
+#define MENU_BORDER 4
+#define MAX_BUTTONS 4
+
 typedef int PlayerAction;
 enum PlayerAction_ {
     PLAYERACT_WALK,
@@ -12,6 +15,9 @@ enum PlayerAction_ {
     COUNT_PLAYERACT
 };
 
+typedef struct SEGame SEGame;
+typedef void (*MenuCallback)(SEGame* game, int button);
+
 typedef struct Player
 {
     Location* location;
@@ -21,10 +27,23 @@ typedef struct Player
     bool isWalking, isTurningLeft, isTurningRight;
 } Player;
 
-typedef struct SEGame
+typedef struct Menu
+{
+    SEGame* game;
+    GSize size;
+    bool hadBeenRendered;
+    const char* text;
+    const char* buttons[MAX_BUTTONS];
+    GRect buttonRects[MAX_BUTTONS];
+    int curButton, flippedButton;
+    MenuCallback callback;
+} Menu;
+
+struct SEGame
 {
     Renderer* renderer;
     Player player;
+    Menu menu;
     bool isPaused;
     bool hadRenderedBefore;
 
@@ -32,12 +51,18 @@ typedef struct SEGame
     const Sprite* iconPlayerActions[COUNT_PLAYERACT];
     const Sprite* iconGold;
     const Sprite* iconHeart;
-} SEGame;
+};
 
 SEGame* segame_init(SEGame* me, Renderer* renderer);
 void segame_free(SEGame* me);
 void segame_update(SEGame* me);
 void segame_render(SEGame* me, RendererTarget renderer);
+
+void menu_open(Menu* menu);
+void menu_render(Menu* menu, RendererTarget renderer);
+void menu_left(Menu* menu);
+void menu_right(Menu* menu);
+void menu_select(Menu* menu);
 
 void segame_input_select_click(SEGame* me);
 void segame_input_back_click(SEGame* me);

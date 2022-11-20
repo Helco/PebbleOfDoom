@@ -274,6 +274,11 @@ void renderer_renderContourSpan(Renderer* me, RendererTarget target, const Bound
     if (target.colorFormat != RendererColorFormat_1BitBW || yStart > yEnd)
         return;
 
+    render_setBitColumn(target, x, yStart, yEnd);
+}
+
+void render_setBitColumn(RendererTarget target, int x, int yStart, int yEnd)
+{
     const int stride = rendererColorFormat_getStride(target.colorFormat);
     uint8_t* const framebufferColumn = (uint8_t*)target.framebuffer + x * stride;
     uint8_t* pixelByte = framebufferColumn + yStart / 8;
@@ -293,6 +298,55 @@ void renderer_renderContourSpan(Renderer* me, RendererTarget target, const Bound
 
     if (bitCount > 0) {
         *pixelByte |= (1 << bitCount) - 1;
+    }
+}
+
+void render_clearBitColumn(RendererTarget target, int x, int yStart, int yEnd)
+{
+    const int stride = rendererColorFormat_getStride(target.colorFormat);
+    uint8_t* const framebufferColumn = (uint8_t*)target.framebuffer + x * stride;
+    uint8_t* pixelByte = framebufferColumn + yStart / 8;
+    int bitCount = yEnd - yStart + 1;
+
+    { // just to group, first try to align
+        *(pixelByte++) &= ~(((1 << min(8, bitCount)) - 1) << (yStart % 8));
+        bitCount -= min(8 - (yStart % 8), bitCount);
+    }
+
+    if (bitCount >= 8) {
+        int byteCount = bitCount / 8;
+        memset(pixelByte, 0, byteCount);
+        pixelByte += byteCount;
+        bitCount = bitCount % 8;
+    }
+
+    if (bitCount > 0) {
+        *pixelByte &= ~((1 << bitCount) - 1);
+    }
+}
+
+void render_flipBitColumn(RendererTarget target, int x, int yStart, int yEnd)
+{
+    const int stride = rendererColorFormat_getStride(target.colorFormat);
+    uint8_t* const framebufferColumn = (uint8_t*)target.framebuffer + x * stride;
+    uint8_t* pixelByte = framebufferColumn + yStart / 8;
+    int bitCount = yEnd - yStart + 1;
+
+    { // just to group, first try to align
+        *(pixelByte++) ^= ((1 << min(8, bitCount)) - 1) << (yStart % 8);
+        bitCount -= min(8 - (yStart % 8), bitCount);
+    }
+
+    if (bitCount >= 8) {
+        int byteCount = bitCount / 8;
+        for (int i = 0; i < byteCount; i++)
+            pixelByte[i] = ~pixelByte[i];
+        pixelByte += byteCount;
+        bitCount = bitCount % 8;
+    }
+
+    if (bitCount > 0) {
+        *pixelByte ^= (1 << bitCount) - 1;
     }
 }
 
