@@ -107,7 +107,8 @@ const level = {
     ]
 };
 
-const descr = yaml.parse(fs.readFileSync("level-tool2/level.yaml", "utf-8"));
+const levelName = "cathedral";
+const descr = yaml.parse(fs.readFileSync("resources/levels/" + levelName + ".yaml", "utf-8"));
 level.vertices = [];
 level.sectors = [];
 level.walls = [];
@@ -177,6 +178,17 @@ const defaultCeilColor = colvalue(descr.defaultCeilColor, "defaultCeilColor");
 const portalMap = new Map();
 const cornerMap = new Map();
 
+function edgeKey(v0, v1)
+{
+    if (typeof v0 !== "number")
+        v0 = v0.index;
+    if (typeof v1 !== "number")
+        v1 = v1.index;
+    if (v1 < v0)
+        [v0, v1] = [v1, v0];
+    return `${v0}|${v1}`;
+}
+
 // First pass
 for (var sectorName in descr.sectors)
 {
@@ -227,14 +239,12 @@ for (var sectorName in descr.sectors)
         sector.walls[i] = w;
         level.walls.push(w);
     }
-
+    
     for (var i = 0; i < sector.walls.length; i++)
     {
-        var v0 = sector.walls[i].corner.index;
-        var v1 = sector.walls[(i + 1) % sector.walls.length].corner.index;
-        if (v1 < v0)
-            [v0, v1] = [v1, v0];
-        var key = `${v0}|${v1}`;
+        var key = edgeKey(
+            sector.walls[i].corner,
+            sector.walls[(i + 1) % sector.walls.length].corner);
         if (portalMap.has(key))
         {
             const portalTarget = portalMap.get(key);
@@ -262,7 +272,7 @@ for (var sectorName in descr.sectors)
         if ("y" in e)
             e.location.height += fvalue(e.y, `${sectorName}_entity${i}_y`);
         else
-            e.location.height += 5;
+            e.location.height += 0;
         e.sprite = ivalue(e.sprite, `${sectorName}_entity${i}_sprite`);
         function optivalue(obj, prop, def, name) {
             return (prop in obj) ? ivalue(obj[prop], `${name}_${prop}`) : def;
@@ -277,6 +287,35 @@ for (var sectorName in descr.sectors)
     }
 }
 
+const disabledPortalContours = new Set();
+if ("disabledPortalContours" in descr)
+{
+    for (var i = 0; i < descr.disabledPortalContours.length; i++)
+    {
+        if (!(descr.disabledPortalContours[i] in descr.vertices))
+            throw "Invalid vertex for disabled portal contours: " + descr.disabledPortalContours[i];
+        disabledPortalContours.add(descr.vertices[descr.disabledPortalContours[i]].index);
+    }
+}
+
+const enabledBottomContours = new Set();
+if ("enabledBottomContours" in descr)
+{
+    for (var i = 0; i < descr.enabledBottomContours.length; i++)
+    {
+        var parts = descr.enabledBottomContours[i].split(",").map(p => p.trim()).filter(p => p !== "");
+        if (parts.length != 2)
+            throw "Invalid part count for enabled bottom contours: " + descr.enabledBottomContours[i];
+        if (!(parts[0] in descr.vertices) || !(parts[1] in descr.vertices))
+            throw "Invalid vertices for enabled bottom contours: " + descr.enabledBottomContours[i];
+
+        enabledBottomContours.add(edgeKey(
+            descr.vertices[parts[0]],
+            descr.vertices[parts[1]]
+        ));
+    }
+}
+
 // second pass, flags
 for (var sectorName in descr.sectors)
 {
@@ -285,7 +324,14 @@ for (var sectorName in descr.sectors)
     for (var i = 0; i < sector.walls.length; i++)
     {
         const w = sector.walls[i];
+        const myRightV = w.startCorner;
+        const myLeftV = sector.walls[(i + 1) % sector.walls.length].startCorner;
+        const key = edgeKey(myRightV, myLeftV);
 
+        let defContourLeft = true;
+        let defContourLeftPortal = true;
+        let defContourRight = false;
+        let defContourRightPortal = false;
         let defContourTop = true;
         let defContourBottom = true;
         if (w.portalTo >= 0)
@@ -293,11 +339,20 @@ for (var sectorName in descr.sectors)
             defContourTop = sector.yEnd != w.portalSector.yEnd;
             defContourBottom = sector.y != w.portalSector.y;
         }
+
+        if ("contourLeft" in sector) defContourLeft = sector.contourLeft;
+        if ("contourLeftPortal" in sector) defContourLeftPortal = sector.contourLeftPortal;
+        if ("contourRight" in sector) defContourRight = sector.contourRight;
+        if ("contourRightPortal" in sector) defContourRightPortal = sector.contourRightPortal;
+
+        if (disabledPortalContours.has(myRightV)) defContourRightPortal = false;
+        if (disabledPortalContours.has(myLeftV)) defContourLeftPortal = false;
+        if (enabledBottomContours.has(key)) defContourBottom = true;
         
-        if (!("contourLeft" in w)) w.contourLeft = true;
-        if (!("contourLeftPortal" in w)) w.contourLeftPortal = true;
-        if (!("contourRight" in w)) w.contourRight = false;
-        if (!("contourRightPortal" in w)) w.contourRightPortal = false;
+        if (!("contourLeft" in w)) w.contourLeft = defContourLeft;
+        if (!("contourLeftPortal" in w)) w.contourLeftPortal = defContourLeftPortal;
+        if (!("contourRight" in w)) w.contourRight = defContourRight;
+        if (!("contourRightPortal" in w)) w.contourRightPortal = defContourRightPortal;
         if (!("contourTop" in w)) w.contourTop = defContourTop;
         if (!("contourTopPortal" in w)) w.contourTopPortal = defContourTop;
         if (!("contourBottom" in w)) w.contourBottom = defContourBottom;
@@ -345,4 +400,4 @@ level.vertexCount = level.vertices.length;
 level.sectorCount = level.sectors.length;
 level.wallCount = level.walls.length;
 level.entityCount = level.entities.length;
-fs.writeFileSync("resources/levels/test.bin", FormatLevel.write(level));
+fs.writeFileSync("resources/levels/" + levelName + ".bin", FormatLevel.write(level));

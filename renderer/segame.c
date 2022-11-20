@@ -16,6 +16,10 @@ static const EntityBrain EntityBrains[] = {
         .playerAction = monster_act,
         .update = monster_update,
         .dtor = monster_dtor
+    },
+    [ENTITY_TECHPRIEST] = {
+        .init = techpriest_init,
+        .playerAction = techpriest_act
     }
 };
 
@@ -66,11 +70,12 @@ SEGame* segame_init(SEGame* me, Renderer* renderer, LevelManagerHandle levelMana
     me->iconHeart = sprite_load(textureManager, RESOURCE_ID_SPR_HEART);
     me->iconPlayerActions[PLAYERACT_WALK] = sprite_load(textureManager, RESOURCE_ID_ICON_BOOTS);
     me->iconPlayerActions[PLAYERACT_USE] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
-    me->iconPlayerActions[PLAYERACT_PICK] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
-    me->iconPlayerActions[PLAYERACT_BATTERY] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
+    me->iconPlayerActions[PLAYERACT_FIST] = sprite_load(textureManager, RESOURCE_ID_ICON_FIST);
+    me->iconPlayerActions[PLAYERACT_BATTERY] = sprite_load(textureManager, RESOURCE_ID_ICON_BATTERY);
     me->iconPlayerActions[PLAYERACT_KEY] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
+    me->iconPlayerActions[PLAYERACT_SPEAK] = sprite_load(textureManager, RESOURCE_ID_ICON_SPEAK);
 
-    segame_changeLevel(me, RESOURCE_ID_LVL_HOME);
+    segame_changeLevel(me, RESOURCE_ID_LVL_CATHEDRAL);
     return me;
 }
 
@@ -112,8 +117,6 @@ void segame_update(SEGame* me)
             {
                 xz_t localDirection = xz_invScale(playerToEntity, real_sqrt(entity->curDistanceSqr));
                 localDirection = xz_rotate(localDirection, me->player.location->angle);
-                // TODO: FIX THIS! this is probably some entity displayed at wrong point or something, but without this the activation angle is *noticeably* off
-                localDirection.x = real_sub(localDirection.x, real_from_float(FOCUS_ANGLE_SHIFT));
                 // yes. too cheap for an acos
                 if (real_compare(real_abs(localDirection.x), real_from_float(MAX_FOCUS_ANGLE)) < 0 &&
                     real_compare(localDirection.z, real_zero) > 0)

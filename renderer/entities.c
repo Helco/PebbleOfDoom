@@ -31,7 +31,7 @@ void monster_init(SEGame* game, EntityData* data)
 {
     TextureManagerHandle textureManager = renderer_getTextureManager(game->renderer);
     data->actionDistanceSqr = real_from_int(50*50);
-    data->playerAction = game->player.hasBattery ? PLAYERACT_BATTERY : PLAYERACT_PICK;
+    data->playerAction = game->player.hasBattery ? PLAYERACT_BATTERY : PLAYERACT_FIST;
     data->monster.distanceLeft = real_zero;
     data->monster.pushTimer = 0;
     data->monster.attackTimer = START_ATTACK_TIMER;
@@ -181,4 +181,120 @@ void monster_dtor(SEGame* game, EntityData* data)
     sprite_free(textureManager, data->monster.sprAlive);
     sprite_free(textureManager, data->monster.sprPushed);
     sprite_free(textureManager, data->monster.sprDead);
+}
+
+void techpriest_menu_heal(SEGame* game, int button)
+{
+    UNUSED(button);
+    game->player.health = game->player.maxHealth;
+    menu_reset(&game->menu);
+    game->menu.text = "Here you go,\nlike new!";
+    game->menu.callback = menu_cb_just_close;
+}
+
+static const char* const techpriest_lines_new[] =
+{
+    "Hello my child and welcome!",
+    "I am the priest of technology and guard of this holy place.",
+    "You look like you could help me: it was long ago since I knew the time...",
+    "Once there were many watches here but alas they did not last and thus were banished into the CAVES below",
+    "There is said to be a special one, a RARE watch to outbest them",
+    "Would you try to find it? But be careful, the OLD ONES are filled with anger!",
+    NULL
+};
+
+static const char* const techpriest_lines_notentered[] =
+{
+    "Yes this is the KEY TO THE CAVES, but what are you waiting for?",
+    "Only the caves could hold the secret, you are wasting your time here!",
+    NULL
+};
+
+static const char* const techpriest_lines_noprogress[] =
+{
+    "You have to go deeper, the clue is bound to be there!",
+    "Do you call this a wound? The old ones have not even touched you!",
+    "Are you a watch? No?! THEN STOP WASTING MY TIME!"
+};
+
+static const char* const techpriest_lines_wounded[] =
+{
+    "Oh yes, the old ones gotten to you. Let me see...",
+    "You know, I was a doctor once. Somewhere around the last century...",
+    "Are you even trying to be careful?"
+};
+
+static const char* const techpriest_lines_battery[] =
+{
+    "Of course a battery defeats the old ones easily, it even revives them.",
+    "What were you doing before? Just PUNCHING them?!",
+    NULL
+};
+
+static const char* const techpriest_lines_gotclue[] =
+{
+    "What have you there, an old diary? Does it reveal anything?",
+    "A code? But there is only one lock of that type in this village...",
+    "GIVE IT TO ME! You will not get EMERY, you are not WORTHY!",
+    NULL
+};
+
+void techpriest_init(SEGame* game, EntityData* data)
+{
+    UNUSED(game);
+    data->actionDistanceSqr = real_from_int(30 * 30);
+    data->playerAction = PLAYERACT_SPEAK;
+    data->entity->sprite = RESOURCE_ID_SPR_TECHPRIEST;
+    data->techpriest.noProgressLine = 0;
+}
+
+void techpriest_act(SEGame* game, EntityData* data)
+{
+    menu_reset(&game->menu);
+    if (!game->player.hasSpokenToPriest)
+    {
+        game->menu.lines = techpriest_lines_new;
+        game->menu.lineI = -1;
+        menu_cb_babble_lines(game, -1);
+        game->player.hasSpokenToPriest = true;
+    }
+    else if (!game->player.hasKey)
+    {
+        menu_reset(&game->menu);
+        game->menu.text = "The greed SHOPKEEPER only sells the KEY TO THE CAVES anymore. What a ...";
+        game->menu.callback = menu_cb_just_close;
+    }
+    else if (!game->player.hasEnteredCave)
+    {
+        game->menu.lines = techpriest_lines_notentered;
+        game->menu.lineI = -1;
+        menu_cb_babble_lines(game, -1);
+    }
+    else if (game->player.hasGotClue)
+    {
+        game->menu.lines = techpriest_lines_gotclue;
+        game->menu.lineI = -1;
+        menu_cb_babble_lines(game, -1);
+        // TODO: Add techpriest monster here
+    }
+    else if (game->player.health < game->player.maxHealth)
+    {
+        menu_reset(&game->menu);
+        game->menu.text = techpriest_lines_wounded[rand() % 3];
+        game->menu.callback = techpriest_menu_heal;
+    }
+    else if (!game->player.priestHasSeenBattery)
+    {
+        game->menu.lines = techpriest_lines_battery;
+        game->menu.lineI = -1;
+        menu_cb_babble_lines(game, -1);
+        game->player.priestHasSeenBattery = true;
+    }
+    else //if (game->player.health == game->player.maxHealth)
+    {
+        menu_reset(&game->menu);
+        game->menu.text = techpriest_lines_noprogress[data->techpriest.noProgressLine];
+        game->menu.callback = menu_cb_just_close;
+        data->techpriest.noProgressLine = (data->techpriest.noProgressLine + 1) % 3;
+    }
 }

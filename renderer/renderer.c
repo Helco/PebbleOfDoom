@@ -126,7 +126,7 @@ lineSeg_t renderer_transformEntity(const Renderer* me, xz_t position, real_t rad
     position = renderer_transformPoint(me, position);
     lineSeg_t l = { .start = {.xz = position}, .end = {.xz = position } };
     l.start.xz.x = real_sub(l.start.xz.x, radius);
-    l.end.xz.x = real_add(l.start.xz.x, radius);
+    l.end.xz.x = real_add(l.end.xz.x, radius);
     return l;
 
     /* alternative billboarding was tried, but not only does this need normalize
@@ -591,7 +591,7 @@ void renderer_renderEntity(Renderer* me, RendererTarget target, const DrawReques
     const Entity* const entity = &sector->entities[entityIndex];
     const BoundarySet* drawBoundary = &me->stackBoundarySets[request->depth];
 
-    lineSeg_t entitySeg = renderer_transformEntity(me, entity->location.position, real_from_int(20));
+    lineSeg_t entitySeg = renderer_transformEntity(me, entity->location.position, real_from_int(15));
     bool isEntityStartBehind = real_compare(entitySeg.start.xz.z, real_zero) < 0;
     bool isEntityEndBehind = real_compare(entitySeg.end.xz.z, real_zero) < 0;
     if (isEntityStartBehind && isEntityEndBehind)
@@ -605,7 +605,7 @@ void renderer_renderEntity(Renderer* me, RendererTarget target, const DrawReques
         return;
 
     WallSection p;
-    renderer_project(me, entity->location.height, real_from_int(15), &entitySeg, &p);
+    renderer_project(me, entity->location.height, real_from_int(30), &entitySeg, &p);
     if (p.left.x >= p.right.x || p.right.x < request->left || p.left.x > request->right)
         return;
     // I wonder if we can run into precision errors here

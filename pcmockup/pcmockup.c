@@ -77,13 +77,18 @@ PCMockup *pcmockup_init()
         textureManager_registerSpriteFile(me->textureManager, "icon_gold.png", RESOURCE_ID_ICON_GOLD) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "spr_heart.png", RESOURCE_ID_SPR_HEART) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "icon_key.png", RESOURCE_ID_ICON_KEY) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "icon_use.png", RESOURCE_ID_ICON_USE) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "icon_fist.png", RESOURCE_ID_ICON_FIST) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "icon_speak.png", RESOURCE_ID_ICON_SPEAK) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "icon_battery.png", RESOURCE_ID_ICON_BATTERY ) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "spr_pr.png", RESOURCE_ID_SPR_PC) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "spr_pr_push.png", RESOURCE_ID_SPR_PC_PUSH) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "spr_pr_dead.png", RESOURCE_ID_SPR_PC_DEAD) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "spr_ptr.png", RESOURCE_ID_SPR_PTR) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "spr_ptr_push.png", RESOURCE_ID_SPR_PTR_PUSH) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "spr_ptr_dead.png", RESOURCE_ID_SPR_PTR_DEAD) == INVALID_SPRITE_ID ||
-        textureManager_registerSpriteFile(me->textureManager, "spr_pt2.png", RESOURCE_ID_SPR_PT2) == INVALID_SPRITE_ID)
+        textureManager_registerSpriteFile(me->textureManager, "spr_pt2.png", RESOURCE_ID_SPR_PT2) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "spr_techpriest.png", RESOURCE_ID_SPR_TECHPRIEST) == INVALID_SPRITE_ID)
     {
         pcmockup_free(me);
         return NULL;
@@ -94,7 +99,8 @@ PCMockup *pcmockup_init()
     texgen_setSize(texgenctx, 64);
     texgen_execute(texgenctx);
 
-    if (levelManager_registerFile(me->levelManager, "test.bin", RESOURCE_ID_LVL_HOME) == INVALID_LEVEL_ID)
+    if (levelManager_registerFile(me->levelManager, "test.bin", RESOURCE_ID_LVL_HOME) == INVALID_LEVEL_ID ||
+        levelManager_registerFile(me->levelManager, "cathedral.bin", RESOURCE_ID_LVL_CATHEDRAL) == INVALID_LEVEL_ID)
     {
         pcmockup_free(me);
         return NULL;

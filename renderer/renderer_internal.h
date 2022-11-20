@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #define MAX_DRAW_DEPTH 8
-#define MAX_DRAW_SECTORS 16
+#define MAX_DRAW_SECTORS 32
 
 typedef struct BoundarySet {
     uint8_t yTop[RENDERER_WIDTH];

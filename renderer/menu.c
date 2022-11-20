@@ -61,3 +61,18 @@ void menu_cb_just_close(SEGame* game, int button)
     UNUSED(button);
     game->isPaused = false;
 }
+
+void menu_cb_babble_lines(SEGame* game, int button)
+{
+    UNUSED(button);
+    game->menu.lineI++;
+    const char* nextLine = game->menu.lines[game->menu.lineI];
+    if (nextLine == NULL)
+    {
+        game->isPaused = false;
+        return;
+    }
+    menu_reset(&game->menu);
+    game->menu.text = nextLine;
+    game->menu.callback = menu_cb_babble_lines;
+}

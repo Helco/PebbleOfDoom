@@ -6,7 +6,6 @@
 #define MENU_BUTTON_SPACE 16
 #define MAX_BUTTONS 4
 #define MAX_ENTITIES 16
-#define FOCUS_ANGLE_SHIFT 0.2f // pls fix
 #define MAX_FOCUS_ANGLE 0.35f
 #define MAX_STOP_DISTANCE real_from_int(35 * 35)
 
@@ -14,9 +13,10 @@ typedef int PlayerAction;
 enum PlayerAction_ {
     PLAYERACT_WALK,
     PLAYERACT_USE,
-    PLAYERACT_PICK,
+    PLAYERACT_FIST,
     PLAYERACT_BATTERY,
     PLAYERACT_KEY,
+    PLAYERACT_SPEAK,
     COUNT_PLAYERACT
 };
 
@@ -29,14 +29,6 @@ typedef enum EntityType_ {
     ENTITY_DOOR
 } EntityType;
 
-typedef enum TechPriestState_ {
-    TECHPRIEST_NEW,
-    TECHPRIEST_NO_MINEKEY,
-    TECHPRIEST_NOT_ENTERED_MINES,
-    TECHPRIEST_OFFER_HEALTH,
-    TECHPRIEST_FOUND_CLUE
-} TechPriestState;
-
 typedef struct SEGame SEGame;
 typedef void (*MenuCallback)(SEGame* game, int button);
 
@@ -47,7 +39,8 @@ typedef struct Player
     int gold;
     PlayerAction activeAction;
     bool isWalking, isTurningLeft, isTurningRight;
-    bool hasKey, hasBattery, hadDoneTutorial;
+    bool hasKey, hasBattery, hadDoneTutorial, hasEnteredCave, hasSpokenToPriest, hasGotClue;
+    bool priestHasSeenBattery;
 } Player;
 
 typedef struct Menu
@@ -60,6 +53,9 @@ typedef struct Menu
     GRect buttonRects[MAX_BUTTONS];
     int curButton, flippedButton;
     MenuCallback callback;
+
+    int lineI;
+    const char* const* lines;
 } Menu;
 
 
@@ -105,7 +101,7 @@ struct EntityData
         struct {
         } shopkeeper;
         struct {
-            TechPriestState state;
+            int noProgressLine;
         } techpriest;
         struct {
             LevelId level;
@@ -147,6 +143,7 @@ void menu_right(Menu* menu);
 void menu_select(Menu* menu);
 void menu_back(Menu* menu);
 void menu_cb_just_close(SEGame* game, int button);
+void menu_cb_babble_lines(SEGame* game, int button);
 
 void book_init(SEGame* game, EntityData* data);
 void book_act(SEGame* game, EntityData* data);
@@ -155,6 +152,9 @@ void monster_init(SEGame* game, EntityData* data);
 void monster_act(SEGame* game, EntityData* data);
 void monster_update(SEGame* game, EntityData* data);
 void monster_dtor(SEGame* game, EntityData* data);
+
+void techpriest_init(SEGame* game, EntityData* data);
+void techpriest_act(SEGame* game, EntityData* data);
 
 void segame_input_select_click(SEGame* me);
 void segame_input_select_long_click(SEGame* me);
