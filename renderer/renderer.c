@@ -669,10 +669,16 @@ void renderer_render(Renderer* renderer, RendererTarget target)
     int nextDepth = 0;
     for (int i = 0; i < renderer->drawRequests.count; i++)
     {
-        if (i == nextDepth)
-            drawRequestStack_nextDepth(&renderer->drawRequests);
-
         const DrawRequest* curRequest = &renderer->drawRequests.requests[i];
+
+        if (i == nextDepth)
+        {
+            drawRequestStack_nextDepth(&renderer->drawRequests);
+            BoundarySet* bSet = &renderer->stackBoundarySets[curRequest->depth];
+            memcpy(bSet[1].yBottom, bSet[0].yBottom, sizeof(bSet[0].yBottom));
+            memcpy(bSet[1].yTop, bSet[0].yTop, sizeof(bSet[0].yTop));
+        }
+
         renderer_renderSector(renderer, target, curRequest);
 
         if (i == nextDepth)
@@ -751,7 +757,7 @@ void drawRequestStack_push(DrawRequestStack* stack, const Sector* sector, int le
 {
     const int insertAt = stack->count;
     assert(insertAt < MAX_DRAW_SECTORS);
-    stack->count = (stack->count + 1) % MAX_DRAW_SECTORS;
+    stack->count++;// = (stack->count + 1) % MAX_DRAW_SECTORS;
     stack->requests[insertAt] = (DrawRequest) {
         .sector = sector,
         .left = left,

@@ -147,7 +147,25 @@ bool loadTextures()
     loadSpriteFromResource(RESOURCE_ID_ICON_BOOTS) != INVALID_SPRITE_ID &&
     loadSpriteFromResource(RESOURCE_ID_ICON_GOLD) != INVALID_SPRITE_ID &&
     loadSpriteFromResource(RESOURCE_ID_SPR_HEART) != INVALID_SPRITE_ID &&
-    loadSpriteFromResource(RESOURCE_ID_ICON_KEY) != INVALID_SPRITE_ID;
+    loadSpriteFromResource(RESOURCE_ID_ICON_KEY) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_ICON_BATTERY) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_ICON_FIST) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_ICON_USE) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_ICON_SPEAK) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_SPR_BATTERY) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_SPR_KEY) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_SPR_PC) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_SPR_PC_DEAD) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_SPR_PC_PUSH) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_SPR_PT2) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_SPR_PTR) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_SPR_PTR_PUSH) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_SPR_PTR_DEAD) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_SPR_SHOPKEEPER) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_SPR_TECHPRIEST) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_SPR_TECHPRIEST_ANGERY) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_SPR_TECHPRIEST_PUSH) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_SPR_TECHPRIEST_DEAD) != INVALID_SPRITE_ID;
 }
 
 void on_select_click(ClickRecognizerRef rec, void* context) { segame_input_select_click(&game); }
@@ -171,27 +189,35 @@ void click_config_provider(Window* window)
   window_raw_click_subscribe(BUTTON_ID_UP, on_left_down, on_left_up, NULL);
 }
 
+int __errno;
+
+void trigger_haptic(int length)
+{
+
+}
+
 int main(void) {
+  APP_LOG(APP_LOG_LEVEL_ERROR, "free: %d", heap_bytes_free());
   if (!loadTextures())
     return -1;
+    APP_LOG(APP_LOG_LEVEL_ERROR, "free: %d", heap_bytes_free());
   //TexGenerationContext* texgenctx = texgen_init(NULL, TexGenerator_XOR, PBL_IF_COLOR_ELSE(64, 1));
   //texgen_execute(texgenctx);
 
-  LevelId levelId = loadLevelFromResource(RESOURCE_ID_LEVEL_TEST);
+  /*LevelId levelId = loadLevelFromResource(RESOURCE_ID_LEVEL_TEST);
   if (levelId == INVALID_LEVEL_ID)
     return -1;
 
   level = level_load(NULL, levelId);
   if (!level)
-    return -1;
+    return -1;*/
 
   renderer = renderer_init();
-  renderer_setLevel(renderer, level);
   renderer_setTextureManager(renderer, NULL);
   s_main_window = window_create();
   window_set_click_config_provider(s_main_window, (ClickConfigProvider)click_config_provider);
 
-  segame_init(&game, renderer);
+  segame_init(&game, renderer, NULL);
 
   root_layer = window_get_root_layer(s_main_window);
   layer_set_update_proc(root_layer, update_layer);

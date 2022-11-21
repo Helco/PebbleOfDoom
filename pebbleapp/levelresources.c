@@ -146,7 +146,8 @@ const Level* level_load(LevelManagerHandle lvlManager, LevelId id)
     walls = (Wall*)malloc(sizeof(Wall) * storedLevel.totalWallCount);
     vertices = (xz_t*)malloc(sizeof(xz_t) * storedLevel.vertexCount);
     entities = (Entity*)malloc(sizeof(Entity) * storedLevel.totalEntityCount);
-    if (sectors == NULL || walls == NULL || vertices == NULL || entities == NULL) {
+    if (sectors == NULL || walls == NULL || vertices == NULL ||
+        (entities == NULL && storedLevel.totalEntityCount > 0)) {
         APP_LOG(APP_LOG_LEVEL_ERROR, "Could not allocate %d sectors, %d walls and %d vertices and %d entities", storedLevel.sectorCount, storedLevel.totalWallCount, storedLevel.vertexCount, storedLevel.totalEntityCount);
         return NULL;
     }
@@ -184,10 +185,12 @@ void level_free(LevelManagerHandle lvlManger, const Level* level)
 {
     if (loadedLevelId == INVALID_LEVEL_ID || level != &loadedLevel)
         return;
-    free(sectors);
+    if (sectors != NULL) free(sectors);
     sectors = NULL;
-    free(walls);
+    if (walls != NULL) free(walls);
     walls = NULL;
+    if (entities != NULL) free(entities);
+    entities = NULL;
     memset(&loadedLevel, 0, sizeof(Level));
     loadedLevelId = 0;
 }

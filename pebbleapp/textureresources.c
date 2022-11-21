@@ -224,8 +224,6 @@ SpriteId loadSpriteFromResource(uint32_t resourceId)
         return INVALID_SPRITE_ID;
     }
 
-    APP_LOG(APP_LOG_LEVEL_ERROR, "load start %d into %d", resourceId, slot);
-
     GBitmap* bitmap = gbitmap_create_with_resource(resourceId);
     if (bitmap == NULL)
     {

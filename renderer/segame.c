@@ -83,7 +83,7 @@ SEGame* segame_init(SEGame* me, Renderer* renderer, LevelManagerHandle levelMana
     me->iconPlayerActions[PLAYERACT_KEY] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
     me->iconPlayerActions[PLAYERACT_SPEAK] = sprite_load(textureManager, RESOURCE_ID_ICON_SPEAK);
 
-    segame_changeLevel(me, RESOURCE_ID_LVL_HOME);
+    segame_changeLevel(me, RESOURCE_ID_LVL_OVERWORLD);
     return me;
 }
 
