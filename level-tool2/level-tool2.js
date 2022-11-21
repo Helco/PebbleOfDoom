@@ -107,7 +107,7 @@ const level = {
     ]
 };
 
-const levelName = "shop";
+const levelName = "home";
 const descr = yaml.parse(fs.readFileSync("resources/levels/" + levelName + ".yaml", "utf-8"));
 level.vertices = [];
 level.sectors = [];
@@ -287,6 +287,17 @@ for (var sectorName in descr.sectors)
     }
 }
 
+const disabledContours = new Set();
+if ("disabledContours" in descr)
+{
+    for (var i = 0; i < descr.disabledContours.length; i++)
+    {
+        if (!(descr.disabledContours[i] in descr.vertices))
+            throw "Invalid vertex for disabled contours: " + descr.disabledContours[i];
+        disabledContours.add(descr.vertices[descr.disabledContours[i]].index);
+    }
+}
+
 const disabledPortalContours = new Set();
 if ("disabledPortalContours" in descr)
 {
@@ -345,6 +356,8 @@ for (var sectorName in descr.sectors)
         if ("contourRight" in sector) defContourRight = sector.contourRight;
         if ("contourRightPortal" in sector) defContourRightPortal = sector.contourRightPortal;
 
+        if (disabledContours.has(myRightV)) defContourRight = false;
+        if (disabledContours.has(myLeftV)) defContourLeft = false;
         if (disabledPortalContours.has(myRightV)) defContourRightPortal = false;
         if (disabledPortalContours.has(myLeftV)) defContourLeftPortal = false;
         if (enabledBottomContours.has(key)) defContourBottom = true;

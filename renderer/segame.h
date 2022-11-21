@@ -26,7 +26,9 @@ typedef enum EntityType_ {
     ENTITY_MONSTER,
     ENTITY_SHOPKEEPER,
     ENTITY_TECHPRIEST,
-    ENTITY_DOOR
+    ENTITY_DOOR,
+    ENTITY_KEY,
+    ENTITY_SAFE
 } EntityType;
 
 typedef struct SEGame SEGame;

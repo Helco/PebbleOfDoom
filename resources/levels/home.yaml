@@ -1,0 +1,139 @@
+zoom: 3
+
+defaultFloorColor: 2,2,2
+defaultCeilColor: 0,0,0
+
+vars:
+  entBook: 0
+  entItemOffer: 1
+  entMonster: 2
+  entShopkeeper: 3
+  entTechpriest: 4
+  corrH: 20
+  gap: 4
+  size: corrH * 2 + gap
+  safeS: 5
+  doorWidth: 8
+  doorDepth: 2
+  doorHeight: 25
+  h: 40
+  safeH: 13
+
+vertices:
+  corrLLL: 0, 0
+  corrLLH: 0, corrH
+  corrLRL: size, 0
+  corrLRH: size, corrH
+  corrHLL: 0, size-corrH
+  corrHLH: 0, size
+  corrHRL: size, size-corrH
+  corrHRH: size, size
+  safeLL: 0, corrH/2-safeS/2
+  safeRL: safeS, corrH/2-safeS/2
+  safeLH: 0, corrH/2+safeS/2
+  safeRH: safeS, corrH/2+safeS/2
+  underSafe: safeS, 0
+  overSafe: safeS, corrH
+  gapLL: size-2*doorWidth,corrH
+  gapRL: size-doorWidth,corrH
+  gapLH: size-2*doorWidth,corrH+gap
+  gapRH: size-doorWidth,corrH+gap
+  doorLL: size-2*doorWidth,size
+  doorRL: size-doorWidth,size
+  doorLH: size-2*doorWidth,size+doorDepth
+  doorRH: size-doorWidth,size+doorDepth
+
+playerStart:
+  sector: corrL
+  position: safeS * 1.6, corrH/2
+  angle: 1.5
+
+disabledContours:
+  - safeLL
+  - safeLH
+  - overSafe
+  - underSafe
+
+sectors:
+  safeL:
+    y: 0
+    h: h
+    walls:
+      - corner: safeRL
+        contourRight: true
+        contourLeft: true
+        contourLeftPortal: false
+      - safeLL
+      - corrLLL
+      - corner: underSafe
+        contourLeftPortal: false
+
+  safe:
+    y: safeH
+    h: h-safeH
+    walls:
+      - safeRH
+      - safeLH
+      - corner: safeLL
+        contourLeftPortal: false
+      - corner: safeRL
+        contourLeftPortal: false
+
+  safeH:
+    y: 0
+    h: h
+    walls:
+      - overSafe
+      - corrLLH
+      - corner: safeLH
+        contourLeftPortal: false
+        contourRightPortal: false
+        contourRight: true
+      - safeRH
+
+  corrL:
+    y: 0
+    h: h
+    walls:
+      - corrLRH
+      - gapRL
+      - gapLL
+      - corner: overSafe
+        contourLeftPortal: false
+      - corner: safeRH
+        contourRight: true
+        contourLeftPortal: false
+      - safeRL
+      - underSafe
+      - corrLRL
+
+  gap:
+    y: 0
+    h: doorHeight
+    walls:
+      - gapRH
+      - gapLH
+      - gapLL
+      - gapRL
+
+  corrH:
+    y: 0
+    h: h
+    walls:
+      - corrHRH
+      - doorRL
+      - doorLL
+      - corrHLH
+      - corrHLL
+      - gapLH
+      - gapRH
+      - corrHRL
+
+  door:
+    y: 0
+    h: doorHeight
+    walls:
+      - doorRH
+      - doorLH
+      - doorLL
+      - doorRL
