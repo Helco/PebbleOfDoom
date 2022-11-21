@@ -56,9 +56,137 @@
           "memoryFormat": "2BitPalette"
         },
         {
+          "type": "bitmap",
+          "name": "ICON_BATTERY",
+          "file": "textures/icon_battery.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_FIST",
+          "file": "textures/icon_fist.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_SPEAK",
+          "file": "textures/icon_speak.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_USE",
+          "file": "textures/icon_use.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "SPR_BATTERY",
+          "file": "textures/spr_battery.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "SPR_KEY",
+          "file": "textures/spr_key.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "SPR_PC",
+          "file": "textures/spr_pr.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "SPR_PC_DEAD",
+          "file": "textures/spr_pr_dead.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "SPR_PC_PUSH",
+          "file": "textures/spr_pr_push.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "SPR_PT2",
+          "file": "textures/spr_pt2.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "SPR_PTR",
+          "file": "textures/spr_ptr.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "SPR_PTR_DEAD",
+          "file": "textures/spr_ptr_dead.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "SPR_PTR_PUSH",
+          "file": "textures/spr_ptr_push.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "SPR_SHOPKEEPER",
+          "file": "textures/spr_shopkeeper.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "SPR_TECHPRIEST",
+          "file": "textures/spr_techpriest.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "SPR_TECHPRIEST_ANGERY",
+          "file": "textures/spr_techpriest_angery.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "SPR_TECHPRIEST_DEAD",
+          "file": "textures/spr_techpriest_dead.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
+          "name": "SPR_TECHPRIEST_PUSH",
+          "file": "textures/spr_techpriest_pushed.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
           "type": "raw",
           "name": "LEVEL_TEST",
           "file": "levels/test.bin"
+        },
+        {
+          "type": "raw",
+          "name": "LVL_HOME",
+          "file": "levels/home.bin"
+        },
+        {
+          "type": "raw",
+          "name": "LVL_SHOP",
+          "file": "levels/shop.bin"
+        },
+        {
+          "type": "raw",
+          "name": "LVL_CATHEDRAL",
+          "file": "levels/cathedral.bin"
+        },
+        {
+          "type": "raw",
+          "name": "LVL_OVERWORLD",
+          "file": "levels/overworld.bin"
         }
       ]
     }

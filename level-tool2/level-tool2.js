@@ -107,7 +107,7 @@ const level = {
     ]
 };
 
-const levelName = "home";
+const levelName = "overworld";
 const descr = yaml.parse(fs.readFileSync("resources/levels/" + levelName + ".yaml", "utf-8"));
 level.vertices = [];
 level.sectors = [];
@@ -165,6 +165,22 @@ function splitvalue(str, name, parts, sep) { return reportError(() => {
     return parts;
 }, name); }
 
+if (!("vertices" in descr))
+    descr.vertices = {};
+
+if ("vertexRects" in descr)
+{
+    for (var v in descr.vertexRects)
+    {
+        const origin = vecvalue(descr.vertexRects[v].origin, v + "_origin");
+        const size = vecvalue(descr.vertexRects[v].size, v + "_size");
+        descr.vertices[v + "LL"] = `${origin.x}, ${origin.y}`;
+        descr.vertices[v + "RL"] = `${origin.x+size.x}, ${origin.y}`;
+        descr.vertices[v + "LH"] = `${origin.x}, ${origin.y+size.y}`;
+        descr.vertices[v + "RH"] = `${origin.x+size.x}, ${origin.y+size.y}`;
+    }
+}
+
 for (var v in descr.vertices)
 {
     descr.vertices[v] = vecvalue(descr.vertices[v], "vertex " + v);
@@ -189,12 +205,29 @@ function edgeKey(v0, v1)
     return `${v0}|${v1}`;
 }
 
+const defaultY = ("defaultY" in descr)
+    ? fvalue(descr.defaultY, "defaultY")
+    : null;
+const defaultH = ("defaultH" in descr)
+    ? fvalue(descr.defaultH, "defaultH")
+    : null;
+
 // First pass
 for (var sectorName in descr.sectors)
 {
     const sector = descr.sectors[sectorName];
-    sector.height = sector.h = fvalue(sector.h, sectorName + "_h");
-    sector.heightOffset = sector.y = fvalue(sector.y, sectorName + "_h");
+    if ("h" in sector)
+        sector.height = sector.h = fvalue(sector.h, sectorName + "_h");
+    else if (defaultH !== null)
+        sector.height = sector.h = defaultH;
+    else
+        throw sectorName + " needs h";
+    if ("y" in sector)
+        sector.heightOffset = sector.y = fvalue(sector.y, sectorName + "_y");
+    else if (defaultY !== null)
+        sector.heightOffset = sector.y = defaultY;
+    else
+        throw sectorName + " needs y";
     sector.yEnd = sector.y + sector.h;
     sector.floorColor = ("floorColor" in sector) && sector["floorColor"] !== undefined
         ? colvalue(sector.floorColor, sectorName + "_floorColor")
@@ -350,6 +383,8 @@ for (var sectorName in descr.sectors)
             defContourTop = sector.yEnd != w.portalSector.yEnd;
             defContourBottom = sector.y != w.portalSector.y;
         }
+
+        if ("defaultContourTop" in descr) defContourTop = descr.defaultContourTop;
 
         if ("contourLeft" in sector) defContourLeft = sector.contourLeft;
         if ("contourLeftPortal" in sector) defContourLeftPortal = sector.contourLeftPortal;

@@ -1,0 +1,256 @@
+zoom: 3
+
+defaultFloorColor: 2,2,2
+defaultCeilColor: 0,0,0
+
+vars:
+  entBook: 0
+  entItemOffer: 1
+  entMonster: 2
+  entShopkeeper: 3
+  entTechpriest: 4
+  homeS: 48
+  homeH: 40
+  shopS: 40
+  shopH: 40
+  mineW: 8
+  mineD: 8
+  mineH: 12
+  mineY: -2
+  cathW: 80
+  cathD: 100
+  cathH: 70
+  cathDoorW: 20
+  doorW: 8
+  doorD: 2
+  doorH: 25
+  outH: 200
+
+  baseW: 4 * shopS
+  baseD: 3.5*shopS+cathD
+  homeOX: baseW/2 - homeS/2
+  shopOZ: 2*shopS
+  cathOX: baseW/2 - cathW/2
+  cathOZ: 3.5*shopS
+  mineOX: baseW
+  mineOZ: 1.5*homeS
+  shopDoorOX: shopS
+  shopDoorOZ: shopOZ+shopS/2-doorW/2
+  homeDoorOX: homeOX+homeS-2*doorW
+  cathDoorOX: cathOX+cathW/2-cathDoorW/2
+  cathDoorOZ: cathOZ-doorD
+
+vertexRects:
+  base:
+    origin: 0, 0
+    size: baseW, baseD
+  shop:
+    origin: 0, shopOZ
+    size: shopS, shopS
+  cath:
+    origin: cathOX, cathOZ
+    size: cathW, cathD
+  home:
+    origin: homeOX, 0
+    size: homeS, homeS
+  mine:
+    origin: mineOX, mineOZ
+    size: mineW, mineD
+  shopDoor:
+    origin: shopDoorOX, shopDoorOZ
+    size: doorD, doorW
+  cathDoor:
+    origin: cathDoorOX, cathDoorOZ
+    size: cathDoorW, doorD
+  homeDoor:
+    origin: homeDoorOX, homeS
+    size: doorW, doorD
+
+playerStart:
+  sector: doors
+  position: homeDoorOX+doorW/2, homeS+doorD*2.5
+  angle: 0
+
+defaultY: 0
+defaultH: outH
+
+defaultContourTop: false
+
+disabledContours:
+  - baseLL
+  - baseRL
+  - baseLH
+  - baseRH
+
+disabledPortalContours:
+  - shopLL
+  - shopRL
+  - shopLH
+  - shopRH
+  - cathLL
+  - cathRL
+  - cathLH
+  - cathRH
+  - homeLH
+  - homeLL
+  - homeRH
+  - homeRL
+  - shopDoorLL
+  - shopDoorRL
+  - shopDoorLH
+  - shopDoorRH
+  - homeDoorLL
+  - homeDoorRL
+  - homeDoorLH
+  - homeDoorRH
+  - cathDoorLL
+  - cathDoorRL
+  - cathDoorLH
+  - cathDoorRH
+
+sectors:
+  cl:
+    walls:
+      - cathLH
+      - baseLH
+      - shopLH
+      - cathLL
+  cath:
+    y: cathH
+    h: outH-cathH
+    walls:
+      - cathRH
+      - cathLH
+      - cathLL
+      - cathDoorLH
+      - cathDoorRH
+      - cathRL
+
+  cr:
+    walls:
+      - baseRH
+      - cathRH
+      - cathRL
+      - mineLH
+
+  sc:
+    walls:
+      - cathDoorLH
+      - cathLL
+      - shopLH
+      - shopRH
+
+  sc2:
+    walls:
+      - cathDoorLL
+      - cathDoorLH
+      - shopRH
+      - shopDoorLH
+      - shopDoorRH
+
+  doors:
+    walls:
+      - cathDoorRL
+      - cathDoorLL
+      - shopDoorRH
+      - shopDoorRL
+      - homeDoorLH
+      - homeDoorRH
+
+  ch:
+    walls:
+      - cathRL
+      - cathDoorRH
+      - cathDoorRL
+      - homeDoorRH
+      - mineLH
+
+  sh:
+    walls:
+      - shopDoorRL
+      - shopDoorLL
+      - shopRL
+      - homeLH
+      - homeDoorLL
+      - homeDoorLH
+
+  hl:
+    walls:
+      - shopRL
+      - shopLL
+      - baseLL
+      - homeLL
+      - homeLH
+
+  hr:
+    walls:
+      - mineLL
+      - homeRH
+      - homeRL
+      - baseRL
+
+  mh:
+    walls:
+      - mineLH
+      - homeDoorRH
+      - homeDoorRL
+      - homeRH
+      - mineLL
+
+  shop:
+    y: shopH
+    h: outH-shopH
+    walls:
+      - shopRH
+      - shopLH
+      - shopLL
+      - shopRL
+      - shopDoorLL
+      - shopDoorLH
+
+  home:
+    y: homeH
+    h: outH-homeH
+    walls:
+      - homeRH
+      - homeDoorRL
+      - homeDoorLL
+      - homeLH
+      - homeLL
+      - homeRL
+
+  mine:
+    y: mineY
+    h: mineH*2
+    walls:
+      - mineRH
+      - mineLH
+      - mineLL
+      - mineRL
+      
+  cathDoor:
+    y: cathDoorW*2.3
+    h: outH-cathDoorW*2.3
+    walls:
+      - cathDoorRH
+      - cathDoorLH
+      - cathDoorLL
+      - cathDoorRL
+
+  shopDoor:
+    y: doorH
+    h: outH-doorH
+    walls:
+      - shopDoorRH
+      - shopDoorLH
+      - shopDoorLL
+      - shopDoorRL
+
+  homeDoor:
+    y: doorH
+    h: outH-doorH
+    walls:
+      - homeDoorRH
+      - homeDoorLH
+      - homeDoorLL
+      - homeDoorRL
