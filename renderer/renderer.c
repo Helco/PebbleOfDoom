@@ -668,8 +668,9 @@ void renderer_render(Renderer* renderer, RendererTarget target)
 
     for (int i = 0; i < renderer->drawRequests.count; i++)
     {
-        const DrawRequest* curRequest = &renderer->drawRequests.requests[i];
-        renderer_renderSector(renderer, target, curRequest);
+        // copy request as we might shuffle the array around during rendering
+        const DrawRequest curRequest = renderer->drawRequests.requests[i];
+        renderer_renderSector(renderer, target, &curRequest);
     }
 
     for (int i = renderer->drawRequests.count - 1; i >= 0; i--)
@@ -742,6 +743,10 @@ void drawRequestStack_reset(DrawRequestStack* stack)
 
 void drawRequestStack_push(DrawRequestStack* stack, const DrawRequest* source, const Sector* sector, int left, int right)
 {
+    //assert(source == NULL || source->depth + 1 < MAX_DRAW_DEPTH);
+    if (source != NULL && source->depth + 1 >= MAX_DRAW_DEPTH)
+        return; // maybe something like "is another boundarySet *required*" would be useful here...
+
     for (int i = stack->count - 1; i >= 0; i++)
     {
         if (stack->requests[i].depth != source->depth + 1)

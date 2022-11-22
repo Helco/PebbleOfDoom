@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #define MAX_DRAW_DEPTH 8
-#define MAX_DRAW_SECTORS 64
+#define MAX_DRAW_SECTORS 128
 
 typedef struct BoundarySet {
     uint8_t yTop[RENDERER_WIDTH];
@@ -32,7 +32,7 @@ struct Renderer
     real_t eyeHeight;
     real_t horFovScale, verFovScale, fov;
     lineSeg_t leftFovSeg, rightFovSeg;
-    BoundarySet stackBoundarySets[MAX_DRAW_DEPTH + 1];
+    BoundarySet stackBoundarySets[MAX_DRAW_DEPTH];
     BoundarySet wallBoundaries;
     short spanStart[RENDERER_HEIGHT];
     DrawRequestStack drawRequests;

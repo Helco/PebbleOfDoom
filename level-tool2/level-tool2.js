@@ -391,8 +391,8 @@ for (var sectorName in descr.sectors)
         if ("contourRight" in sector) defContourRight = sector.contourRight;
         if ("contourRightPortal" in sector) defContourRightPortal = sector.contourRightPortal;
 
-        if (disabledContours.has(myRightV)) defContourRight = false;
-        if (disabledContours.has(myLeftV)) defContourLeft = false;
+        if (disabledContours.has(myRightV)) { defContourRight = false; defContourRightPortal = false; }
+        if (disabledContours.has(myLeftV)) { defContourLeft = false; defContourLeftPortal = false; }
         if (disabledPortalContours.has(myRightV)) defContourRightPortal = false;
         if (disabledPortalContours.has(myLeftV)) defContourLeftPortal = false;
         if (enabledBottomContours.has(key)) defContourBottom = true;
