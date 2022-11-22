@@ -45,6 +45,13 @@ void prv_renderIcon(RendererTarget target, const Sprite* sprite, int x)
     prv_renderIconPart(target, sprite, x, 0, sprite->size.h);
 }
 
+void prv_renderIconInv(RendererTarget target, const Sprite* sprite, int x)
+{
+    assert(sprite->size.w == 32);
+    assert(sprite->bytesPerRow == 4);
+    prv_renderIconSrcInv(target, sprite->bw, x, 0, sprite->size.h);
+}
+
 void segame_render(SEGame* me, RendererTarget target)
 {
     if (!me->isPaused || !me->hadRenderedBefore)
@@ -76,7 +83,10 @@ void segame_render(SEGame* me, RendererTarget target)
         prv_renderIconPart(target, me->iconDigits, HUD_HEIGHT + i * DIGIT_WIDTH, srcY * DIGIT_WIDTH, DIGIT_WIDTH);
     }
 
-    prv_renderIcon(target, me->iconPlayerActions[me->player.activeAction], RENDERER_WIDTH / 2 - HUD_HEIGHT / 2);
+    if (me->player.activeAction == PLAYERACT_WALK && me->player.isWalking)
+        prv_renderIconInv(target, me->iconPlayerActions[me->player.activeAction], RENDERER_WIDTH / 2 - HUD_HEIGHT / 2);
+    else
+        prv_renderIcon(target, me->iconPlayerActions[me->player.activeAction], RENDERER_WIDTH / 2 - HUD_HEIGHT / 2);
 
     for (int i = 0; i < me->player.maxHealth; i++)
     {
