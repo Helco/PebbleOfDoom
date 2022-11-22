@@ -765,10 +765,7 @@ void drawRequestStack_push(DrawRequestStack* stack, const DrawRequest* source, c
             return;
         }
     }
-
-    if (left == right)
-        return; // not strictly correct, but hey, let's not draw a bunch of one pixel sectors
-
+    
     assert(stack->count < MAX_DRAW_SECTORS);
     stack->requests[stack->count++] = (DrawRequest) {
         .sector = sector,

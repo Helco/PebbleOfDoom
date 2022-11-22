@@ -24,7 +24,7 @@ vars:
   doorW: 8
   doorD: 2
   doorH: 25
-  outH: 200
+  outH: 400
 
   baseW: 4 * shopS
   baseD: 3.5*shopS+cathD
@@ -112,98 +112,114 @@ sectors:
   cl:
     walls:
       - cathLH
-      - baseLH
+      - corner: baseLH
+        contourLeft: true
       - shopLH
-      - cathLL
+      - corner: cathLL
+        contourRight: true
+
   cath:
     y: cathH
     h: outH-cathH
     walls:
-      - cathRH
-      - cathLH
+      - corner: cathRH
+      - corner: cathLH
       - cathLL
       - cathDoorLH
       - cathDoorRH
-      - cathRL
+      - corner: cathRL
 
   cr:
     walls:
-      - baseRH
+      - corner: baseRH
       - cathRH
-      - cathRL
+      - corner: cathRL
       - mineLH
 
   sc:
     walls:
-      - cathDoorLH
+      - corner: cathDoorLH
       - cathLL
-      - shopLH
+      - corner: shopLH
+        contourRight: true
       - shopRH
 
   sc2:
     walls:
-      - cathDoorLL
+      - corner: cathDoorLL
+        contourRight: true
       - cathDoorLH
-      - shopRH
+      - corner: shopRH
+        contourRight: true
       - shopDoorLH
-      - shopDoorRH
+      - corner: shopDoorRH
 
   doors:
     walls:
-      - cathDoorRL
-      - cathDoorLL
-      - shopDoorRH
-      - shopDoorRL
-      - homeDoorLH
-      - homeDoorRH
+      - corner: cathDoorRL
+        contourRight: true
+      - corner: cathDoorLL
+      - corner: shopDoorRH
+        contourRight: true
+      - corner: shopDoorRL
+      - corner: homeDoorLH
+        contourRight: true
+      - corner: homeDoorRH
 
   ch:
     walls:
-      - cathRL
-      - cathDoorRH
+      - corner: cathRL
+        contourRight: true
+      - corner: cathDoorRH
       - cathDoorRL
       - homeDoorRH
       - mineLH
 
   sh:
     walls:
-      - shopDoorRL
-      - shopDoorLL
+      - corner: shopDoorRL
+        contourRight: true
+      - corner: shopDoorLL
       - shopRL
-      - homeLH
-      - homeDoorLL
+      - corner: homeLH
+        contourRight: true
+      - corner: homeDoorLL
       - homeDoorLH
 
   hl:
     walls:
-      - shopRL
-      - shopLL
-      - baseLL
-      - homeLL
+      - corner: shopRL
+        contourRight: true
+      - corner: shopLL
+      - corner: baseLL
+      - corner: homeLL
       - homeLH
 
   hr:
     walls:
       - mineLL
-      - homeRH
-      - homeRL
+      - corner: homeRH
+        contourRight: true
+      - corner: homeRL
       - baseRL
 
   mh:
     walls:
       - mineLH
-      - homeDoorRH
-      - homeDoorRL
+      - corner: homeDoorRH
+        contourRight: true
+      - corner: homeDoorRL
       - homeRH
-      - mineLL
+      - corner: mineLL
+        contourTopPortal: true
 
   shop:
     y: shopH
     h: outH-shopH
     walls:
-      - shopRH
-      - shopLH
-      - shopLL
+      - corner: shopRH
+      - corner: shopLH
+      - corner: shopLL
       - shopRL
       - shopDoorLL
       - shopDoorLH
@@ -215,18 +231,22 @@ sectors:
       - homeRH
       - homeDoorRL
       - homeDoorLL
-      - homeLH
-      - homeLL
+      - corner: homeLH
+      - corner: homeLL
       - homeRL
 
   mine:
     y: mineY
     h: mineH*2
     walls:
-      - mineRH
-      - mineLH
-      - mineLL
-      - mineRL
+      - corner: mineRH
+        contourTop: true
+      - corner: mineLH
+        contourTop: true
+      - corner: mineLL
+        contourTop: true
+      - corner: mineRL
+        contourTop: true
       
   cathDoor:
     y: cathDoorW*2.3
