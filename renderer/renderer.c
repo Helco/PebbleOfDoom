@@ -742,6 +742,28 @@ void drawRequestStack_reset(DrawRequestStack* stack)
 
 void drawRequestStack_push(DrawRequestStack* stack, const DrawRequest* source, const Sector* sector, int left, int right)
 {
+    for (int i = stack->count - 1; i >= 0; i++)
+    {
+        if (stack->requests[i].depth != source->depth + 1)
+            break;
+        if (stack->requests[i].sector != sector)
+            continue;
+        DrawRequest* neighbor = &stack->requests[i];
+        if (right + 1 == neighbor->left)
+        {
+            neighbor->left = left;
+            return;
+        }
+        if (neighbor->right + 1 == left)
+        {
+            neighbor->right = right;
+            return;
+        }
+    }
+
+    if (left == right)
+        return; // not strictly correct, but hey, let's not draw a bunch of one pixel sectors
+
     assert(stack->count < MAX_DRAW_SECTORS);
     stack->requests[stack->count++] = (DrawRequest) {
         .sector = sector,
