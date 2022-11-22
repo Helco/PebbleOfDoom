@@ -19,7 +19,7 @@ typedef struct DrawRequest {
 
 typedef struct DrawRequestStack {
     DrawRequest requests[MAX_DRAW_SECTORS];
-    int count, depth;
+    int count;
 } DrawRequestStack;
 
 struct Renderer
@@ -55,8 +55,7 @@ typedef enum BresenhamStep
 } BresenhamStep;
 
 void drawRequestStack_reset(DrawRequestStack* stack);
-void drawRequestStack_push(DrawRequestStack* stack, const Sector* sector, int left, int right, const Sector* sourceSector);
-void drawRequestStack_nextDepth(DrawRequestStack* stack);
+void drawRequestStack_push(DrawRequestStack* stack, const DrawRequest* source, const Sector* sector, int left, int right);
 
 void bresenham_init(BresenhamIterator* it, int x0, int y0, int x1, int y1);
 BresenhamStep bresenham_step(BresenhamIterator* it);

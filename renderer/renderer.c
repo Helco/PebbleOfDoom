@@ -382,13 +382,17 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
     if (p.left.x >= p.right.x || p.right.x < request->left || p.left.x > request->right)
         return;
 
+    const BoundarySet* drawBoundary = &me->stackBoundarySets[request->depth];
+    BoundarySet* nextBoundary = &me->stackBoundarySets[request->depth + 1];
+    const int renderLeft = max(request->left, p.left.x);
+    const int renderRight = min(request->right, p.right.x);
     const Sector* targetSector = &me->level->sectors[wall->portalTo];
     int portalNomStart = -1, portalNomEnd = -1;
+
     if (wall->portalTo >= 0 && targetSector != request->sourceSector) {
         portalNomStart = clampi(0, targetSector->heightOffset - sector->heightOffset, sector->height);
         portalNomEnd = clampi(0, portalNomStart + targetSector->height, sector->height);
-        drawRequestStack_push(&me->drawRequests, targetSector,
-            max(request->left, p.left.x), min(request->right, p.right.x), sector);
+        drawRequestStack_push(&me->drawRequests, request, targetSector, renderLeft, renderRight);
     }
 
     const Texture* texture = NULL;
@@ -403,10 +407,6 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
     }
 
     // render wall
-    const BoundarySet* drawBoundary = &me->stackBoundarySets[request->depth];
-    BoundarySet* nextBoundary = &me->stackBoundarySets[request->depth + 1];
-    const int renderLeft = max(request->left, p.left.x);
-    const int renderRight = min(request->right, p.right.x);
     BresenhamIterator upperIt, lowerIt;
     bresenham_init(&lowerIt,
         renderLeft, lerpi(renderLeft, p.left.x, p.right.x, p.left.yStart, p.right.yStart),
@@ -662,27 +662,14 @@ void renderer_render(Renderer* renderer, RendererTarget target)
 
     drawRequestStack_reset(&renderer->drawRequests);
     drawRequestStack_push(&renderer->drawRequests,
+        NULL,
         &renderer->level->sectors[renderer->location.sector],
-        0, RENDERER_WIDTH - 1, NULL);
-    //drawRequestStack_nextDepth(&renderer->drawRequests);
+        0, RENDERER_WIDTH - 1);
 
-    int nextDepth = 0;
     for (int i = 0; i < renderer->drawRequests.count; i++)
     {
         const DrawRequest* curRequest = &renderer->drawRequests.requests[i];
-
-        if (i == nextDepth)
-        {
-            drawRequestStack_nextDepth(&renderer->drawRequests);
-            BoundarySet* bSet = &renderer->stackBoundarySets[curRequest->depth];
-            memcpy(bSet[1].yBottom, bSet[0].yBottom, sizeof(bSet[0].yBottom));
-            memcpy(bSet[1].yTop, bSet[0].yTop, sizeof(bSet[0].yTop));
-        }
-
         renderer_renderSector(renderer, target, curRequest);
-
-        if (i == nextDepth)
-            nextDepth = renderer->drawRequests.count;
     }
 
     for (int i = renderer->drawRequests.count - 1; i >= 0; i--)
@@ -750,26 +737,19 @@ void renderer_moveTo(Renderer* renderer, Location relativOrigin)
 
 void drawRequestStack_reset(DrawRequestStack* stack)
 {
-    stack->count = stack->depth = 0;
+    stack->count = 0;
 }
 
-void drawRequestStack_push(DrawRequestStack* stack, const Sector* sector, int left, int right, const Sector* sourceSector)
+void drawRequestStack_push(DrawRequestStack* stack, const DrawRequest* source, const Sector* sector, int left, int right)
 {
-    const int insertAt = stack->count;
-    assert(insertAt < MAX_DRAW_SECTORS);
-    stack->count++;// = (stack->count + 1) % MAX_DRAW_SECTORS;
-    stack->requests[insertAt] = (DrawRequest) {
+    assert(stack->count < MAX_DRAW_SECTORS);
+    stack->requests[stack->count++] = (DrawRequest) {
         .sector = sector,
         .left = left,
         .right = right,
-        .depth = stack->depth,
-        .sourceSector = sourceSector
+        .depth = source == NULL ? 0 : source->depth + 1,
+        .sourceSector = source == NULL ? NULL : source->sector
     };
-}
-
-void drawRequestStack_nextDepth(DrawRequestStack* stack)
-{
-    stack->depth++;
 }
 
 void bresenham_init(BresenhamIterator* it, int x0, int y0, int x1, int y1)
