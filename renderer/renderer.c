@@ -636,10 +636,43 @@ void renderer_renderSector(Renderer* renderer, RendererTarget target, const Draw
 
 void renderer_renderSectorEntities(Renderer* renderer, RendererTarget target, const DrawRequest* request)
 {
-    for (int i = 0; i < request->sector->entityCount; i++)
+#define MAX_ENTITIES_PER_SECTOR 8
+    assert(request->sector->entityCount <= MAX_ENTITIES_PER_SECTOR);
+    static int sortedIndices[MAX_ENTITIES_PER_SECTOR];
+    static real_t depths[MAX_ENTITIES_PER_SECTOR];
+    const Entity* entities = request->sector->entities;
+    const int entityCount = request->sector->entityCount;
+
+    for (int i = 0; i < entityCount; i++)
     {
-        if (request->sector->entities[i].sprite != INVALID_SPRITE_ID)
-            renderer_renderEntity(renderer, target, request, i);
+        sortedIndices[i] = i;
+        depths[i] = renderer_transformPoint(renderer, entities[i].location.position).z;
+    }
+
+    for (int i = 0; i < entityCount; i++)
+    {
+        bool didChange = false;
+        for (int j = 0; j < entityCount - 1; j++)
+        {
+            int a = sortedIndices[j];
+            int b = sortedIndices[j + 1];
+            if (real_compare(depths[a], depths[b]) <  0)
+            {
+                didChange = true;
+                sortedIndices[j] = b;
+                sortedIndices[j + 1] = a;
+            }
+        }
+        if (!didChange)
+            break;
+    }
+
+
+    for (int i = 0; i < entityCount; i++)
+    {
+        int actualI = sortedIndices[i];
+        if (entities[actualI].sprite != INVALID_SPRITE_ID)
+            renderer_renderEntity(renderer, target, request, actualI);
     }
 }
 

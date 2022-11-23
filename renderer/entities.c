@@ -74,7 +74,7 @@ void monster_act(SEGame* game, EntityData* data)
     if (data->monster.health > 0)
     {
         data->entity->sprite = data->monster.sprPushed->id;
-        data->monster.pushTimer = 60;
+        data->monster.pushTimer = 30;
 
         monster_pushMovement(game, data, data->entity->arg1 == 0 ? 150 : 100);
     }
