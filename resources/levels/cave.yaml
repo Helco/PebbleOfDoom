@@ -1,0 +1,339 @@
+zoom: 3
+
+defaultFloorColor: 2,2,2
+defaultCeilColor: 0,0,0
+
+vars:
+  entBook: 0
+  entItemOffer: 1
+  entMonster: 2
+  entShopkeeper: 3
+  entTechpriest: 4
+  Ad: 10
+  Asw: 7
+  Aw: 4*Asw
+  Bw: 40
+  Bd: 20
+  Cw: 13
+  Cd: 38
+  Hubw: 51
+  Hubd: 67
+  Dw: 22
+  Dd: 48
+  D1w: 22
+  D1d: 15
+  Ew: 40
+  Ed: 20
+  Fw: 12
+  Fd: 21
+  ED1w: 47
+  ED1d: 10
+  Gw: 36
+  Gd: 29
+  Hw: 26
+  Hd: 42
+  Iw: 33
+  Id: 16
+  Jw: 9
+  Jd: 22
+  gs: 5
+  gh: 23
+  EDDD: 19
+
+  Aox: Bw
+  Aoz: 5
+  A1ox: Aox+Aw
+  A2ox: A1ox+Asw
+  Box: 0
+  Boz: 0
+  Cox: 10
+  Coz: Bd
+  Hubox: Cox-10
+  Huboz: Coz+Cd
+  Dox: Hubox + 7
+  Doz: Huboz+Hubd
+  D1ox: Dox+Dw
+  D1oz: Doz+28
+  Eox: Hubox-Ew
+  Eoz: Huboz+32
+  Fox: Eox+7
+  Foz: Eoz-Fd
+  EDox: Eox+12
+  EDoz: Eoz+Ed
+  Gox: Hubox+Hubw
+  Goz: Huboz+22
+  Hox: Gox+13
+  Hoz: Goz-Hd
+  Iox: Hox+Hw
+  Ioz: Hoz+10
+  Jox: Iox+16
+  Joz: Ioz+Id
+
+vertexRects:
+  A:
+    origin: Aox, Aoz
+    size: Aw, Ad
+  A2:
+    origin: A2ox, Aoz
+    size: Asw, Ad
+  C:
+    origin: Cox, Coz
+    size: Cw, Cd
+  F:
+    origin: Fox, Foz
+    size: Fw, Fd
+  D1:
+    origin: D1ox, D1oz
+    size: D1w, D1d
+  I:
+    origin: Iox, Ioz
+    size: Iw, Id
+  J:
+    origin: Jox, Joz
+    size: Jw, Jd
+
+vertices:
+  Ba: Box+7, Boz+Bd
+  Bb: Box, Boz+4
+  Bc: Box+14, Boz
+  Bd: Box+29, Boz
+  Huba: Hubox+Hubw, Huboz+Hubd
+  Hubb: Hubox, Huboz+13
+  Hubc: Hubox+9, Huboz
+  Da: Dox+11, Doz+Dd
+  Db: Dox, Doz
+  Dc: Dox+Dw, Doz
+  Ea: Eox+Ew, Eoz+Ed
+  Eb: Eox, Eoz+9
+  Ec: Eox, Eoz
+  Ed: Eox+Ew, Eoz
+  ED1a: Dox-ED1w+ED1d*0.5, Doz+Dd-EDDD-ED1d
+  ED1b: Dox-ED1w-ED1d*0.3, Doz+Dd-EDDD-ED1d*0.5
+  ED1c: Eox+13, Eoz+Ed
+  ED1d: Eox+19, Eoz+Ed
+  ED2a: Dox, Doz+Dd-EDDD
+  ED2b: Dox-ED1w, Doz+Dd-EDDD
+  ED2c: Dox, Doz+Dd-EDDD-ED1d
+  Ga: Gox+Gw-18, Goz+Gd
+  Gb: Gox, Goz+Gd
+  Gc: Gox, Goz
+  Gd: Gox+Gw, Goz+12
+  Ha: Hox+Hw, Hoz+Hd
+  Hb: Hox, Hoz+Hd
+  Hc: Hox, Hoz+11
+  Hd: Hox+10, Hoz
+  He: Hox+Hw, Hoz
+
+playerStart:
+  sector: A
+  position: A1ox-Asw/2, Aoz+Ad/2
+  angle: -1.5
+
+sectors:
+  A:
+    y: gs*0.3
+    h: gh
+    walls:
+      - ARH
+      - ALH
+      - ALL
+      - ARL
+  
+  A1:
+    y: gs
+    h: gh
+    walls:
+      - A2LH
+      - ARH
+      - ARL
+      - A2LL
+  
+  A2:
+    y: gs*1.7
+    h: gh
+    walls:
+      - A2RH
+      - A2LH
+      - A2LL
+      - A2RL
+
+  B:
+    y: 0
+    h: gh*1.2
+    walls:
+      - CRL
+      - CLL
+      - Ba
+      - Bb
+      - Bc
+      - Bd
+      - ALL
+      - ALH
+    entities:
+      - type: entMonster
+        position: Box+14, Boz+Bd/2
+        arg1: 0
+
+  C:
+    y: -gs/2
+    h: gh*0.7
+    walls:
+      - CRH
+      - CLH
+      - CLL
+      - CRL
+
+  Hub:
+    y: -gs
+    h: gh * 3
+    walls:
+      - Huba
+      - Dc
+      - Db
+      - Ea
+      - Ed
+      - Hubb
+      - Hubc
+      - CLH
+      - CRH
+      - Gc
+      - Gb
+    entities:
+      - type: entMonster
+        position: Hubox/3, Doz-20
+        arg1: 0
+      - type: entMonster
+        position: Hubox/3*2, Doz-25
+        arg1: 0
+
+  D:
+    y: 0
+    h: gh * 1.6
+    walls:
+      - D1LH
+      - Da
+      - ED2a
+      - ED2c
+      - Db
+      - Dc
+      - D1LL
+    entities:
+      - type: entMonster
+        position: Dox+Dw/2, Doz+Dd-10
+        arg1: 1
+
+  D1:
+    y: gs * -0.3
+    h: gh
+    walls:
+      - D1RH
+      - D1LH
+      - D1LL
+      - D1RL
+
+  E:
+    y: gs * -0.2
+    h: gh * 1.4
+    walls:
+      - Ea
+      - ED1d
+      - ED1c
+      - Eb
+      - Ec
+      - FLH
+      - FRH
+      - Ed
+
+  F:
+    y: gs * 0.2
+    h: gh * 0.9
+    walls:
+      - FRH
+      - FLH
+      - FLL
+      - FRL
+    entities:
+      - type: entMonster
+        position: Fox+Fw/2, Foz+Fd/2
+        arg1: 1
+
+  ED1:
+    y: gs * 0.8
+    h: gh * 1.3
+    walls:
+      - ED1a
+      - ED1b
+      - ED1c
+      - ED1d
+
+  ED2:
+    y: gs
+    h: gh * 1.3
+    walls: 
+      - ED2a
+      - ED2b
+      - ED1b
+      - ED1a
+      - ED2c
+    entities:
+      - type: entMonster
+        position: Dox-ED1w+ED1d/2, Doz+Dd-EDDD-ED1d/2
+        arg1: 0
+
+  G:
+    y: gs * -2
+    h: gh*1.3
+    walls:
+      - Ga
+      - Gb
+      - Gc
+      - Hb
+      - Ha
+      - Gd
+    entities:
+      - type: entMonster
+        position: Gox+Gw/2, Goz+Gd/2
+        arg1: 0
+
+  H:
+    y: gs * -3
+    h: gh
+    walls:
+      - Ha
+      - Hb
+      - Hc
+      - Hd
+      - He
+      - ILL
+      - ILH
+    entities:
+      - type: entMonster
+        position: Hox+Hw/3, Hoz+Hd/3*2
+        arg1: 0
+      - type: entMonster
+        position: Hox+Hw/3*2, Hoz+Hd/3
+        arg1: 1
+  
+  I:
+    y: gs * -3.3
+    h: gh * 0.85
+    walls:
+      - IRH
+      - JRL
+      - JLL
+      - ILH
+      - ILL
+      - IRL
+
+  J:
+    y: gs * -3.6
+    h: gh * 0.7
+    walls:
+      - JRH
+      - JLH
+      - JLL
+      - JRL
+    entities:
+      - type: entMonster
+        position: Jox+Jw/2, Joz+Jd/3
+        arg1: 1
