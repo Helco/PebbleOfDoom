@@ -415,3 +415,49 @@ void itemoffer_act(SEGame* game, EntityData* data)
         : "A heart.\nIf one is good, why not have two?";
     game->menu.callback = itemoffer_menu_confirm;
 }
+
+void door_init(SEGame* game, EntityData* data)
+{
+    UNUSED(game);
+    data->playerAction = PLAYERACT_DOOR;
+    data->actionDistanceSqr = real_from_int(20 * 20);
+    data->entity->sprite = INVALID_SPRITE_ID;
+}
+
+static const LevelId DoorTargets[] = {
+    RESOURCE_ID_LVL_HOME,
+    RESOURCE_ID_LVL_OVERWORLD,
+    RESOURCE_ID_LVL_SHOP,
+    RESOURCE_ID_LVL_CATHEDRAL,
+    RESOURCE_ID_LVL_CAVE
+};
+
+void door_act(SEGame* game, EntityData* data)
+{
+    if (data->entity->arg3 > 0 && !game->player.hasKey)
+    {
+        menu_reset(&game->menu);
+        game->menu.text = "The door is locked.";
+        game->menu.callback = menu_cb_just_close;
+        return;
+    }
+
+    int targetEntry = data->entity->arg2 >> 4;
+    segame_changeLevel(game, DoorTargets[data->entity->arg1]);
+
+    for (int i = 0; i < game->level->sectorCount; i++)
+    {
+        const Sector* sector = &game->level->sectors[i];
+        for (int j = 0; j < sector->entityCount; j++)
+        {
+            const Entity* entity = &sector->entities[j];
+            if (entity->type == ENTITY_DOOR && (entity->arg2 & 0xf) == targetEntry)
+            {
+                *game->player.location = entity->location;
+                return;
+            }
+        }
+    }
+
+    assert(false && "Invalid target entry");
+}

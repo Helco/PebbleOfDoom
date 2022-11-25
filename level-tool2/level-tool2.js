@@ -107,7 +107,7 @@ const level = {
     ]
 };
 
-const levelName = "cave";
+const levelName = "overworld";
 const descr = yaml.parse(fs.readFileSync("resources/levels/" + levelName + ".yaml", "utf-8"));
 level.vertices = [];
 level.sectors = [];
@@ -306,6 +306,8 @@ for (var sectorName in descr.sectors)
             e.location.height += fvalue(e.y, `${sectorName}_entity${i}_y`);
         else
             e.location.height += 0;
+        if ("angle" in e)
+            e.location.angle = fvalue(e.angle, `${sectorName}_entity${i}_y`);
         e.sprite = ivalue(e.sprite, `${sectorName}_entity${i}_sprite`);
         function optivalue(obj, prop, def, name) {
             return (prop in obj) ? ivalue(obj[prop], `${name}_${prop}`) : def;

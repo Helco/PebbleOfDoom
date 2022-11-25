@@ -81,6 +81,7 @@ PCMockup *pcmockup_init()
         textureManager_registerSpriteFile(me->textureManager, "icon_fist.png", RESOURCE_ID_ICON_FIST) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "icon_speak.png", RESOURCE_ID_ICON_SPEAK) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "icon_battery.png", RESOURCE_ID_ICON_BATTERY ) == INVALID_SPRITE_ID ||
+        textureManager_registerSpriteFile(me->textureManager, "icon_door.png", RESOURCE_ID_ICON_DOOR) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "spr_pr.png", RESOURCE_ID_SPR_PC) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "spr_pr_push.png", RESOURCE_ID_SPR_PC_PUSH) == INVALID_SPRITE_ID ||
         textureManager_registerSpriteFile(me->textureManager, "spr_pr_dead.png", RESOURCE_ID_SPR_PC_DEAD) == INVALID_SPRITE_ID ||

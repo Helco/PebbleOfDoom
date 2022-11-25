@@ -9,6 +9,7 @@ vars:
   entMonster: 2
   entShopkeeper: 3
   entTechpriest: 4
+  entDoor: 5
   size: 40
   counterSize: 8
   counterHeight: 13
@@ -83,3 +84,9 @@ sectors:
       - doorLH
       - doorLL
       - doorRL
+    entities:
+      - type: entDoor
+        position: size+doorDepth/2, size/2
+        angle: -1.5
+        arg1: 1
+        arg2: 0x10

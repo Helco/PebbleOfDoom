@@ -70,6 +70,16 @@ void renderer_renderDebugSector(Renderer* me, SDL_Renderer* sdlRenderer, xz_t of
         renderer_setDebugColor(sdlRenderer, GColorFromRGB((i % 3 == 0) * 255, (i % 3 == 1) * 255, (i % 3 == 2) * 255));
         renderer_renderSDLDebugLine(me, sdlRenderer, offset, wallLine, opts);
     }
+
+    for (int i = 0; i < sector->entityCount; i++)
+    {
+        renderer_setDebugColor(sdlRenderer, GColorFromRGB(0, 255, 0));
+        const Entity* entity = &sector->entities[i];
+        renderer_renderDebugVector(me, sdlRenderer, offset,
+            entity->location.position,
+            angleToVector(entity->location.angle, real_from_int(13)),
+            opts);
+    }
 }
 
 void renderer_debug_renderWorld(Renderer* me, SDL_Renderer* sdlRenderer, xz_t offset, const void* userdata)

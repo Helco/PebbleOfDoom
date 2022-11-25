@@ -7,6 +7,7 @@ vars:
   entBook: 0
   entMonster: 2
   entTechpriest: 4
+  entDoor: 5
   stairL: 17
   stairH: 5
   stairD: 5
@@ -23,7 +24,13 @@ vars:
   heightSide: 45
   heightBase: 70
   heightTower: 100
-  
+  doorW: 20
+  doorD: 3
+
+vertexRects:
+  door:
+    origin: baseW/2-doorW/2, -doorD
+    size: doorW, doorD
 
 vertices:
   baseLL: 0, 0
@@ -96,17 +103,36 @@ sectors:
       - colLL_LL
       - sideLL
       - baseLL
+      - doorLH
       - carpetLL
 
   sideRL:
     y: 0
     h: heightBase
     walls:
+      - doorRH
       - baseRL
       - sideRL
       - colRL_RL
       - colRL_LL
       - carpetRL
+
+  door:
+    y: 0
+    h: doorW * 2.3
+    walls:
+      - carpetLL
+      - doorLH
+      - doorLL
+      - doorRL
+      - doorRH
+      - carpetRL
+    entities:
+      - type: entDoor
+        position: baseW/2, -doorD/2
+        angle: 0
+        arg1: 1
+        arg2: 0x20
 
   centerLI:
     y: 0

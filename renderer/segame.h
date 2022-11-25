@@ -17,6 +17,7 @@ enum PlayerAction_ {
     PLAYERACT_BATTERY,
     PLAYERACT_KEY,
     PLAYERACT_SPEAK,
+    PLAYERACT_DOOR,
     COUNT_PLAYERACT
 };
 
@@ -28,7 +29,7 @@ typedef enum EntityType_ {
     ENTITY_TECHPRIEST,
     ENTITY_DOOR,
     ENTITY_KEY,
-    ENTITY_SAFE
+    ENTITY_SAFE,
 } EntityType;
 
 typedef struct SEGame SEGame;
@@ -163,6 +164,9 @@ void shopkeeper_act(SEGame* game, EntityData* data);
 
 void itemoffer_init(SEGame* game, EntityData* data);
 void itemoffer_act(SEGame* game, EntityData* data);
+
+void door_init(SEGame* game, EntityData* data);
+void door_act(SEGame* game, EntityData* data);
 
 void segame_input_select_click(SEGame* me);
 void segame_input_select_long_click(SEGame* me);

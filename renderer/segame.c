@@ -28,6 +28,10 @@ static const EntityBrain EntityBrains[] = {
     [ENTITY_SHOPKEEPER] = {
         .init = shopkeeper_init,
         .playerAction = shopkeeper_act
+    },
+    [ENTITY_DOOR] = {
+        .init = door_init,
+        .playerAction = door_act
     }
 };
 
@@ -82,8 +86,9 @@ SEGame* segame_init(SEGame* me, Renderer* renderer, LevelManagerHandle levelMana
     me->iconPlayerActions[PLAYERACT_BATTERY] = sprite_load(textureManager, RESOURCE_ID_ICON_BATTERY);
     me->iconPlayerActions[PLAYERACT_KEY] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
     me->iconPlayerActions[PLAYERACT_SPEAK] = sprite_load(textureManager, RESOURCE_ID_ICON_SPEAK);
+    me->iconPlayerActions[PLAYERACT_DOOR] = sprite_load(textureManager, RESOURCE_ID_ICON_DOOR);
 
-    segame_changeLevel(me, RESOURCE_ID_LVL_CAVE);
+    segame_changeLevel(me, RESOURCE_ID_LVL_HOME);
     return me;
 }
 

@@ -9,6 +9,7 @@ vars:
   entMonster: 2
   entShopkeeper: 3
   entTechpriest: 4
+  entDoor: 5
   homeS: 48
   homeH: 40
   shopS: 40
@@ -165,6 +166,32 @@ sectors:
       - corner: homeDoorLH
         contourRight: true
       - corner: homeDoorRH
+    entities:
+      - type: entDoor
+        position: cathDoorOX+cathDoorW/6, cathDoorOZ
+        angle: -3.1
+        arg1: 3
+        arg2: 0x08
+      - type: entDoor
+        position: cathDoorOX+cathDoorW/6*5, cathDoorOZ
+        angle: -3.1
+        arg1: 3
+        arg2: 0x08
+      - type: entDoor
+        position: cathDoorOX+cathDoorW/2, cathDoorOZ
+        angle: -3.1
+        arg1: 3
+        arg2: 0x02
+      - type: entDoor
+        position: shopDoorOX+doorD*1.5, shopDoorOZ+doorW/2
+        angle: 1.5
+        arg1: 2
+        arg2: 0x01
+      - type: entDoor
+        position: homeDoorOX+doorW/2, homeS+doorD*1.5
+        angle: 0
+        arg1: 0
+        arg2: 0x00
 
   ch:
     walls:
@@ -247,6 +274,13 @@ sectors:
         contourTop: true
       - corner: mineRL
         contourTop: true
+    entities:
+      - type: entDoor
+        position: mineOX+mineW/2, mineOZ+mineD/2
+        angle: -1.5
+        arg1: 4
+        arg2: 0x03
+        arg3: 2
       
   cathDoor:
     y: cathDoorW*2.3
@@ -264,7 +298,7 @@ sectors:
       - shopDoorRH
       - shopDoorLH
       - shopDoorLL
-      - shopDoorRL
+      - shopDoorRL      
 
   homeDoor:
     y: doorH
@@ -273,4 +307,4 @@ sectors:
       - homeDoorRH
       - homeDoorLH
       - homeDoorLL
-      - homeDoorRL
+      - homeDoorRL      

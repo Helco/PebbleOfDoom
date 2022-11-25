@@ -9,6 +9,7 @@ vars:
   entMonster: 2
   entShopkeeper: 3
   entTechpriest: 4
+  entDoor: 5
   Ad: 10
   Asw: 7
   Aw: 4*Asw
@@ -156,6 +157,12 @@ sectors:
       - A2LH
       - A2LL
       - A2RL
+    entities:
+      - type: entDoor
+        position: A2ox+Asw/3, Aoz+Ad/2
+        angle: -1.5
+        arg1: 1
+        arg2: 0x30
 
   B:
     y: 0
