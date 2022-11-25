@@ -42,7 +42,7 @@ typedef struct Player
     int gold;
     PlayerAction activeAction;
     bool isWalking, isTurningLeft, isTurningRight;
-    bool hasKey, hasBattery, hadDoneTutorial, hasEnteredCave, hasSpokenToPriest, hasGotClue;
+    bool hasHomeKey, hasMineKey, hasBattery, hasEnteredCave, hasSpokenToPriest, hasGotClue;
     bool priestHasSeenBattery, hasSpokenToShopKeeper, shopKeeperTold;
 } Player;
 
@@ -112,6 +112,8 @@ struct EntityData
     };
 };
 
+typedef void (*SEGameOnceCallback)(SEGame* game);
+
 struct SEGame
 {
     Renderer* renderer;
@@ -121,6 +123,7 @@ struct SEGame
     Menu menu;
     bool isPaused;
     bool hadRenderedBefore;
+    SEGameOnceCallback onceCallback;
 
     EntityData* focusedEntity;
     EntityData entities[MAX_ENTITIES];
@@ -138,6 +141,8 @@ void segame_update(SEGame* me);
 void segame_render(SEGame* me, RendererTarget renderer);
 void segame_changeLevel(SEGame* me, LevelId newLevel);
 void segame_hurtPlayer(SEGame* me);
+void segame_once_tutorial(SEGame* me);
+void segame_once_died(SEGame* me);
 
 void menu_reset(Menu* menu);
 void menu_render(Menu* menu, RendererTarget renderer);
@@ -167,6 +172,10 @@ void itemoffer_act(SEGame* game, EntityData* data);
 
 void door_init(SEGame* game, EntityData* data);
 void door_act(SEGame* game, EntityData* data);
+void door_update(SEGame* game, EntityData* data);
+
+void key_init(SEGame* game, EntityData* data);
+void key_act(SEGame* game, EntityData* data);
 
 void segame_input_select_click(SEGame* me);
 void segame_input_select_long_click(SEGame* me);

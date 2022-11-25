@@ -31,7 +31,12 @@ static const EntityBrain EntityBrains[] = {
     },
     [ENTITY_DOOR] = {
         .init = door_init,
-        .playerAction = door_act
+        .playerAction = door_act,
+        .update = door_update
+    },
+    [ENTITY_KEY] = {
+        .init = key_init,
+        .playerAction = key_act
     }
 };
 
@@ -89,6 +94,7 @@ SEGame* segame_init(SEGame* me, Renderer* renderer, LevelManagerHandle levelMana
     me->iconPlayerActions[PLAYERACT_DOOR] = sprite_load(textureManager, RESOURCE_ID_ICON_DOOR);
 
     segame_changeLevel(me, RESOURCE_ID_LVL_HOME);
+    me->onceCallback = segame_once_tutorial;
     return me;
 }
 
@@ -105,6 +111,12 @@ void segame_free(SEGame* me)
 
 void segame_update(SEGame* me)
 {
+    if (me->onceCallback != NULL)
+    {
+        me->onceCallback(me);
+        me->onceCallback = NULL;
+    }
+
     if (me->isPaused)
     {
 
@@ -130,8 +142,9 @@ void segame_update(SEGame* me)
             {
                 xz_t localDirection = xz_invScale(playerToEntity, real_sqrt(entity->curDistanceSqr));
                 localDirection = xz_rotate(localDirection, me->player.location->angle);
+                float maxFocusAngle = entity->entity->type == ENTITY_DOOR ? MAX_FOCUS_ANGLE * 4 : MAX_FOCUS_ANGLE;
                 // yes. too cheap for an acos
-                if (real_compare(real_abs(localDirection.x), real_from_float(MAX_FOCUS_ANGLE)) < 0 &&
+                if (real_compare(real_abs(localDirection.x), real_from_float(maxFocusAngle)) < 0 &&
                     real_compare(localDirection.z, real_zero) > 0)
                 {
                     me->focusedEntity = entity;
@@ -183,6 +196,9 @@ void segame_changeLevel(SEGame* me, LevelId levelId)
     }
     me->entityCount = entityI;
     me->focusedEntity = NULL;
+
+    if (levelId == RESOURCE_ID_LVL_MINE)
+        me->player.hasEnteredCave = true;
 }
 
 void segame_menu_died_3(SEGame* me, int button)
@@ -216,6 +232,21 @@ void segame_hurtPlayer(SEGame* me)
         me->menu.text = "Hey, wake up!\nOh good, you are alive...";
         me->menu.callback = segame_menu_died_2;
     }
+}
+
+static const char* const TutorialLines[] = {
+    "Welcome to\nSearching Emery",
+    "The icon centered in the bottom is your current action. Long-press SELECT to use.",
+    "To walk, short-press SELECT to start walking and press again to stop.",
+    "Why don't you get the key from the other room?",
+    NULL
+};
+
+void segame_once_tutorial(SEGame* me)
+{
+    me->menu.lineI = -1;
+    me->menu.lines = TutorialLines;
+    menu_cb_babble_lines(me, -1);
 }
 
 void segame_input_select_click(SEGame* me)

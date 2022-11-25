@@ -10,6 +10,7 @@ vars:
   entShopkeeper: 3
   entTechpriest: 4
   entDoor: 5
+  entKey: 6
   corrH: 20
   gap: 4
   size: corrH * 2 + gap
@@ -129,6 +130,10 @@ sectors:
       - gapLH
       - gapRH
       - corrHRL
+    entities:
+      - type: entKey
+        position: size / 5, size - corrH/2
+        angle: 1.5
 
   door:
     y: 0

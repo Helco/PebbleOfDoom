@@ -66,6 +66,11 @@ void segame_render(SEGame* me, RendererTarget target)
         me->hadRenderedBefore = true;
     }
 
+    if (me->player.activeAction == PLAYERACT_WALK && me->player.isWalking)
+        prv_renderIconInv(target, me->iconPlayerActions[me->player.activeAction], RENDERER_WIDTH / 2 - HUD_HEIGHT / 2);
+    else
+        prv_renderIcon(target, me->iconPlayerActions[me->player.activeAction], RENDERER_WIDTH / 2 - HUD_HEIGHT / 2);
+
     if (me->isPaused)
     {
         menu_render(&me->menu, target);
@@ -83,11 +88,6 @@ void segame_render(SEGame* me, RendererTarget target)
         prv_renderIconPart(target, me->iconDigits, HUD_HEIGHT + i * DIGIT_WIDTH, srcY * DIGIT_WIDTH, DIGIT_WIDTH);
     }
 
-    if (me->player.activeAction == PLAYERACT_WALK && me->player.isWalking)
-        prv_renderIconInv(target, me->iconPlayerActions[me->player.activeAction], RENDERER_WIDTH / 2 - HUD_HEIGHT / 2);
-    else
-        prv_renderIcon(target, me->iconPlayerActions[me->player.activeAction], RENDERER_WIDTH / 2 - HUD_HEIGHT / 2);
-
     for (int i = 0; i < me->player.maxHealth; i++)
     {
         int x = RENDERER_WIDTH + DIGIT_WIDTH * (i - me->player.maxHealth);
@@ -98,6 +98,8 @@ void segame_render(SEGame* me, RendererTarget target)
         else
             prv_renderIconSrcInv(target, spriteSrc, x, (i % 2) * DIGIT_WIDTH, DIGIT_WIDTH);
     }
+
+    
 
 }
 

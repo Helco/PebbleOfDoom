@@ -258,7 +258,7 @@ void techpriest_act(SEGame* game, EntityData* data)
         game->player.hasSpokenToPriest = true;
         game->player.gold += 5;
     }
-    else if (!game->player.hasKey)
+    else if (!game->player.hasMineKey)
     {
         menu_reset(&game->menu);
         game->menu.text = "The greed SHOPKEEPER only sells the KEY TO THE CAVES anymore. What a ...";
@@ -339,15 +339,15 @@ void shopkeeper_act(SEGame* game, EntityData* data)
         game->menu.text = "Well I don't have any work for you, but maybe the priest in the cathedral?";
         game->menu.callback = menu_cb_just_close;
     }
-    else if (!game->player.hasKey && !game->player.hasEnteredCave)
+    else if (!game->player.hasMineKey && !game->player.hasEnteredCave)
     {
         menu_reset(&game->menu);
         game->menu.text = "Sure you can buy the key, here you go.\nHave fun, don't let the grumpy watches bite you";
         game->menu.callback = menu_cb_just_close;
-        game->player.hasKey = true;
+        game->player.hasMineKey = true;
         game->player.gold -= 3;
     }
-    else if (game->player.hasKey && !game->player.hasEnteredCave)
+    else if (game->player.hasMineKey && !game->player.hasEnteredCave)
     {
         menu_reset(&game->menu);
         game->menu.text = "Well go on if you will. And if you don't make it, could you return the key?";
@@ -365,7 +365,7 @@ void itemoffer_init(SEGame* game, EntityData* data)
 {
     UNUSED(game);
     data->actionDistanceSqr = real_from_int(30 * 30);
-    data->playerAction = PLAYERACT_SPEAK;
+    data->playerAction = PLAYERACT_USE;
     data->entity->sprite = data->entity->arg1 == 0 ? RESOURCE_ID_SPR_BATTERY : RESOURCE_ID_SPR_HEART;
     data->entity->radius = 12;
 }
@@ -418,8 +418,11 @@ void itemoffer_act(SEGame* game, EntityData* data)
 
 void door_init(SEGame* game, EntityData* data)
 {
-    UNUSED(game);
-    data->playerAction = PLAYERACT_DOOR;
+    data->playerAction =
+        (data->entity->arg3 == 0) ||
+        (data->entity->arg3 == 1 && game->player.hasHomeKey) ||
+        (data->entity->arg3 == 2 && game->player.hasMineKey)
+        ? PLAYERACT_DOOR : PLAYERACT_KEY;
     data->actionDistanceSqr = real_from_int(20 * 20);
     data->entity->sprite = INVALID_SPRITE_ID;
 }
@@ -432,12 +435,27 @@ static const LevelId DoorTargets[] = {
     RESOURCE_ID_LVL_CAVE
 };
 
+void door_update(SEGame* game, EntityData* data)
+{
+    if (data->entity->arg3 == 1 && game->player.hasHomeKey)
+    {
+        data->playerAction = PLAYERACT_DOOR;
+    }
+}
+
 void door_act(SEGame* game, EntityData* data)
 {
-    if (data->entity->arg3 > 0 && !game->player.hasKey)
+    if (data->entity->arg3 == 1 && !game->player.hasHomeKey)
     {
         menu_reset(&game->menu);
-        game->menu.text = "The door is locked.";
+        game->menu.text = "The door is locked. The key is to your left, at the end of the room.";
+        game->menu.callback = menu_cb_just_close;
+        return;
+    }
+    if (data->entity->arg3 == 2 && !game->player.hasMineKey)
+    {
+        menu_reset(&game->menu);
+        game->menu.text = "This trapdoor leads to a cave. However it is locked.";
         game->menu.callback = menu_cb_just_close;
         return;
     }
@@ -460,4 +478,23 @@ void door_act(SEGame* game, EntityData* data)
     }
 
     assert(false && "Invalid target entry");
+}
+
+void key_init(SEGame* game, EntityData* data)
+{
+    UNUSED(game);
+    data->playerAction = PLAYERACT_USE;
+    data->actionDistanceSqr = real_from_int(20 * 20);
+    data->entity->sprite = RESOURCE_ID_SPR_KEY;
+    data->entity->radius = 6;
+}
+
+void key_act(SEGame* game, EntityData* data)
+{
+    data->isDead = true;
+    data->entity->sprite = INVALID_SPRITE_ID;
+    game->player.hasHomeKey = true;
+    menu_reset(&game->menu);
+    game->menu.text = "Great, no you can leave this house.";
+    game->menu.callback = menu_cb_just_close;
 }
