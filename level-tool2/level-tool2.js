@@ -107,7 +107,7 @@ const level = {
     ]
 };
 
-const levelName = "home";
+const levelName = "cathedral";
 const descr = yaml.parse(fs.readFileSync("resources/levels/" + levelName + ".yaml", "utf-8"));
 level.vertices = [];
 level.sectors = [];

@@ -3,7 +3,10 @@
 #include "resources.h"
 
 static const char* const BookTexts[] = {
-    "This is a book.\nCongratulations"
+    "This is a book.\nCongratulations",
+    "...everyone knows the six major types, but there is a seventh coming soon. It will\n<page was torn here>",
+    "...will degrade if left too long and turn spiteful. Recommendations to prolong this are\n<burn marks>",
+    "...but never sold. However one Emery was locked in a safe not far away from the office space."
 };
 
 void book_init(SEGame* game, EntityData* data)
@@ -12,6 +15,7 @@ void book_init(SEGame* game, EntityData* data)
     data->actionDistanceSqr = real_from_int(50 * 50);
     data->playerAction = PLAYERACT_USE;
     data->entity->sprite = RESOURCE_ID_SPR_BOOK;
+    data->entity->radius = 8;
 }
 
 void book_act(SEGame* game, EntityData* data)
@@ -22,6 +26,9 @@ void book_act(SEGame* game, EntityData* data)
     menu_reset(&game->menu);
     game->menu.text = BookTexts[data->entity->arg1];
     game->menu.callback = menu_cb_just_close;
+
+    if (data->entity->arg1 == 3)
+        game->player.hasGotClue = true;
 }
 
 #define START_ATTACK_TIMER 37
@@ -194,7 +201,7 @@ void techpriest_menu_heal(SEGame* game, int button)
 
 static const char* const techpriest_lines_new[] =
 {
-    "Hello my child and welcome!",
+    "Hello wanderer and welcome!",
     "I am the priest of technology and guard of this holy place.",
     "You look like you could help me: it was long ago since I knew the time...",
     "Once there were many watches here but alas they did not last and thus were banished into the CAVES below",
@@ -234,8 +241,9 @@ static const char* const techpriest_lines_battery[] =
 static const char* const techpriest_lines_gotclue[] =
 {
     "What have you there, an old diary? Does it reveal anything?",
-    "A code? But there is only one lock of that type in this village...",
-    "GIVE IT TO ME! You will not get EMERY, you are not WORTHY!",
+    "A code? Surely it MUST be 411! But there is only ONE safe in this village...",
+    "Thank you but your journey ends here, I'm afraid",
+    "I can let you get EMERY, you are not WORTHY!",
     NULL
 };
 

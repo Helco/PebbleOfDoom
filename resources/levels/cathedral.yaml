@@ -75,6 +75,8 @@ disabledPortalContours:
   - stairCRL
   - stairCLH
   - stairCRH
+  - carpetLL
+  - carpetRL
 
 enabledBottomContours:
   - carpetLL, stairCLL
@@ -82,7 +84,8 @@ enabledBottomContours:
 
 playerStart:
   sector: carpet
-  position: baseW/2, 5
+  position: baseW/2, baseH + stairL * 1.2
+  y: stairH * 2
   angle: 0
 
 sectors:

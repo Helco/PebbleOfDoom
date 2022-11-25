@@ -237,6 +237,10 @@ sectors:
       - D1LH
       - D1LL
       - D1RL
+    entities:
+      - type: entBook
+        position: D1ox+D1w*5/6, D1oz+D1d/2
+        arg1: 2
 
   E:
     y: gs * -0.2
@@ -262,6 +266,9 @@ sectors:
     entities:
       - type: entMonster
         position: Fox+Fw/2, Foz+Fd/2
+        arg1: 1
+      - type: entBook
+        position: Fox+Fw/2, Foz+Fd/5
         arg1: 1
 
   ED1:
@@ -344,3 +351,6 @@ sectors:
       - type: entMonster
         position: Jox+Jw/2, Joz+Jd/3
         arg1: 1
+      - type: entBook
+        position: Jox+Jw/2, Joz+Jd*5/6
+        arg1: 3

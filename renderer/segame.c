@@ -86,15 +86,15 @@ SEGame* segame_init(SEGame* me, Renderer* renderer, LevelManagerHandle levelMana
     me->iconGold = sprite_load(textureManager, RESOURCE_ID_ICON_GOLD);
     me->iconHeart = sprite_load(textureManager, RESOURCE_ID_SPR_HEART);
     me->iconPlayerActions[PLAYERACT_WALK] = sprite_load(textureManager, RESOURCE_ID_ICON_BOOTS);
-    me->iconPlayerActions[PLAYERACT_USE] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
+    me->iconPlayerActions[PLAYERACT_USE] = sprite_load(textureManager, RESOURCE_ID_ICON_USE);
     me->iconPlayerActions[PLAYERACT_FIST] = sprite_load(textureManager, RESOURCE_ID_ICON_FIST);
     me->iconPlayerActions[PLAYERACT_BATTERY] = sprite_load(textureManager, RESOURCE_ID_ICON_BATTERY);
     me->iconPlayerActions[PLAYERACT_KEY] = sprite_load(textureManager, RESOURCE_ID_ICON_KEY);
     me->iconPlayerActions[PLAYERACT_SPEAK] = sprite_load(textureManager, RESOURCE_ID_ICON_SPEAK);
     me->iconPlayerActions[PLAYERACT_DOOR] = sprite_load(textureManager, RESOURCE_ID_ICON_DOOR);
 
-    segame_changeLevel(me, RESOURCE_ID_LVL_HOME);
-    me->onceCallback = segame_once_tutorial;
+    segame_changeLevel(me, RESOURCE_ID_LVL_CAVE);
+    //me->onceCallback = segame_once_tutorial;
     return me;
 }
 
@@ -218,6 +218,13 @@ void segame_menu_died_2(SEGame* me, int button)
     me->menu.callback = segame_menu_died_3;
 }
 
+void segame_once_died(SEGame* me)
+{
+    menu_reset(&me->menu);
+    me->menu.text = "Hey, wake up!\nOh good, you are alive...";
+    me->menu.callback = segame_menu_died_2;
+}
+
 void segame_hurtPlayer(SEGame* me)
 {
     trigger_haptic(200);
@@ -227,10 +234,8 @@ void segame_hurtPlayer(SEGame* me)
         me->player.health = 1;
         me->player.gold /= 3;
         segame_changeLevel(me, RESOURCE_ID_LVL_CATHEDRAL);
-        //me->player.location->position = xz(real_from_int(300), real_from_int(200)); 
-        menu_reset(&me->menu);
-        me->menu.text = "Hey, wake up!\nOh good, you are alive...";
-        me->menu.callback = segame_menu_died_2;
+        me->onceCallback = segame_once_died;
+        
     }
 }
 
