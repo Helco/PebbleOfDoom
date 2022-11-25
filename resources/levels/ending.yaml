@@ -1,0 +1,48 @@
+zoom: 3
+
+defaultFloorColor: 2,2,2
+defaultCeilColor: 0,0,0
+
+vars:
+  entBook: 0
+  entItemOffer: 1
+  entMonster: 2
+  entShopkeeper: 3
+  entTechpriest: 4
+  entDoor: 5
+  entKey: 6
+  entEmery: 8
+  corrH: 20
+  gap: 4
+  size: corrH * 2 + gap
+  safeS: 5
+  doorWidth: 8
+  doorDepth: 2
+  doorHeight: 25
+  h: 40
+  safeH: 13
+
+vertices:
+  corrLLL: 0, 0
+  corrLLH: 0, corrH
+  corrLRL: size, 0
+  corrLRH: size, corrH
+
+playerStart:
+  sector: corrL
+  position: size*2/3, corrH/2
+  angle: -1.5
+
+sectors:
+  corrL:
+    y: 0
+    h: h
+    walls:
+      - corrLLL
+      - corrLRL
+      - corrLRH
+      - corrLLH
+    entities:
+      - type: entEmery
+        position: 3, corrH/2
+        angle: 1.5

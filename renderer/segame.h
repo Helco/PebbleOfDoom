@@ -30,6 +30,7 @@ typedef enum EntityType_ {
     ENTITY_DOOR,
     ENTITY_KEY,
     ENTITY_SAFE,
+    ENTITY_EMERY
 } EntityType;
 
 typedef struct SEGame SEGame;
@@ -137,6 +138,7 @@ struct SEGame
 };
 
 SEGame* segame_init(SEGame* me, Renderer* renderer, LevelManagerHandle levelManager);
+void segame_end(SEGame* me);
 void segame_free(SEGame* me);
 void segame_update(SEGame* me);
 void segame_render(SEGame* me, RendererTarget renderer);
@@ -178,6 +180,12 @@ void door_update(SEGame* game, EntityData* data);
 
 void key_init(SEGame* game, EntityData* data);
 void key_act(SEGame* game, EntityData* data);
+
+void safe_init(SEGame* game, EntityData* data);
+void safe_act(SEGame* game, EntityData* data);
+
+void emery_init(SEGame* game, EntityData* data);
+void emery_act(SEGame* game, EntityData* data);
 
 void segame_input_select_click(SEGame* me);
 void segame_input_select_long_click(SEGame* me);

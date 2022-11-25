@@ -37,6 +37,14 @@ static const EntityBrain EntityBrains[] = {
     [ENTITY_KEY] = {
         .init = key_init,
         .playerAction = key_act
+    },
+    [ENTITY_SAFE] = {
+        .init = safe_init,
+        .playerAction = safe_act
+    },
+    [ENTITY_EMERY] = {
+        .init = emery_init,
+        .playerAction = emery_act
     }
 };
 
@@ -94,8 +102,15 @@ SEGame* segame_init(SEGame* me, Renderer* renderer, LevelManagerHandle levelMana
     me->iconPlayerActions[PLAYERACT_DOOR] = sprite_load(textureManager, RESOURCE_ID_ICON_DOOR);
 
     segame_changeLevel(me, RESOURCE_ID_LVL_HOME);
-    me->onceCallback = segame_once_tutorial;
+    me->player.hasCathKey = true;
+    //me->onceCallback = segame_once_tutorial;
     return me;
+}
+
+void segame_end(SEGame* me)
+{
+    // DO SOMETHING
+    UNUSED(me);
 }
 
 void segame_free(SEGame* me)

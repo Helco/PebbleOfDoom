@@ -639,3 +639,65 @@ void key_act(SEGame* game, EntityData* data)
     game->menu.text = "Great, no you can leave this house.";
     game->menu.callback = menu_cb_just_close;
 }
+
+void safe_init(SEGame* game, EntityData* data)
+{
+    UNUSED(game);
+    data->playerAction = PLAYERACT_USE;
+    data->actionDistanceSqr = real_from_int(20 * 20);
+    data->entity->sprite = INVALID_SPRITE_ID;
+    data->entity->radius = 10;
+}
+
+void safe_act(SEGame* game, EntityData* data)
+{
+    UNUSED(data);
+    if (game->player.hasCathKey)
+    {
+        segame_changeLevel(game, RESOURCE_ID_LVL_ENDING);
+    }
+    else if (game->player.hasGotClue)
+    {
+        menu_reset(&game->menu);
+        game->menu.text = "A safe, just like the note in the caves. But what is the combination?";
+        game->menu.callback = menu_cb_just_close;
+    }
+    else
+    {
+        menu_reset(&game->menu);
+        game->menu.text = "This is a safe, but it looks like it was not opened in a long time.";
+        game->menu.callback = menu_cb_just_close;
+    }
+}
+
+void emery_init(SEGame* game, EntityData* data)
+{
+    UNUSED(game);
+    data->playerAction = PLAYERACT_SPEAK;
+    data->entity->sprite = RESOURCE_ID_SPR_PT2;
+    data->entity->radius = 16;
+    data->actionDistanceSqr = real_from_int(37 * 37);
+}
+
+void emery_end_game(SEGame* game, int button)
+{
+    UNUSED(button);
+    segame_end(game);
+}
+
+static const char* const EmeryLines[] = {
+    "\"Emery\", Pebble Time 2\nStill living on...",
+    "",
+    "THE END\n\nThanks for playing",
+    "Keep your Pebble alive and charged!",
+    NULL
+};
+
+void emery_act(SEGame* game, EntityData* data)
+{
+    UNUSED(data);
+    game->menu.lineI = -1;
+    game->menu.lines = EmeryLines;
+    game->menu.babbleCallback = emery_end_game;
+    menu_cb_babble_lines(game, -1);
+}

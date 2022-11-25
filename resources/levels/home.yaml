@@ -11,6 +11,7 @@ vars:
   entTechpriest: 4
   entDoor: 5
   entKey: 6
+  entSafe: 7
   corrH: 20
   gap: 4
   size: corrH * 2 + gap
@@ -80,6 +81,10 @@ sectors:
         contourLeftPortal: false
       - corner: safeRL
         contourLeftPortal: false
+    entities:
+      - type: entSafe
+        position: safeS, corrH/2
+        angle: 1.5 
 
   safeH:
     y: 0
