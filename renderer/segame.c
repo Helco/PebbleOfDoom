@@ -93,7 +93,9 @@ SEGame* segame_init(SEGame* me, Renderer* renderer, LevelManagerHandle levelMana
     me->iconPlayerActions[PLAYERACT_SPEAK] = sprite_load(textureManager, RESOURCE_ID_ICON_SPEAK);
     me->iconPlayerActions[PLAYERACT_DOOR] = sprite_load(textureManager, RESOURCE_ID_ICON_DOOR);
 
-    segame_changeLevel(me, RESOURCE_ID_LVL_CAVE);
+    segame_changeLevel(me, RESOURCE_ID_LVL_CATHEDRAL);
+    me->player.hasGotClue = me->player.hasMineKey = me->player.hasEnteredCave = true;
+    me->player.gold = 50;
     //me->onceCallback = segame_once_tutorial;
     return me;
 }
@@ -252,6 +254,13 @@ void segame_once_tutorial(SEGame* me)
     me->menu.lineI = -1;
     me->menu.lines = TutorialLines;
     menu_cb_babble_lines(me, -1);
+}
+
+void segame_once_angered(SEGame* me)
+{
+    menu_reset(&me->menu);
+    me->menu.text = "I can let you get EMERY, you are not WORTHY!";
+    me->menu.callback = menu_cb_just_close;
 }
 
 void segame_input_select_click(SEGame* me)

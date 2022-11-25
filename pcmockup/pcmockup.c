@@ -110,7 +110,8 @@ PCMockup *pcmockup_init()
         levelManager_registerFile(me->levelManager, "cathedral.bin", RESOURCE_ID_LVL_CATHEDRAL) == INVALID_LEVEL_ID ||
         levelManager_registerFile(me->levelManager, "shop.bin", RESOURCE_ID_LVL_SHOP) == INVALID_LEVEL_ID ||
         levelManager_registerFile(me->levelManager, "overworld.bin", RESOURCE_ID_LVL_OVERWORLD) == INVALID_LEVEL_ID ||
-        levelManager_registerFile(me->levelManager, "cave.bin", RESOURCE_ID_LVL_CAVE) == INVALID_LEVEL_ID)
+        levelManager_registerFile(me->levelManager, "cave.bin", RESOURCE_ID_LVL_CAVE) == INVALID_LEVEL_ID ||
+        levelManager_registerFile(me->levelManager, "cathedral_end.bin", RESOURCE_ID_LVL_CATHEDRAL_END) == INVALID_LEVEL_ID)
     {
         pcmockup_free(me);
         return NULL;

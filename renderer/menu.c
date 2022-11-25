@@ -69,6 +69,11 @@ void menu_cb_babble_lines(SEGame* game, int button)
     const char* nextLine = game->menu.lines[game->menu.lineI];
     if (nextLine == NULL)
     {
+        if (game->menu.babbleCallback != NULL)
+        {
+            game->menu.babbleCallback(game, -1);
+            game->menu.babbleCallback = NULL;
+        }
         game->isPaused = false;
         return;
     }

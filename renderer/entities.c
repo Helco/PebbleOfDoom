@@ -31,37 +31,70 @@ void book_act(SEGame* game, EntityData* data)
         game->player.hasGotClue = true;
 }
 
-#define START_ATTACK_TIMER 37
-#define REPEAT_ATTACK_TIMER 30
-
-void monster_init(SEGame* game, EntityData* data)
+typedef struct MonsterStats
 {
-    TextureManagerHandle textureManager = renderer_getTextureManager(game->renderer);
-    data->actionDistanceSqr = real_from_int(50*50);
-    data->playerAction = game->player.hasBattery ? PLAYERACT_BATTERY : PLAYERACT_FIST;
-    data->monster.distanceLeft = real_zero;
-    data->monster.pushTimer = 0;
-    data->monster.attackTimer = START_ATTACK_TIMER;
-    if (data->entity->arg1 == 0)
-    {
-        data->monster.sprAlive = sprite_load(textureManager, RESOURCE_ID_SPR_PC);
-        data->monster.sprPushed = sprite_load(textureManager, RESOURCE_ID_SPR_PC_PUSH);
-        data->monster.sprDead = sprite_load(textureManager, RESOURCE_ID_SPR_PC_DEAD);
-        data->monster.speed = real_from_float(1.3f);
-        data->monster.health = 3;
-    }
-    else
-    {
-        data->monster.sprAlive = sprite_load(textureManager, RESOURCE_ID_SPR_PTR);
-        data->monster.sprPushed = sprite_load(textureManager, RESOURCE_ID_SPR_PTR_PUSH);
-        data->monster.sprDead = sprite_load(textureManager, RESOURCE_ID_SPR_PTR_DEAD);
-        data->monster.speed = real_from_float(0.7f);
-        data->monster.health = 5;
-    }
-    data->monster.regularSpeed = data->monster.speed;
+    SpriteId sprAlive;
+    SpriteId sprPushed;
+    SpriteId sprDead;;
+    int startAttackTimer;
+    int repeatAttackTimer;
+    int hurtChance;
+    int maxHealth;
+    float speed;
+    int pushMovement;
+    int gold;
+    bool canWanderSectors;
+    int jitterFreqDiv;
+    int jitterAmplDiv;
+} MonsterStats;
 
-    data->entity->sprite = data->monster.sprAlive->id;
-}
+static const MonsterStats AllMonsterStats[] = {
+    {
+        .sprAlive = RESOURCE_ID_SPR_PC,
+        .sprPushed = RESOURCE_ID_SPR_PC_PUSH,
+        .sprDead = RESOURCE_ID_SPR_PC_DEAD,
+        .startAttackTimer = 37,
+        .repeatAttackTimer = 30,
+        .hurtChance = 3,
+        .maxHealth = 2,
+        .speed = 1.3f,
+        .pushMovement = 150,
+        .gold = 2,
+        .canWanderSectors = false,
+        .jitterFreqDiv = 1,
+        .jitterAmplDiv = 2
+    },
+    {
+        .sprAlive = RESOURCE_ID_SPR_PTR,
+        .sprPushed = RESOURCE_ID_SPR_PTR_PUSH,
+        .sprDead = RESOURCE_ID_SPR_PTR_DEAD,
+        .startAttackTimer = 37,
+        .repeatAttackTimer = 30,
+        .hurtChance = 3,
+        .maxHealth = 4,
+        .speed = 0.7f,
+        .pushMovement = 100,
+        .gold = 5,
+        .canWanderSectors = false,
+        .jitterFreqDiv = 2,
+        .jitterAmplDiv = 1
+    },
+    {
+        .sprAlive = RESOURCE_ID_SPR_TECHPRIEST_ANGERY,
+        .sprPushed = RESOURCE_ID_SPR_TECHPRIEST_PUSHED,
+        .sprDead = RESOURCE_ID_SPR_TECHPRIEST_DEAD,
+        .startAttackTimer = 10,
+        .repeatAttackTimer = 15,
+        .hurtChance = 4,
+        .maxHealth = 7,
+        .speed = 2,
+        .pushMovement = 250,
+        .gold = 0,
+        .canWanderSectors = true,
+        .jitterFreqDiv = 1,
+        .jitterAmplDiv = 1
+    }
+};
 
 void monster_pushMovement(SEGame* game, EntityData* data, int distance)
 {
@@ -71,28 +104,83 @@ void monster_pushMovement(SEGame* game, EntityData* data, int distance)
     data->monster.speed = real_mul(data->monster.regularSpeed, real_from_int(10));
 }
 
+void monster_init(SEGame* game, EntityData* data)
+{
+    TextureManagerHandle textureManager = renderer_getTextureManager(game->renderer);
+    data->actionDistanceSqr = real_from_int(50*50);
+    data->playerAction = game->player.hasBattery ? PLAYERACT_BATTERY : PLAYERACT_FIST;
+    data->monster.distanceLeft = real_zero;
+    data->monster.pushTimer = 0;
+
+    const MonsterStats* stats = &AllMonsterStats[data->entity->arg1];
+    data->monster.sprAlive = sprite_load(textureManager, stats->sprAlive);
+    data->monster.sprPushed = sprite_load(textureManager, stats->sprPushed);
+    data->monster.sprDead = sprite_load(textureManager, stats->sprDead);
+    data->monster.speed = real_from_float(1.3f);
+    data->monster.health = stats->maxHealth;
+    data->monster.attackTimer = stats->startAttackTimer;
+
+    data->monster.regularSpeed = data->monster.speed;
+    data->entity->sprite = data->monster.sprAlive->id;
+
+    if (stats->canWanderSectors)
+    {
+        monster_pushMovement(game, data, 100);
+        data->monster.pushTimer = 22;
+    }
+}
+
 void monster_act(SEGame* game, EntityData* data)
 {
+    const MonsterStats* stats = &AllMonsterStats[data->entity->arg1];
     if (data->monster.pushTimer > 0 || data->monster.health < 0)
         return;
 
     trigger_haptic(50);
-    data->monster.health -= game->player.hasBattery ? 3 : 1;
+    data->monster.health -= game->player.hasBattery ? 2 : 1;
     if (data->monster.health > 0)
     {
         data->entity->sprite = data->monster.sprPushed->id;
         data->monster.pushTimer = 30;
 
-        monster_pushMovement(game, data, data->entity->arg1 == 0 ? 150 : 100);
+        monster_pushMovement(game, data, stats->pushMovement);
     }
     else
     {
-        game->player.gold += data->entity->arg1 == 0 ? 2 : 5;
+        if (stats->canWanderSectors)
+        {
+            game->player.hasCathKey = true;
+            menu_reset(&game->menu);
+            game->menu.text = "You defeated me, now it is your task: Don't let it die, keep Emery alive!";
+            game->menu.callback = menu_cb_just_close;
+            data->monster.speed = real_zero;
+        }
+        else
+            monster_pushMovement(game, data, 50);
+        game->player.gold += stats->gold;
         data->entity->sprite = data->monster.sprDead->id;
         data->monster.health = 0;
         data->playerAction = PLAYERACT_WALK;
-        monster_pushMovement(game, data, 50);
     }
+}
+
+bool monster_try_changeSector(SEGame* game, EntityData* data, Location* newLocation)
+{
+    const MonsterStats* stats = &AllMonsterStats[data->entity->arg1];
+    if (!stats->canWanderSectors || newLocation->sector < 0)
+        return false;
+
+    Sector* oldSector = &game->level->sectors[data->entity->location.sector];
+    Sector* newSector = &game->level->sectors[newLocation->sector];
+    if (newSector->entityCount != 0)
+        return false;
+
+    newSector->entities = oldSector->entities;
+    oldSector->entityCount = 0;
+    newSector->entityCount = 1;
+    
+    newLocation->height = real_from_int(game->level->sectors[newLocation->sector].heightOffset);
+    return true;
 }
 
 bool monster_walk(SEGame* game, EntityData* data)
@@ -100,7 +188,8 @@ bool monster_walk(SEGame* game, EntityData* data)
     real_t move = real_min(data->monster.distanceLeft, data->monster.speed);
     Location newLocation = data->entity->location;
     newLocation.position = xz_add(newLocation.position, xz_scale(data->monster.direction, move));
-    if (!location_updateSectorNear(&newLocation, game->level))
+    if (!location_updateSectorNear(&newLocation, game->level) ||
+        monster_try_changeSector(game, data, &newLocation))
     {
         data->entity->location = newLocation;
         data->monster.distanceLeft = real_sub(data->monster.distanceLeft, move);
@@ -111,6 +200,7 @@ bool monster_walk(SEGame* game, EntityData* data)
 
 void monster_update(SEGame* game, EntityData* data)
 {
+    const MonsterStats* stats = &AllMonsterStats[data->entity->arg1];
     if (data->monster.health <= 0)
     {
         monster_walk(game, data);
@@ -127,9 +217,9 @@ void monster_update(SEGame* game, EntityData* data)
             real_from_int(sectorHeight + 5),
             real_lerpi(-data->monster.health, 30, 45, 0, 15));
 
-        int jitterFreqDiv = data->entity->arg1 == 0 ? 1 : 2;
-        int jitterAmplDiv = data->entity->arg1 == 0 ? 2 : 1;
-        real_t jitter = real_div(real_from_int((-data->monster.health / jitterFreqDiv % 2) * 2 - 1), real_from_int(jitterAmplDiv));
+        real_t jitter = real_div(
+            real_from_int((-data->monster.health / stats->jitterFreqDiv % 2) * 2 - 1),
+            real_from_int(stats->jitterAmplDiv));
         data->entity->location.position = xz_add(data->entity->location.position, xz(jitter, jitter));
     }
     else if (data->monster.pushTimer > 0)
@@ -141,7 +231,7 @@ void monster_update(SEGame* game, EntityData* data)
         {
             data->monster.pushTimer = 0;
             data->entity->sprite = data->monster.sprAlive->id;
-            data->monster.attackTimer = START_ATTACK_TIMER;
+            data->monster.attackTimer = stats->startAttackTimer;
         }
     }
     else if (game->player.location->sector == data->entity->location.sector)
@@ -153,12 +243,12 @@ void monster_update(SEGame* game, EntityData* data)
             data->monster.direction = xz_normalize(dir);
             data->monster.distanceLeft = real_from_int(100000);
             monster_walk(game, data);
-            data->monster.attackTimer = min(data->monster.attackTimer + 2, START_ATTACK_TIMER);
+            data->monster.attackTimer = min(data->monster.attackTimer + 2, stats->startAttackTimer);
         }
         else if (--data->monster.attackTimer <= 0)
         {
-            data->monster.attackTimer = REPEAT_ATTACK_TIMER;
-            if (rand() % 3 > 0)
+            data->monster.attackTimer = stats->repeatAttackTimer;
+            if (rand() % stats->hurtChance > 0)
             {
                 segame_hurtPlayer(game);
             }
@@ -168,7 +258,7 @@ void monster_update(SEGame* game, EntityData* data)
     {
         data->monster.speed = real_lerp(real_from_float(0.05f), data->monster.speed,
             real_div(data->monster.regularSpeed, real_from_int(2)));
-        data->monster.attackTimer = min(data->monster.attackTimer + 1, START_ATTACK_TIMER);
+        data->monster.attackTimer = min(data->monster.attackTimer + 1, stats->startAttackTimer);
 
         if (data->monster.wasAttacking || real_compare(data->monster.distanceLeft, real_zero) <= 0)
         {
@@ -243,17 +333,29 @@ static const char* const techpriest_lines_gotclue[] =
     "What have you there, an old diary? Does it reveal anything?",
     "A code? Surely it MUST be 411! But there is only ONE safe in this village...",
     "Thank you but your journey ends here, I'm afraid",
-    "I can let you get EMERY, you are not WORTHY!",
     NULL
 };
 
 void techpriest_init(SEGame* game, EntityData* data)
 {
-    UNUSED(game);
+    if (game->player.hasCathKey)
+    {
+        data->isDead = true;
+        data->entity->sprite = INVALID_SPRITE_ID;
+        return;
+    }
+
     data->actionDistanceSqr = real_from_int(30 * 30);
     data->playerAction = PLAYERACT_SPEAK;
     data->entity->sprite = RESOURCE_ID_SPR_TECHPRIEST;
     data->techpriest.noProgressLine = 0;
+}
+
+void techpriest_get_angry(SEGame* game, int button)
+{
+    UNUSED(button);
+    segame_changeLevel(game, RESOURCE_ID_LVL_CATHEDRAL_END);
+    game->onceCallback = segame_once_angered;
 }
 
 void techpriest_act(SEGame* game, EntityData* data)
@@ -282,8 +384,8 @@ void techpriest_act(SEGame* game, EntityData* data)
     {
         game->menu.lines = techpriest_lines_gotclue;
         game->menu.lineI = -1;
+        game->menu.babbleCallback = techpriest_get_angry;
         menu_cb_babble_lines(game, -1);
-        // TODO: Add techpriest monster here
     }
     else if (game->player.health < game->player.maxHealth)
     {
@@ -371,14 +473,21 @@ void shopkeeper_act(SEGame* game, EntityData* data)
 
 void itemoffer_init(SEGame* game, EntityData* data)
 {
-    UNUSED(game);
     data->actionDistanceSqr = real_from_int(30 * 30);
     data->playerAction = PLAYERACT_USE;
     data->entity->sprite = data->entity->arg1 == 0 ? RESOURCE_ID_SPR_BATTERY : RESOURCE_ID_SPR_HEART;
     data->entity->radius = 12;
+
+    if ((data->entity->arg1 == 0 && game->player.hasBattery) ||
+        (data->entity->arg1 == 1 && game->player.maxHealth > 2))
+    {
+        data->entity->sprite = INVALID_SPRITE_ID;
+        data->isDead = true;
+    }
 }
 
 static int activatedItem = 0;
+static EntityData* activatedItemData = 0;
 
 void itemoffer_menu_result(SEGame* game, int button)
 {
@@ -389,6 +498,8 @@ void itemoffer_menu_result(SEGame* game, int button)
         menu_reset(&game->menu);
         game->menu.text = "Here you go.";
         game->menu.callback = menu_cb_just_close;
+        activatedItemData->isDead = true;
+        activatedItemData->entity->sprite = INVALID_SPRITE_ID;
     }
     else if (button == 0 && game->player.gold < price)
     {
@@ -417,6 +528,7 @@ void itemoffer_menu_confirm(SEGame* game, int button)
 void itemoffer_act(SEGame* game, EntityData* data)
 {
     activatedItem = data->entity->arg1;
+    activatedItemData = data;
     menu_reset(&game->menu);
     game->menu.text = activatedItem == 0
         ? "A battery.\nGood against all machines that have just run out of juice."
@@ -429,7 +541,7 @@ void door_init(SEGame* game, EntityData* data)
     data->playerAction =
         (data->entity->arg3 == 0) ||
         (data->entity->arg3 == 1 && game->player.hasHomeKey) ||
-        (data->entity->arg3 == 2 && game->player.hasMineKey)
+        (data->entity->arg3 == 2 && game->player.hasMineKey) 
         ? PLAYERACT_DOOR : PLAYERACT_KEY;
     data->actionDistanceSqr = real_from_int(20 * 20);
     data->entity->sprite = INVALID_SPRITE_ID;
@@ -446,9 +558,9 @@ static const LevelId DoorTargets[] = {
 void door_update(SEGame* game, EntityData* data)
 {
     if (data->entity->arg3 == 1 && game->player.hasHomeKey)
-    {
         data->playerAction = PLAYERACT_DOOR;
-    }
+    if (data->entity->arg3 == 3 && game->player.hasCathKey)
+        data->playerAction = PLAYERACT_DOOR;
 }
 
 void door_act(SEGame* game, EntityData* data)
@@ -464,6 +576,13 @@ void door_act(SEGame* game, EntityData* data)
     {
         menu_reset(&game->menu);
         game->menu.text = "This trapdoor leads to a cave. However it is locked.";
+        game->menu.callback = menu_cb_just_close;
+        return;
+    }
+    if (data->entity->arg3 == 3 && !game->player.hasCathKey)
+    {
+        menu_reset(&game->menu);
+        game->menu.text = "The door is locked.";
         game->menu.callback = menu_cb_just_close;
         return;
     }
@@ -490,7 +609,12 @@ void door_act(SEGame* game, EntityData* data)
 
 void key_init(SEGame* game, EntityData* data)
 {
-    UNUSED(game);
+    if (game->player.hasHomeKey)
+    {
+        data->entity->sprite = INVALID_SPRITE_ID;
+        data->isDead = true;
+        return;
+    }
     data->playerAction = PLAYERACT_USE;
     data->actionDistanceSqr = real_from_int(20 * 20);
     data->entity->sprite = RESOURCE_ID_SPR_KEY;

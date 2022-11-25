@@ -37,6 +37,7 @@ enum {
     RESOURCE_ID_LVL_MINE,
     RESOURCE_ID_LVL_OVERWORLD,
     RESOURCE_ID_LVL_CAVE,
+    RESOURCE_ID_LVL_CATHEDRAL_END
 };
 #else
 #include <pebble.h>

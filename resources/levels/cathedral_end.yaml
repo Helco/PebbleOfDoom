@@ -1,0 +1,265 @@
+zoom: 3
+
+defaultFloorColor: 2,2,2
+defaultCeilColor: 0,0,0
+
+vars:
+  entBook: 0
+  entMonster: 2
+  entTechpriest: 4
+  entDoor: 5
+  stairL: 17
+  stairH: 5
+  stairD: 5
+  baseW: 5 * stairL
+  baseH: 100
+  stairSlope: stairD / Math.sqrt(2)
+  centerL: baseW/2-stairL/2
+  centerR: baseW/2+stairL/2
+  colL: 6
+  lowColZ: 30
+  highColZ: 80
+  leftColX: stairL-colL
+  rightColX: baseW-stairL
+  heightSide: 45
+  heightBase: 70
+  heightTower: 100
+  doorW: 20
+  doorD: 3
+
+vertexRects:
+  door:
+    origin: baseW/2-doorW/2, -doorD
+    size: doorW, doorD
+
+vertices:
+  baseLL: 0, 0
+  baseRL: baseW, 0
+  baseLH: 0, baseH
+  baseRH: baseW, baseH
+  stairBLL: stairL, baseH+stairL
+  stairBRL: baseW-stairL, baseH+stairL
+  stairBLH: stairL+stairSlope, baseH+stairL+stairSlope
+  stairBRH: baseW-stairL-stairSlope, baseH+stairL+stairSlope
+  stairCLH: centerL, baseH+stairD
+  stairCRH: centerR, baseH+stairD
+  stairCLL: centerL, baseH
+  stairCRL: centerR, baseH
+  tipL: centerL, baseH+2*stairL
+  tipR: centerR, baseH+2*stairL
+  carpetLL: centerL, 0
+  carpetRL: centerR, 0
+  colLL_LL: leftColX, lowColZ
+  colLL_RL: leftColX+colL, lowColZ
+  colLL_LH: leftColX, lowColZ+colL
+  colLL_RH: leftColX+colL, lowColZ+colL
+  colRL_LL: rightColX, lowColZ
+  colRL_RL: rightColX+colL, lowColZ
+  colRL_LH: rightColX, lowColZ+colL
+  colRL_RH: rightColX+colL, lowColZ+colL
+  colLH_LL: leftColX, highColZ
+  colLH_RL: leftColX+colL, highColZ
+  colLH_LH: leftColX, highColZ+colL
+  colLH_RH: leftColX+colL, highColZ+colL
+  colRH_LL: rightColX, highColZ
+  colRH_RL: rightColX+colL, highColZ
+  colRH_LH: rightColX, highColZ+colL
+  colRH_RH: rightColX+colL, highColZ+colL
+  sideLL: 0, lowColZ
+  sideRL: baseW, lowColZ
+  sideLH: 0, highColZ+colL
+  sideRH: baseW, highColZ+colL
+
+disabledPortalContours:
+  - stairCLL
+  - stairCRL
+  - stairCLH
+  - stairCRH
+  - carpetLL
+  - carpetRL
+
+enabledBottomContours:
+  - carpetLL, stairCLL
+  - carpetRL, stairCRL
+
+playerStart:
+  sector: carpet
+  position: baseW/2, baseH + stairL * 1.2
+  y: stairH * 2
+  angle: -3.1
+
+sectors:
+  carpet:
+    y: 0
+    h: heightBase
+    walls:
+      - stairCRL
+      - stairCLL
+      - carpetLL
+      - carpetRL
+
+  sideLL:
+    y: 0
+    h: heightBase
+    walls:
+      - colLL_RL
+      - colLL_LL
+      - sideLL
+      - baseLL
+      - doorLH
+      - carpetLL
+
+  sideRL:
+    y: 0
+    h: heightBase
+    walls:
+      - doorRH
+      - baseRL
+      - sideRL
+      - colRL_RL
+      - colRL_LL
+      - carpetRL
+
+  door:
+    y: 0
+    h: doorW * 2.3
+    walls:
+      - carpetLL
+      - doorLH
+      - doorLL
+      - doorRL
+      - doorRH
+      - carpetRL
+    entities:
+      - type: entDoor
+        position: baseW/2, -doorD/2
+        angle: 0
+        arg1: 1
+        arg2: 0x20
+        arg3: 3
+
+  centerLI:
+    y: 0
+    h: heightBase
+    walls:
+      - carpetLL
+      - stairCLL
+      - colLH_RH
+      - colLH_RL
+      - colLL_RH
+      - colLL_RL
+
+  centerRI:
+    y: 0
+    h: heightBase
+    walls:
+      - carpetRL
+      - colRL_LL
+      - colRL_LH
+      - colRH_LL
+      - colRH_LH
+      - stairCRL
+
+  centerLM:
+    y: 0
+    h: heightSide
+    walls:
+      - colLH_RL
+      - colLH_LL
+      - colLL_LH
+      - colLL_RH
+
+  centerRM:
+    y: 0
+    h: heightSide
+    walls:
+      - colRH_RL
+      - colRH_LL
+      - colRL_LH
+      - colRL_RH
+
+  centerLO:
+    y: 0
+    h: heightSide
+    walls:
+      - colLH_LL
+      - colLH_LH
+      - sideLH
+      - sideLL
+      - colLL_LL
+      - colLL_LH
+
+  centerRO:
+    y: 0
+    h: heightSide
+    walls:
+      - sideRH
+      - colRH_RH
+      - colRH_RL
+      - colRL_RH
+      - colRL_RL
+      - sideRL
+
+  sideLH:
+    y: 0
+    h: heightBase
+    walls:
+      - stairCLL
+      - stairBLL
+      - baseLH
+      - sideLH
+      - colLH_LH
+      - colLH_RH
+
+  sideRH:
+    y: 0
+    h: heightBase
+    walls:
+      - stairCRL
+      - colRH_LH
+      - colRH_RH
+      - sideRH
+      - baseRH
+      - stairBRL
+
+  stairL:
+    y: stairH
+    h: heightTower + stairH
+    walls:
+      - stairCLH
+      - stairBLH
+      - stairBLL
+      - stairCLL
+
+  stairR:
+    y: stairH
+    h: heightTower + stairH
+    walls:
+      - stairBRH
+      - stairCRH
+      - stairCRL
+      - stairBRL
+
+  stairC:
+    y: stairH
+    h: heightTower + stairH
+    walls:
+      - stairCRH
+      - stairCLH
+      - stairCLL
+      - stairCRL
+    entities:
+      - type: entMonster
+        position: baseW/2, baseH + stairL * 0.3
+        arg1: 2
+
+  podium:
+    y: stairH * 2
+    h: heightTower
+    walls:
+      - tipR
+      - tipL
+      - stairBLH
+      - stairCLH
+      - stairCRH
+      - stairBRH

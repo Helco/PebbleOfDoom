@@ -42,7 +42,7 @@ typedef struct Player
     int gold;
     PlayerAction activeAction;
     bool isWalking, isTurningLeft, isTurningRight;
-    bool hasHomeKey, hasMineKey, hasBattery, hasEnteredCave, hasSpokenToPriest, hasGotClue;
+    bool hasHomeKey, hasMineKey, hasCathKey, hasBattery, hasEnteredCave, hasSpokenToPriest, hasGotClue;
     bool priestHasSeenBattery, hasSpokenToShopKeeper, shopKeeperTold;
 } Player;
 
@@ -56,6 +56,7 @@ typedef struct Menu
     GRect buttonRects[MAX_BUTTONS];
     int curButton, flippedButton;
     MenuCallback callback;
+    MenuCallback babbleCallback;
 
     int lineI;
     const char* const* lines;
@@ -143,6 +144,7 @@ void segame_changeLevel(SEGame* me, LevelId newLevel);
 void segame_hurtPlayer(SEGame* me);
 void segame_once_tutorial(SEGame* me);
 void segame_once_died(SEGame* me);
+void segame_once_angered(SEGame* me);
 
 void menu_reset(Menu* menu);
 void menu_render(Menu* menu, RendererTarget renderer);

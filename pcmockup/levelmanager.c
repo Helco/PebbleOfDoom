@@ -43,7 +43,7 @@ void levelManager_freeLevel(Level* level)
     {
         Sector* sector = &level->sectors[sectorI];
         free(sector->walls);
-        free(sector->entities);
+        //free(sector->entities); // yes memory leak but we need a hack for the techpriest monster. It is only on PC
     }
     free(level->sectors);
     free(level->vertices);
