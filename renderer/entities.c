@@ -500,6 +500,14 @@ void itemoffer_menu_result(SEGame* game, int button)
         game->menu.callback = menu_cb_just_close;
         activatedItemData->isDead = true;
         activatedItemData->entity->sprite = INVALID_SPRITE_ID;
+
+        if (activatedItem == 0)
+            game->player.hasBattery = true;
+        else
+        {
+            game->player.maxHealth += 2;
+            game->player.health = game->player.maxHealth;
+        }
     }
     else if (button == 0 && game->player.gold < price)
     {
@@ -510,6 +518,7 @@ void itemoffer_menu_result(SEGame* game, int button)
     else if (button == 1)
     {
         game->isPaused = false;
+        game->hadRenderedBefore = false;
     }
 }
 

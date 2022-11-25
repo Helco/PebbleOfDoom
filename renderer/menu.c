@@ -60,6 +60,7 @@ void menu_cb_just_close(SEGame* game, int button)
 {
     UNUSED(button);
     game->isPaused = false;
+    game->hadRenderedBefore = false;
 }
 
 void menu_cb_babble_lines(SEGame* game, int button)
@@ -75,6 +76,7 @@ void menu_cb_babble_lines(SEGame* game, int button)
             game->menu.babbleCallback = NULL;
         }
         game->isPaused = false;
+        game->hadRenderedBefore = false;
         return;
     }
     menu_reset(&game->menu);

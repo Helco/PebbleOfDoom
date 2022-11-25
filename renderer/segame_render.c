@@ -98,9 +98,6 @@ void segame_render(SEGame* me, RendererTarget target)
         else
             prv_renderIconSrcInv(target, spriteSrc, x, (i % 2) * DIGIT_WIDTH, DIGIT_WIDTH);
     }
-
-    
-
 }
 
 void prv_render_textSprite(RendererTarget target, const Sprite* sprite, int x, int y)

@@ -93,10 +93,8 @@ SEGame* segame_init(SEGame* me, Renderer* renderer, LevelManagerHandle levelMana
     me->iconPlayerActions[PLAYERACT_SPEAK] = sprite_load(textureManager, RESOURCE_ID_ICON_SPEAK);
     me->iconPlayerActions[PLAYERACT_DOOR] = sprite_load(textureManager, RESOURCE_ID_ICON_DOOR);
 
-    segame_changeLevel(me, RESOURCE_ID_LVL_CATHEDRAL);
-    me->player.hasGotClue = me->player.hasMineKey = me->player.hasEnteredCave = true;
-    me->player.gold = 50;
-    //me->onceCallback = segame_once_tutorial;
+    segame_changeLevel(me, RESOURCE_ID_LVL_HOME);
+    me->onceCallback = segame_once_tutorial;
     return me;
 }
 
