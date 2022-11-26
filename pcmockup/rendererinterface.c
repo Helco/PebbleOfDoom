@@ -90,3 +90,8 @@ void trigger_haptic(int length)
     puts("\a");
 #endif
 }
+
+void endApplication()
+{
+    puts("END APPLICATION STUB");
+}

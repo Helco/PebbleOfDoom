@@ -53,12 +53,14 @@ void player_resetMovement(Player* me)
     me->isTurningLeft = me->isTurningRight = me->isWalking = false;
 }
 
-void player_reset(Player* me)
+void player_reset(Player* me, Location* location)
 {
+    memset(me, 0, sizeof(Player));
     me->maxHealth = 2;
     me->health = 2;
     me->gold = 0;
     me->activeAction = PLAYERACT_WALK;
+    me->location = location;
     player_resetMovement(me);
 }
 
@@ -81,12 +83,12 @@ void segame_main_menu(SEGame* me, int button)
 SEGame* segame_init(SEGame* me, Renderer* renderer, LevelManagerHandle levelManager)
 {
     memset(me, 0, sizeof(SEGame));
-    player_reset(&me->player);
+    player_reset(&me->player, renderer_getLocation(renderer));
     me->renderer = renderer;
     me->levelManager = levelManager;
-    me->player.location = renderer_getLocation(me->renderer);
     me->menu.game = me;
-    me->isPaused = false;
+    me->isPaused = true;
+    me->gameIsRunning = false;
     me->hadRenderedBefore = false;
 
     TextureManagerHandle textureManager = renderer_getTextureManager(renderer);
@@ -101,16 +103,57 @@ SEGame* segame_init(SEGame* me, Renderer* renderer, LevelManagerHandle levelMana
     me->iconPlayerActions[PLAYERACT_SPEAK] = sprite_load(textureManager, RESOURCE_ID_ICON_SPEAK);
     me->iconPlayerActions[PLAYERACT_DOOR] = sprite_load(textureManager, RESOURCE_ID_ICON_DOOR);
 
-    segame_changeLevel(me, RESOURCE_ID_LVL_HOME);
-    me->player.hasCathKey = true;
-    me->onceCallback = segame_once_tutorial;
+    segame_mainmenu(me);
     return me;
+}
+
+void segame_exit_callback(SEGame* me, int button)
+{
+    UNUSED(me);
+    if (button == 1)
+        endApplication();
+    else if (me->gameIsRunning)
+        me->isPaused = false;
+    else
+        segame_mainmenu(me);
+}
+
+void segame_mainmenu_callback(SEGame* me, int button)
+{
+    if (button == 0)
+    {
+        me->isPaused = false;
+        if (!me->gameIsRunning)
+        {
+            me->gameIsRunning = true;
+            player_reset(&me->player, renderer_getLocation(me->renderer));
+            segame_changeLevel(me, RESOURCE_ID_LVL_HOME);
+            me->onceCallback = segame_once_tutorial;
+        }
+    }
+    else if (button == 1)
+    {
+        menu_reset(&me->menu);
+        me->menu.text = "Are you sure?";
+        me->menu.buttons[0] = "No";
+        me->menu.buttons[1] = "Yes";
+        me->menu.callback = segame_exit_callback;
+    }
+}
+
+void segame_mainmenu(SEGame* me)
+{
+    menu_reset(&me->menu);
+    me->menu.text = me->gameIsRunning ? "Paused" : "Searching Emery";
+    me->menu.buttons[0] = me->gameIsRunning ? "Continue" : "New game";
+    me->menu.buttons[1] = "Exit";
+    me->menu.callback = segame_mainmenu_callback;
 }
 
 void segame_end(SEGame* me)
 {
-    // DO SOMETHING
-    UNUSED(me);
+    me->gameIsRunning = false;
+    segame_mainmenu(me);
 }
 
 void segame_free(SEGame* me)
@@ -134,7 +177,7 @@ void segame_update(SEGame* me)
 
     if (me->isPaused)
     {
-
+        player_resetMovement(&me->player);
     }
     else
     {
@@ -322,6 +365,6 @@ void segame_input_back_click(SEGame* me)
     }
     else
     {
-        // open main menu here
+        segame_mainmenu(me);
     }
 }

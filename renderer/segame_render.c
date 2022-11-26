@@ -66,10 +66,13 @@ void segame_render(SEGame* me, RendererTarget target)
         me->hadRenderedBefore = true;
     }
 
-    if (me->player.activeAction == PLAYERACT_WALK && me->player.isWalking)
-        prv_renderIconInv(target, me->iconPlayerActions[me->player.activeAction], RENDERER_WIDTH / 2 - HUD_HEIGHT / 2);
-    else
-        prv_renderIcon(target, me->iconPlayerActions[me->player.activeAction], RENDERER_WIDTH / 2 - HUD_HEIGHT / 2);
+    if (me->gameIsRunning)
+    {
+        if (me->player.activeAction == PLAYERACT_WALK && me->player.isWalking)
+            prv_renderIconInv(target, me->iconPlayerActions[me->player.activeAction], RENDERER_WIDTH / 2 - HUD_HEIGHT / 2);
+        else
+            prv_renderIcon(target, me->iconPlayerActions[me->player.activeAction], RENDERER_WIDTH / 2 - HUD_HEIGHT / 2);
+    }
 
     if (me->isPaused)
     {

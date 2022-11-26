@@ -125,6 +125,7 @@ struct SEGame
     Menu menu;
     bool isPaused;
     bool hadRenderedBefore;
+    bool gameIsRunning;
     SEGameOnceCallback onceCallback;
 
     EntityData* focusedEntity;
@@ -139,6 +140,7 @@ struct SEGame
 
 SEGame* segame_init(SEGame* me, Renderer* renderer, LevelManagerHandle levelManager);
 void segame_end(SEGame* me);
+void segame_mainmenu(SEGame* me);
 void segame_free(SEGame* me);
 void segame_update(SEGame* me);
 void segame_render(SEGame* me, RendererTarget renderer);

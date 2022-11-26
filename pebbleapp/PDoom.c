@@ -197,6 +197,11 @@ void trigger_haptic(int length)
 
 }
 
+void endApplication()
+{
+  window_stack_pop_all(false);
+}
+
 int main(void) {
   APP_LOG(APP_LOG_LEVEL_ERROR, "free: %d", heap_bytes_free());
   if (!loadTextures())

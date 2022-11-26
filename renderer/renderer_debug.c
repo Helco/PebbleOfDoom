@@ -84,6 +84,8 @@ void renderer_renderDebugSector(Renderer* me, SDL_Renderer* sdlRenderer, xz_t of
 
 void renderer_debug_renderWorld(Renderer* me, SDL_Renderer* sdlRenderer, xz_t offset, const void* userdata)
 {
+    if (me->level == NULL)
+        return;
     const RenderWorldOptions* opts = (const RenderWorldOptions*)userdata;
     const Sector* curSector = me->level->sectors;
     for (int i = 0; i < me->level->sectorCount; i++, curSector++)
@@ -171,6 +173,7 @@ bool igcLocation(Location* location)
 
 void renderer_debug_cameraOptions(Renderer* me, ImGuiWindowFlags* flags, const void* userdata)
 {
+
     UNUSED(flags, userdata);
     igcSliderReal("Eye Height", &me->eyeHeight, -20.0f, 20.0f);
 
@@ -180,7 +183,7 @@ void renderer_debug_cameraOptions(Renderer* me, ImGuiWindowFlags* flags, const v
 
     igSeparator();
     igText("Camera location");
-    if (igcLocation(&me->location))
+    if (igcLocation(&me->location) && me->level != NULL)
         location_updateSector(&me->location, me->level);
 }
 
