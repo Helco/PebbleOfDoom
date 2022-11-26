@@ -44,7 +44,7 @@ typedef struct Player
     PlayerAction activeAction;
     bool isWalking, isTurningLeft, isTurningRight;
     bool hasHomeKey, hasMineKey, hasCathKey, hasBattery, hasEnteredCave, hasSpokenToPriest, hasGotClue;
-    bool priestHasSeenBattery, hasSpokenToShopKeeper, shopKeeperTold;
+    bool priestHasSeenBattery, hasSpokenToShopKeeper, shopKeeperTold, hasAngeredPriest;
 } Player;
 
 typedef struct Menu

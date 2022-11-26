@@ -293,16 +293,38 @@ void segame_once_died(SEGame* me)
     me->menu.callback = segame_menu_died_2;
 }
 
+static const char* const GameoverLines[] = {
+    "GAMEOVER",
+    "GAMEOVER\nYou died and there is no one to heal you.",
+    NULL
+};
+
+void segame_gameover(SEGame* me, int button)
+{
+    UNUSED(button);
+    me->onceCallback = segame_end;
+}
+
 void segame_hurtPlayer(SEGame* me)
 {
     trigger_haptic(200);
     me->player.health--;
     if (me->player.health < 0)
     {
-        me->player.health = 1;
-        me->player.gold /= 3;
-        segame_changeLevel(me, RESOURCE_ID_LVL_CATHEDRAL);
-        me->onceCallback = segame_once_died;
+        if (me->player.hasAngeredPriest)
+        {
+            me->menu.lineI = -1;
+            me->menu.lines = GameoverLines;
+            me->menu.babbleCallback = segame_gameover;
+            menu_cb_babble_lines(me, -1);
+        }
+        else
+        {
+            me->player.health = 1;
+            me->player.gold /= 3;
+            segame_changeLevel(me, RESOURCE_ID_LVL_CATHEDRAL);
+            me->onceCallback = segame_once_died;
+        }
         
     }
 }

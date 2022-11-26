@@ -382,6 +382,7 @@ void techpriest_act(SEGame* game, EntityData* data)
     }
     else if (game->player.hasGotClue)
     {
+        game->player.hasAngeredPriest = true;
         game->menu.lines = techpriest_lines_gotclue;
         game->menu.lineI = -1;
         game->menu.babbleCallback = techpriest_get_angry;
