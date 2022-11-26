@@ -157,6 +157,50 @@ static void prv_pebbleWindow_convertPebbleToTexture(PebbleWindow* me)
         assert(false && "Unknown RendererColorFormat for PebbleWindow");
 }
 
+static uint8_t fauxFramebuffer[20 * 168];
+#define W { .r = 3, .g = 3, .b = 3, .a = 3 }
+#define B { .r = 0, .g = 0, .b = 0, .a = 3 }
+
+void convertFauxFramebuffer(uint8_t* target)
+{
+    static union {
+        uint32_t pixelQuads[16];
+        GColor pixelColors[16 * 4];
+    } l = {
+        .pixelColors = {
+            B, B, B, B,
+            W, B, B, B,
+            B, W, B, B,
+            W, W, B, B,
+            B, B, W, B,
+            W, B, W, B,
+            B, W, W, B,
+            W, W, W, B,
+            B, B, B, W,
+            W, B, B, W,
+            B, W, B, W,
+            W, W, B, W,
+            B, B, W, W,
+            W, B, W, W,
+            B, W, W, W,
+            W, W, W, W,
+        }
+    };
+
+    uint8_t* source = fauxFramebuffer;
+    for (int i = 0; i < 168; i++)
+    {
+        for (int j = 0; j < 144; j += 8)
+        {
+            uint8_t s = source[j / 8];
+            *((uint32_t*)&target[j + 0]) = l.pixelQuads[s & 0xf];
+            *((uint32_t*)&target[j + 4]) = l.pixelQuads[s >> 4];
+        }
+        source += 20;
+        target += 144;
+    }
+}
+
 void pebbleWindow_contentUpdate(void* userdata)
 {
     PebbleWindow* me = (PebbleWindow*)userdata;
@@ -171,10 +215,14 @@ void pebbleWindow_contentUpdate(void* userdata)
 
     safeFramebuffer_prepare(me->framebuffer);
     RendererTarget target = {
-        .framebuffer = pebbleWindow_getPebbleFramebuffer(me),
-        .colorFormat = me->format
+        .framebuffer = me->format == RendererColorFormat_1BitBW
+            ? pebbleWindow_getPebbleFramebuffer(me)
+            : fauxFramebuffer,
+        .colorFormat = RendererColorFormat_1BitBW
     };
     segame_render(&me->game, target);
+    if (me->format != RendererColorFormat_1BitBW)
+        convertFauxFramebuffer((uint8_t*)pebbleWindow_getPebbleFramebuffer(me));
     safeFramebuffer_check(me->framebuffer);
     prv_pebbleWindow_convertPebbleToTexture(me);
     imageWindow_setImageData(me->window, me->pebbleSize, me->textureData);

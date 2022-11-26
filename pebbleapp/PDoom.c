@@ -28,6 +28,52 @@ int time_difference_ms(time_t a, uint16_t aMs, time_t b, uint16_t bMs)
         (int)(aMs) - bMs;
 }
 
+#if PBL_IF_COLOR_ELSE(1, 0)
+static uint8_t fauxFramebuffer[20 * 168];
+#define W { .r = 3, .g = 3, .b = 3, .a = 3 }
+#define B { .r = 0, .g = 0, .b = 0, .a = 3 }
+
+void convertFauxFramebuffer(uint8_t* target)
+{
+    static union {
+        uint32_t pixelQuads[16];
+        GColor pixelColors[16 * 4];
+    } l = {
+        .pixelColors = {
+            B, B, B, B,
+            W, B, B, B,
+            B, W, B, B,
+            W, W, B, B,
+            B, B, W, B,
+            W, B, W, B,
+            B, W, W, B,
+            W, W, W, B,
+            B, B, B, W,
+            W, B, B, W,
+            B, W, B, W,
+            W, W, B, W,
+            B, B, W, W,
+            W, B, W, W,
+            B, W, W, W,
+            W, W, W, W,
+        }
+    };
+
+    uint8_t* source = fauxFramebuffer;
+    for (int i = 0; i < 168; i++)
+    {
+        for (int j = 0; j < 144; j += 8)
+        {
+            uint8_t s = source[j / 8];
+            *((uint32_t*)&target[j + 0]) = l.pixelQuads[s & 0xf];
+            *((uint32_t*)&target[j + 4]) = l.pixelQuads[s >> 4];
+        }
+        source += 20;
+        target += 144;
+    }
+}
+#endif
+
 void update_layer(Layer* layer, GContext* gctx)
 {
   ctx = gctx;
@@ -37,13 +83,13 @@ void update_layer(Layer* layer, GContext* gctx)
   segame_update(&game);
 
   RendererTarget target = {
-      .framebuffer = framebuffer,
-      .colorFormat = PBL_IF_COLOR_ELSE(
-          RendererColorFormat_8BitColor,
-          RendererColorFormat_1BitBW
-      )
+      .framebuffer = PBL_IF_COLOR_ELSE(fauxFramebuffer, framebuffer),
+      .colorFormat = RendererColorFormat_1BitBW
   };
   segame_render(&game, target);
+#if PBL_IF_COLOR_ELSE(1, 0)
+  convertFauxFramebuffer(framebuffer);
+#endif
 
   graphics_release_frame_buffer(ctx, framebuffer_bitmap);
 
@@ -94,6 +140,32 @@ const Sprite* text_sprite_create(TextureManagerHandle _, const char* text)
   sprite->bw = (uint8_t*)(sprite + 1);
   sprite->alpha = NULL;
 
+//#if PBL_IF_COLOR_ELSE(1, 0)
+#if 1
+  // game rendering is done to offscreen so we can temporarily abuse the normal framebuffer, given that we clear
+  GRect clearBox = {
+    .origin = { .x = 0, .y = 0 },
+    .size = size
+  };
+  graphics_release_frame_buffer(ctx, framebuffer_bitmap);
+  graphics_fill_rect(ctx, clearBox, 0, 0);
+  graphics_draw_text(ctx, text, font, box, overflowMode, alignment, NULL);
+  framebuffer_bitmap = graphics_capture_frame_buffer(ctx);
+
+  GColor* source = (GColor*)framebuffer;
+  uint8_t* target = sprite->bw;
+  for (int y = 0; y < size.h; y++)
+  {
+    for (int x = 0; x < size.w; x++)
+    {
+      int byte = x / 8;
+      int bit = x % 8;
+      target[byte] |= (source[x].r > 0) << bit;
+    }
+    source += 144;
+    target += bytesPerRow;
+  }
+#else
   // offscreen text rendering based on https://github.com/mhungerford/pebble_offscreen_rendering_text_demo/blob/master/src/main.c
   uint8_t *orig_addr = gbitmap_get_data(framebuffer_bitmap);
   GBitmapFormat orig_format = gbitmap_get_format(framebuffer_bitmap);
@@ -105,6 +177,7 @@ const Sprite* text_sprite_create(TextureManagerHandle _, const char* text)
 
   framebuffer_bitmap = graphics_capture_frame_buffer(ctx);
   framebuffer = gbitmap_get_data(framebuffer_bitmap);
+#endif
 
   return sprite;
 }
@@ -126,23 +199,6 @@ void update_animation(Animation *animation, const AnimationProgress progress)
 
 bool loadTextures()
 {
-  static const uint32_t resourceIds[] = {
-#if PBL_IF_COLOR_ELSE(1, 0)
-      RESOURCE_ID_TEXTURE_INFODESK,
-      RESOURCE_ID_TEXTURE_CANTINA,
-      RESOURCE_ID_TEXTURE_ELEVATORS,
-      RESOURCE_ID_TEXTURE_BLACKBOARD,
-      RESOURCE_ID_TEXTURE_ENTRY
-#endif
-  };
-  static const int countIds = sizeof(resourceIds) / sizeof(uint32_t);
-  for (int i = 0; i < countIds; i++)
-  {
-    TextureId texId = loadTextureFromResource(resourceIds[i]);
-    if (texId == INVALID_TEXTURE_ID)
-      return false;
-    texture_load(NULL, texId);
-  }
   return 
     loadSpriteFromResource(RESOURCE_ID_SPR_BOOK) != INVALID_SPRITE_ID &&
     loadSpriteFromResource(RESOURCE_ID_ICON_DIGITS) != INVALID_SPRITE_ID &&
