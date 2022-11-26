@@ -4,6 +4,7 @@
 void menu_reset(Menu* menu)
 {
     memset(menu->buttons, 0, sizeof(menu->buttons));
+    memset(menu->buttonRects, 0, sizeof(menu->buttonRects));
     menu->hadBeenRendered = false;
     menu->size = (GSize){ .w = 0, .h = 0 };
     menu->curButton = 0;

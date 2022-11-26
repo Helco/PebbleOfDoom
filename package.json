@@ -81,6 +81,12 @@
         },
         {
           "type": "bitmap",
+          "name": "ICON_DOOR",
+          "file": "textures/icon_door.png",
+          "memoryFormat": "2BitPalette"
+        },
+        {
+          "type": "bitmap",
           "name": "SPR_BATTERY",
           "file": "textures/spr_battery.png",
           "memoryFormat": "2BitPalette"
@@ -159,7 +165,7 @@
         },
         {
           "type": "bitmap",
-          "name": "SPR_TECHPRIEST_PUSH",
+          "name": "SPR_TECHPRIEST_PUSHED",
           "file": "textures/spr_techpriest_pushed.png",
           "memoryFormat": "2BitPalette"
         },
@@ -187,6 +193,21 @@
           "type": "raw",
           "name": "LVL_OVERWORLD",
           "file": "levels/overworld.bin"
+        },
+        {
+          "type": "raw",
+          "name": "LVL_CATHEDRAL_END",
+          "file": "levels/cathedral_end.bin"
+        },
+        {
+          "type": "raw",
+          "name": "LVL_CAVE",
+          "file": "levels/cave.bin"
+        },
+        {
+          "type": "raw",
+          "name": "LVL_ENDING",
+          "file": "levels/ending.bin"
         }
       ]
     }

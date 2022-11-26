@@ -164,6 +164,7 @@ real_t real_fractional(real_t a)
     return (real_t){ modff(a.v, &dummy) };
 }
 
+/*
 real_t real_sqrt(real_t a)
 {
     return (real_t){ sqrtf(a.v) };
@@ -172,6 +173,22 @@ real_t real_sqrt(real_t a)
 real_t real_invSqrt(real_t a)
 {
     return (real_t){ 1.0f / sqrtf(a.v) };
+}*/
+
+real_t real_invSqrt(real_t a)
+{
+    union {
+        float    f;
+        uint32_t i;
+    } conv = { .f = a.v };
+    conv.i = 0x5f3759df - (conv.i >> 1);
+    conv.f *= 1.5F - (a.v * 0.5F * conv.f * conv.f);
+    return (real_t) { conv.f };
+}
+
+real_t real_sqrt(real_t a)
+{
+    return (real_t) { 1.0f / real_invSqrt(a).v };
 }
 
 #endif

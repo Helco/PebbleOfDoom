@@ -103,7 +103,7 @@ SEGame* segame_init(SEGame* me, Renderer* renderer, LevelManagerHandle levelMana
 
     segame_changeLevel(me, RESOURCE_ID_LVL_HOME);
     me->player.hasCathKey = true;
-    //me->onceCallback = segame_once_tutorial;
+    me->onceCallback = segame_once_tutorial;
     return me;
 }
 
@@ -155,7 +155,7 @@ void segame_update(SEGame* me)
                 real_compare(entity->curDistanceSqr, entity->actionDistanceSqr) < 0 &&
                 real_compare(entity->curDistanceSqr, lastDistanceSqr) < 0)
             {
-                xz_t localDirection = xz_invScale(playerToEntity, real_sqrt(entity->curDistanceSqr));
+                xz_t localDirection = xz_scale(playerToEntity, real_invSqrt(entity->curDistanceSqr));
                 localDirection = xz_rotate(localDirection, me->player.location->angle);
                 float maxFocusAngle = entity->entity->type == ENTITY_DOOR ? MAX_FOCUS_ANGLE * 4 : MAX_FOCUS_ANGLE;
                 // yes. too cheap for an acos
@@ -212,7 +212,7 @@ void segame_changeLevel(SEGame* me, LevelId levelId)
     me->entityCount = entityI;
     me->focusedEntity = NULL;
 
-    if (levelId == RESOURCE_ID_LVL_MINE)
+    if (levelId == RESOURCE_ID_LVL_CAVE)
         me->player.hasEnteredCave = true;
 }
 

@@ -68,8 +68,8 @@ const Sprite* text_sprite_create(TextureManagerHandle _, const char* text)
   if (font == NULL)
     font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
   
-  graphics_context_set_fill_color(ctx, GColorWhite);
-  graphics_context_set_text_color(ctx, GColorBlack);
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_context_set_text_color(ctx, GColorWhite);
 
   GRect box = {
     .origin = { .x = 0, .y = 0 },
@@ -78,6 +78,7 @@ const Sprite* text_sprite_create(TextureManagerHandle _, const char* text)
   const GTextOverflowMode overflowMode = GTextOverflowModeWordWrap;
   const GTextAlignment alignment = GTextAlignmentLeft;
   GSize size = graphics_text_layout_get_content_size(text, font, box, overflowMode, alignment);
+  size.h += 2; // hack but returned size is apparently wrong
 
   int bytesPerRow = (size.w + 31) / 32 * 4;
   Sprite* sprite = (Sprite*)malloc(sizeof(Sprite) + bytesPerRow * size.h);
@@ -86,6 +87,7 @@ const Sprite* text_sprite_create(TextureManagerHandle _, const char* text)
     APP_LOG(APP_LOG_LEVEL_ERROR, "Could not allocate %d bytes for text sprite %s", sizeof(Sprite) + bytesPerRow * size.h, text);
     return NULL;
   }
+  memset(sprite, 0, sizeof(Sprite) + bytesPerRow * size.h);
   sprite->id = -2;
   sprite->size = size;
   sprite->bytesPerRow = bytesPerRow;
@@ -152,6 +154,7 @@ bool loadTextures()
     loadSpriteFromResource(RESOURCE_ID_ICON_FIST) != INVALID_SPRITE_ID &&
     loadSpriteFromResource(RESOURCE_ID_ICON_USE) != INVALID_SPRITE_ID &&
     loadSpriteFromResource(RESOURCE_ID_ICON_SPEAK) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_ICON_DOOR) != INVALID_SPRITE_ID &&
     loadSpriteFromResource(RESOURCE_ID_SPR_BATTERY) != INVALID_SPRITE_ID &&
     loadSpriteFromResource(RESOURCE_ID_SPR_KEY) != INVALID_SPRITE_ID &&
     loadSpriteFromResource(RESOURCE_ID_SPR_PC) != INVALID_SPRITE_ID &&
@@ -164,12 +167,12 @@ bool loadTextures()
     loadSpriteFromResource(RESOURCE_ID_SPR_SHOPKEEPER) != INVALID_SPRITE_ID &&
     loadSpriteFromResource(RESOURCE_ID_SPR_TECHPRIEST) != INVALID_SPRITE_ID &&
     loadSpriteFromResource(RESOURCE_ID_SPR_TECHPRIEST_ANGERY) != INVALID_SPRITE_ID &&
-    loadSpriteFromResource(RESOURCE_ID_SPR_TECHPRIEST_PUSH) != INVALID_SPRITE_ID &&
+    loadSpriteFromResource(RESOURCE_ID_SPR_TECHPRIEST_PUSHED) != INVALID_SPRITE_ID &&
     loadSpriteFromResource(RESOURCE_ID_SPR_TECHPRIEST_DEAD) != INVALID_SPRITE_ID;
 }
 
 void on_select_click(ClickRecognizerRef rec, void* context) { segame_input_select_click(&game); }
-void on_select_long_click(ClickRecognizerRef rec, void* context) { }
+void on_select_long_click(ClickRecognizerRef rec, void* context) { segame_input_select_long_click(&game); }
 void on_back_click(ClickRecognizerRef rec, void* context) { segame_input_back_click(&game); }
 void on_right_click(ClickRecognizerRef rec, void* context) { segame_input_direction_click(&game, true); }
 void on_left_click(ClickRecognizerRef rec, void* context) { segame_input_direction_click(&game, false); }
@@ -188,8 +191,6 @@ void click_config_provider(Window* window)
   window_raw_click_subscribe(BUTTON_ID_DOWN, on_right_down, on_right_up, NULL);
   window_raw_click_subscribe(BUTTON_ID_UP, on_left_down, on_left_up, NULL);
 }
-
-int __errno;
 
 void trigger_haptic(int length)
 {
