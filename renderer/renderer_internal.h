@@ -33,8 +33,6 @@ struct Renderer
     real_t horFovScale, verFovScale, fov;
     lineSeg_t leftFovSeg, rightFovSeg;
     BoundarySet stackBoundarySets[MAX_DRAW_DEPTH];
-    BoundarySet wallBoundaries;
-    short spanStart[RENDERER_HEIGHT];
     DrawRequestStack drawRequests;
 
     TextureManagerHandle textureManager;

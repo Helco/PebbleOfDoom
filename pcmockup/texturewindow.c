@@ -14,9 +14,9 @@ void textureWindow_free(void* userdata);
 void textureWindow_updateContent(void* userdata);
 void textureWindow_updateMenubar(void* userdata);
 void textureWindow_printImportedTexture(TextureWindow* me, const Texture* texture);
-void textureWindow_printGeneratedTexture(TextureWindow* me, const Texture* texture, TexGenerationContext* generationContext);
+//void textureWindow_printGeneratedTexture(TextureWindow* me, const Texture* texture, TexGenerationContext* generationContext);
 void textureWindow_printImportFromFileMenu(TextureWindow* me);
-void textureWindow_printGenerateNewMenu(TextureWindow* me);
+//void textureWindow_printGenerateNewMenu(TextureWindow* me);
 
 TextureWindow* textureWindow_init(WindowContainer* parent, TextureManager* manager)
 {
@@ -108,7 +108,7 @@ void textureWindow_updateContent(void* userdata)
     TextureWindow* me = (TextureWindow*)userdata;
     if (igBeginMenuBar()) {
         textureWindow_printImportFromFileMenu(me);
-        textureWindow_printGenerateNewMenu(me);
+        //textureWindow_printGenerateNewMenu(me);
         igEndMenuBar();
     }
 
@@ -116,11 +116,11 @@ void textureWindow_updateContent(void* userdata)
 
     igSeparator();
     const Texture* const curTexture = textureManager_getTextureByIndex(me->manager, me->curTextureIndex);
-    TexGenerationContext* const generationContext = textureManager_getGenerationContext(me->manager, curTexture->id);
-    if (generationContext == NULL)
+    //TexGenerationContext* const generationContext = textureManager_getGenerationContext(me->manager, curTexture->id);
+    //if (generationContext == NULL)
         textureWindow_printImportedTexture(me, curTexture);
-    else
-        textureWindow_printGeneratedTexture(me, curTexture, generationContext);
+    //else
+    //    textureWindow_printGeneratedTexture(me, curTexture, generationContext);
 }
 
 void textureWindow_printImportedTexture(TextureWindow* me, const Texture* texture)
@@ -129,7 +129,7 @@ void textureWindow_printImportedTexture(TextureWindow* me, const Texture* textur
     igLabelText("Size", "%dx%d", texture->size.w, texture->size.h);
 }
 
-bool textureWindow_printGenerators(TexGenerationContext* generationContext)
+/*bool textureWindow_printGenerators(TexGenerationContext* generationContext)
 {
     const ImVec2 defaultSize = { 0, 0 };
     const TexGeneratorID curGeneratorId = texgen_getGenerator(generationContext);
@@ -205,7 +205,7 @@ bool textureWindow_printBoolGenerationParameter(TexGenerationContext* generation
         return true;
     }
     return false;
-}
+}*/
 
 ImVec4 pebbleColorToImGui(GColor color)
 {
@@ -265,7 +265,7 @@ bool igcGColorPicker(const char* label, GColor* color)
     return didValueChange;
 }
 
-bool textureWindow_printColorGenerationParameter(TexGenerationContext* generationContext, const TexGeneratorParameterInfo* paramInfo)
+/*bool textureWindow_printColorGenerationParameter(TexGenerationContext* generationContext, const TexGeneratorParameterInfo* paramInfo)
 {
     bool shouldRegenerate = false;
     GColor value = texgen_getParamColor(generationContext, paramInfo->id);
@@ -319,7 +319,7 @@ void textureWindow_printGeneratedTexture(TextureWindow* me, const Texture* textu
         texgen_execute(generationContext);
         me->uploadedTextureIndex = -1;
     }
-}
+}*/
 
 static bool isTextureAlreadyImported(TextureManager* manager, const char* filename)
 {
@@ -361,7 +361,7 @@ void textureWindow_printImportFromFileMenu(TextureWindow* me)
     igEndPopup();
 }
 
-void textureWindow_printGenerateNewMenu(TextureWindow* me)
+/*void textureWindow_printGenerateNewMenu(TextureWindow* me)
 {
     if (!igMenuItemBool("Generate new", "", false, true))
         return;
@@ -370,7 +370,7 @@ void textureWindow_printGenerateNewMenu(TextureWindow* me)
     TexGenerationContext* texgenctx = textureManager_createGeneratedTexture(me->manager, generatorInfo.id, 64);
     texgen_execute(texgenctx);
     me->curTextureIndex = textureManager_getTextureCount(me->manager) - 1;
-}
+}*/
 
 void textureWindow_updateMenubar(void* userdata)
 {

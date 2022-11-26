@@ -2,7 +2,6 @@
 #include "cimgui.include.h"
 #include "pcmockup.h"
 #include "renderer.h"
-#include "texgen/texgen.h"
 #include "platform.h"
 #include "resources.h"
 
@@ -100,11 +99,6 @@ PCMockup *pcmockup_init()
         pcmockup_free(me);
         return NULL;
     }
-    TexGenerationContext* texgenctx = textureManager_createGeneratedTexture(me->textureManager, TexGenerator_Bricks, 256);
-    texgen_execute(texgenctx);
-    texgen_setGenerator(texgenctx, TexGenerator_Rand);
-    texgen_setSize(texgenctx, 64);
-    texgen_execute(texgenctx);
 
     if (levelManager_registerFile(me->levelManager, "home.bin", RESOURCE_ID_LVL_HOME) == INVALID_LEVEL_ID ||
         levelManager_registerFile(me->levelManager, "cathedral.bin", RESOURCE_ID_LVL_CATHEDRAL) == INVALID_LEVEL_ID ||

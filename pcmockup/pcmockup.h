@@ -3,7 +3,6 @@
 #include "sdl.include.h"
 #include "pebble.h"
 #include "renderer.h"
-#include "texgen/texgen.h"
 #include "window.h"
 #include "platform.h"
 #include "levelmanager.h"
@@ -67,8 +66,8 @@ const Texture* textureManager_loadTexture(TextureManager* me, TextureId id);
 const Texture* textureManager_createEmptyTexture(TextureManager* me, GSize size, GColor** outputPtr);
 void textureManager_resizeEmptyTexture(TextureManager* me, TextureId id, GSize newSize, GColor** outputPtr);
 void textureManager_freeTexture(TextureManager* me, const Texture* texture);
-TexGenerationContext* textureManager_createGeneratedTexture(TextureManager* me, TexGeneratorID id, int size);
-TexGenerationContext* textureManager_getGenerationContext(TextureManager* me, TextureId id);
+//TexGenerationContext* textureManager_createGeneratedTexture(TextureManager* me, TexGeneratorID id, int size);
+//TexGenerationContext* textureManager_getGenerationContext(TextureManager* me, TextureId id);
 int textureManager_getTextureCount(TextureManager* me);
 const Texture* textureManager_getTextureByIndex(TextureManager* me, int index);
 const char* textureManager_getTextureSource(TextureManager* me, const Texture* texture);

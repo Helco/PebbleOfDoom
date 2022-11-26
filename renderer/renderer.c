@@ -464,9 +464,6 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
                 renderer_renderContourSpan(me, target, drawBoundary, x, yPortalEnd, yPortalEnd);
         }
 
-        me->wallBoundaries.yBottom[x] = max(yBottom, lowerIt.y0);
-        me->wallBoundaries.yTop[x] = min(yTop, upperIt.y0 - 1);
-
         real_t xNorm = real_div(real_from_int(x - p.left.x), real_from_int(p.right.x - p.left.x));
         renderSpan(me, target, x,
             lowerIt.y0, upperIt.y0, max(yBottom, lowerIt.y0), min(yTop, yPortalStart - 1),
@@ -484,57 +481,6 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
 
     if (texture != NULL)
         texture_free(me->textureManager, texture);
-}
-
-void renderer_renderSlabColumns(Renderer* renderer, RendererTarget target, const DrawRequest* request, const short* bottomSet, const short* topSet, bool isCeil)
-{
-    if (target.colorFormat != RendererColorFormat_8BitColor)
-        return;
-    GColor* const framebuffer = (GColor*)target.framebuffer;
-
-    const int minX = request->left, maxX = request->right;
-    const GColor color = isCeil
-        ? request->sector->ceilColor
-        : request->sector->floorColor;
-    int top1, top2, bottom1, bottom2;
-    top1 = -10000;
-    bottom1 = 10000;
-
-    for (int x = minX; x <= maxX + 1; x++)
-    {
-        top2 = x <= maxX ? topSet[x] : -10000;
-        bottom2 = x <= maxX ? bottomSet[x] : 10000;
-
-        while (top1 < top2 && top2 >= bottom2)
-        {
-            renderer->spanStart[top2] = x;
-            top2--;
-        }
-        while (bottom1 > bottom2 && bottom2 <= top2)
-        {
-            renderer->spanStart[bottom2] = x;
-            bottom2++;
-        }
-        while (top1 > top2 && top1 >= bottom1)
-        {
-            assert(renderer->spanStart[top1] >= 0 && renderer->spanStart[top1] < RENDERER_WIDTH);
-            assert(top1 >= 0 && top1 < RENDERER_HEIGHT);
-            for (int i = renderer->spanStart[top1]; i < x; i++)
-                framebuffer[i * RENDERER_HEIGHT + top1] = color;
-            top1--;
-        }
-        while (bottom1 < bottom2 && bottom1 <= top1)
-        {
-            assert(renderer->spanStart[bottom1] >= 0 && renderer->spanStart[bottom1] < RENDERER_WIDTH);
-            assert(bottom1 >= 0 && bottom1 < RENDERER_HEIGHT);
-            for (int i = renderer->spanStart[bottom1]; i < x; i++)
-                framebuffer[i * RENDERER_HEIGHT + bottom1] = color;
-            bottom1++;
-        }
-
-        top1 = topSet[x];
-        bottom1 = bottomSet[x];
-    }
 }
 
 void renderer_renderSlabs(Renderer* me, RendererTarget target, const DrawRequest* request)
@@ -635,8 +581,6 @@ void renderer_renderEntity(Renderer* me, RendererTarget target, const DrawReques
 
 void renderer_renderSector(Renderer* renderer, RendererTarget target, const DrawRequest* request)
 {
-    for (int y = 0; y < RENDERER_HEIGHT; y++)
-        renderer->spanStart[y] = -1;
     for (int i = 0; i < request->sector->wallCount; i++)
         renderer_renderWall(renderer, target, request, i);
     renderer_renderSlabs(renderer, target, request);
@@ -698,8 +642,6 @@ void renderer_render(Renderer* renderer, RendererTarget target)
     memset(renderer->transformedStatus, 0, sizeof(uint32_t) * ((renderer->level->vertexCount + 31) / 32));
     memset(renderer->stackBoundarySets[0].yBottom, 0, sizeof(renderer->stackBoundarySets[0].yBottom));
     memset(renderer->stackBoundarySets[0].yTop, RENDERER_HEIGHT - 1, sizeof(renderer->stackBoundarySets[0].yBottom));
-    memset(renderer->wallBoundaries.yBottom, 0, sizeof(renderer->wallBoundaries.yBottom));
-    memset(renderer->wallBoundaries.yTop, RENDERER_HEIGHT - 1, sizeof(renderer->wallBoundaries.yTop));
 
     drawRequestStack_reset(&renderer->drawRequests);
     drawRequestStack_push(&renderer->drawRequests,

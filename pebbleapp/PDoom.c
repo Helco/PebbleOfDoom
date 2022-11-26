@@ -2,7 +2,6 @@
 #include "textureresources.h"
 #include "levelresources.h"
 #include "../renderer/renderer.h"
-#include "../renderer/texgen/texgen.h"
 #include "../renderer/segame.h"
 #include "../renderer/platform.h"
 

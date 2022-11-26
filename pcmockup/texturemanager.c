@@ -12,7 +12,7 @@ typedef struct LoadedTexture
     int referenceCount;
     Texture texture;
     char* source;
-    TexGenerationContext* generationContext;
+    //TexGenerationContext* generationContext;
 } LoadedTexture;
 
 typedef struct LoadedSprite
@@ -72,8 +72,8 @@ void textureManager_free(TextureManager* me)
         LoadedTexture* itTexture = me->textures;
         for (int i = 0; i < me->texCount; i++, itTexture++)
         {
-            if (itTexture->generationContext != NULL)
-                texgen_free(itTexture->generationContext);
+           // if (itTexture->generationContext != NULL)
+           //     texgen_free(itTexture->generationContext);
 
             assert(itTexture->referenceCount == 0);
             if (itTexture->texture.pixels != NULL)
@@ -113,7 +113,7 @@ static LoadedTexture* prv_textureManager_nextEntry(TextureManager* me)
     LoadedTexture *texture = &me->textures[me->texCount];
     texture->referenceCount = 0;
     texture->texture.id = me->texCount;
-    texture->generationContext = NULL;
+    //texture->generationContext = NULL;
     texture->source = NULL;
     me->texCount++;
     return texture;
@@ -336,7 +336,7 @@ void textureManager_freeSprite(TextureManager* me, const Sprite* sprite)
     loadedSprite->referenceCount--;
 }
 
-TexGenerationContext* textureManager_createGeneratedTexture(TextureManager* me, TexGeneratorID id, int size)
+/*TexGenerationContext* textureManager_createGeneratedTexture(TextureManager* me, TexGeneratorID id, int size)
 {
     TexGenerationContext* generationContext = texgen_init(me, id, size);
     if (generationContext == NULL)
@@ -351,7 +351,7 @@ TexGenerationContext* textureManager_getGenerationContext(TextureManager* me, Te
 {
     assert(id >= 0 && id < me->texCount);
     return me->textures[id].generationContext;
-}
+}*/
 
 int textureManager_getTextureCount(TextureManager* me)
 {
