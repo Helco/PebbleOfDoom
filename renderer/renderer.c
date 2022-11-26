@@ -438,16 +438,18 @@ void renderer_renderWall(Renderer* me, RendererTarget target, const DrawRequest*
         const int yBottom = drawBoundary->yBottom[x];
         const int yTop = drawBoundary->yTop[x];
 
+        int before = upperIt.y0;
         do {
-            upperStep = bresenham_step(&upperIt);
-            if (wall->flags & WALL_CONTOUR_TOP)
-                renderer_renderContourSpan(me, target, drawBoundary, x, upperIt.y0, upperIt.y0);
+            upperStep = bresenham_fasterYStep(&upperIt);
         } while (upperStep != BRESENHAMSTEP_X && upperStep != BRESENHAMSTEP_NONE);
+        if (wall->flags & WALL_CONTOUR_TOP)
+            renderer_renderContourSpan(me, target, drawBoundary, x, min(before, upperIt.y0), max(before, upperIt.y0));
+        before = lowerIt.y0;
         do {
-            lowerStep = bresenham_step(&lowerIt);
-            if (wall->flags & WALL_CONTOUR_BOTTOM)
-                renderer_renderContourSpan(me, target, drawBoundary, x, lowerIt.y0, lowerIt.y0);
+            lowerStep = bresenham_fasterYStep(&lowerIt);
         } while (lowerStep != BRESENHAMSTEP_X && lowerStep != BRESENHAMSTEP_NONE);
+        if (wall->flags & WALL_CONTOUR_BOTTOM)
+            renderer_renderContourSpan(me, target, drawBoundary, x, max(before, lowerIt.y0), max(before, lowerIt.y0));
         assert(upperIt.x0 == lowerIt.x0);
 
         int yPortalStart = upperIt.y0, yPortalEnd = yTop + 1;
@@ -564,9 +566,14 @@ void renderer_renderSpriteSpan(Renderer* me, RendererTarget target, const Bounda
     const int yHigh = min(drawBoundary->yTop[x], p.left.yEnd);
     real_t texRow = real_mul(real_from_int(yLow - p.left.yStart), spriteYIncr);
 
+    int shift = 16;
+    int texRowII = real_to_int(real_mul(texRow, real_from_int(1 << shift)));
+    int texRowIncrI = real_to_int(real_mul(spriteYIncr, real_from_int(1 << shift)));
+
     for (int y = yLow; y <= yHigh; y++)
     {
-        int texRowI = real_to_int(real_round(texRow));
+        //int texRowI = real_to_int(real_round(texRow));
+        int texRowI = texRowII >> shift;
         assert(texRowI >= 0 && texRowI < sprite->size.w);
         int texByte = texRowI / 8;
         int texShift = texRowI % 8;
@@ -581,7 +588,8 @@ void renderer_renderSpriteSpan(Renderer* me, RendererTarget target, const Bounda
 
         fb[fbByte] = (fb[fbByte] & ~fbMask) | ((fbValue & 1) << fbShift);
 
-        texRow = real_add(texRow, spriteYIncr);
+        texRowII += texRowIncrI;
+        //texRow = real_add(texRow, spriteYIncr);
     }
 }
 
@@ -835,6 +843,33 @@ BresenhamStep bresenham_step(BresenhamIterator* it)
         it->err += it->dy;
         it->x0 += it->sx;
         return BRESENHAMSTEP_X;
+    }
+    if (it->err * 2 < it->dx) {
+        it->err += it->dx;
+        it->y0 += it->sy;
+        return BRESENHAMSTEP_Y;
+    }
+    assert(false && "This should never have happened");
+    return BRESENHAMSTEP_NONE;
+}
+
+BresenhamStep bresenham_fasterYStep(BresenhamIterator* it)
+{
+    if (it->isFirstStep) {
+        it->isFirstStep = false;
+        return BRESENHAMSTEP_INIT;
+    }
+    if (it->x0 == it->x1 && it->y0 == it->y1)
+        return BRESENHAMSTEP_NONE;
+    if (it->err * 2 > it->dy) {
+        it->err += it->dy;
+        it->x0 += it->sx;
+        return BRESENHAMSTEP_X;
+    }
+    if ((it->err + it->dx * 8) * 2 < it->dx && (it->x0 != it->x1)) {
+        it->err += it->dx * 8;
+        it->y0 += it->sy * 8;
+        return BRESENHAMSTEP_Y;
     }
     if (it->err * 2 < it->dx) {
         it->err += it->dx;

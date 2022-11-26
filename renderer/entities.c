@@ -636,7 +636,7 @@ void key_act(SEGame* game, EntityData* data)
     data->entity->sprite = INVALID_SPRITE_ID;
     game->player.hasHomeKey = true;
     menu_reset(&game->menu);
-    game->menu.text = "Great, no you can leave this house.";
+    game->menu.text = "Great, now you can leave this house.";
     game->menu.callback = menu_cb_just_close;
 }
 
@@ -682,7 +682,7 @@ void emery_init(SEGame* game, EntityData* data)
 void emery_end_game(SEGame* game, int button)
 {
     UNUSED(button);
-    segame_end(game);
+    game->onceCallback = segame_end;
 }
 
 static const char* const EmeryLines[] = {

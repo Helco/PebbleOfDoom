@@ -59,6 +59,7 @@ void drawRequestStack_push(DrawRequestStack* stack, const DrawRequest* source, c
 
 void bresenham_init(BresenhamIterator* it, int x0, int y0, int x1, int y1);
 BresenhamStep bresenham_step(BresenhamIterator* it);
+BresenhamStep bresenham_fasterYStep(BresenhamIterator* it);
 
 void renderer_setFieldOfView(Renderer* me, real_t newFov);
 void renderer_transformLine(const Renderer* me, const lineSeg_t* line, lineSeg_t* result);
