@@ -202,6 +202,11 @@ void endApplication()
   window_stack_pop_all(false);
 }
 
+void setBacklight(int enable)
+{
+  light_enable(enable);
+}
+
 int main(void) {
   APP_LOG(APP_LOG_LEVEL_ERROR, "free: %d", heap_bytes_free());
   if (!loadTextures())

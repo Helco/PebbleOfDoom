@@ -95,3 +95,8 @@ void endApplication()
 {
     puts("END APPLICATION STUB");
 }
+
+void setBacklight(int enable)
+{
+    printf("Backlight: %d\n", enable);
+}

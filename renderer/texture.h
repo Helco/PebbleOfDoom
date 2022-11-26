@@ -39,5 +39,6 @@ extern void text_sprite_free(const Sprite* sprite);
 extern void trigger_haptic(int length);
 
 extern void endApplication();
+extern void setBacklight(int enable);
 
 #endif

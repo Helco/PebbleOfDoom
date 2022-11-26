@@ -82,8 +82,11 @@ void segame_main_menu(SEGame* me, int button)
 
 SEGame* segame_init(SEGame* me, Renderer* renderer, LevelManagerHandle levelManager)
 {
+    setBacklight(true);
+
     memset(me, 0, sizeof(SEGame));
     player_reset(&me->player, renderer_getLocation(renderer));
+    me->isBacklightOn = true;
     me->renderer = renderer;
     me->levelManager = levelManager;
     me->menu.game = me;
@@ -133,6 +136,12 @@ void segame_mainmenu_callback(SEGame* me, int button)
     }
     else if (button == 1)
     {
+        me->isBacklightOn = !me->isBacklightOn;
+        setBacklight(me->isBacklightOn);
+        segame_mainmenu(me);
+    }
+    else if (button == 2)
+    {
         menu_reset(&me->menu);
         me->menu.text = "Are you sure?";
         me->menu.buttons[0] = "No";
@@ -146,7 +155,8 @@ void segame_mainmenu(SEGame* me)
     menu_reset(&me->menu);
     me->menu.text = me->gameIsRunning ? "Paused" : "Searching Emery";
     me->menu.buttons[0] = me->gameIsRunning ? "Continue" : "New game";
-    me->menu.buttons[1] = "Exit";
+    me->menu.buttons[1] = me->isBacklightOn ? "Backlight: On" : "Backlight: Auto";
+    me->menu.buttons[2] = "Exit";
     me->menu.callback = segame_mainmenu_callback;
 }
 

@@ -126,6 +126,7 @@ struct SEGame
     bool isPaused;
     bool hadRenderedBefore;
     bool gameIsRunning;
+    bool isBacklightOn;
     SEGameOnceCallback onceCallback;
 
     EntityData* focusedEntity;
