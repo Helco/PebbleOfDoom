@@ -32,7 +32,7 @@ struct Renderer
     real_t eyeHeight;
     real_t horFovScale, verFovScale, fov;
     lineSeg_t leftFovSeg, rightFovSeg;
-    BoundarySet stackBoundarySets[MAX_DRAW_DEPTH];
+    BoundarySet stackBoundarySets[MAX_DRAW_DEPTH + 1];
     DrawRequestStack drawRequests;
 
     TextureManagerHandle textureManager;
